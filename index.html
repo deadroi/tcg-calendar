@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>TCG 일정 캘린더</title>
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
+<style>
+  :root { --panel-w: 260px; }
+  body { font-family: system-ui, -apple-system, Segoe UI, Roboto, 'Noto Sans KR', sans-serif; margin:0; background:#fff; }
+  .app { display:flex; gap:16px; padding:20px 14px; max-width: 1600px; margin:0 auto; align-items:flex-start; }
+  .sidebar {
+    width: var(--panel-w); flex: 0 0 var(--panel-w);
+    border: 1px solid #eee; border-radius: 12px; padding: 14px 12px;
+    height: calc(100vh - 40px); position: sticky; top: 20px; overflow:auto; background:#fff;
+  }
+  .sidebar h2 { margin: 2px 6px 10px; font-size: 14px; color:#111; }
+  .filters { display:flex; flex-direction:column; gap:8px; padding: 0 6px 6px; }
+  .chk {
+    display:flex; align-items:center; gap:10px;
+    padding: 8px 8px; border-radius: 10px; cursor:pointer; user-select:none;
+  }
+  .chk:hover { background:#f6f7f9; }
+  .chk input { width: 16px; height: 16px; }
+  .badge {
+    margin-left:auto; font-size: 12px; color:#555;
+    background:#f1f3f5; padding: 2px 8px; border-radius: 999px;
+  }
+  .color-chip {
+    width: 10px; height: 10px; border-radius: 999px; display:inline-block;
+    border: 1px solid rgba(0,0,0,0.08);
+  }
+  .hint { margin: 10px 8px 0; font-size: 12px; color:#666; line-height: 1.35; }
+  .main { flex: 1 1 auto; min-width: 740px; }
+  #calendar { max-width:1200px; margin:0 auto; padding:0 10px; }
+  .fc .fc-daygrid-day-frame { min-height: 110px; }
+  .fc .fc-daygrid-day-events { max-height: 74px; overflow: hidden; }
+  .fc .fc-daygrid-day { cursor: pointer; }
+  .tcg-region-tag { font-weight: 700; margin-right: 6px; }
+  .tcg-event-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .modal {
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45);
+    z-index: 9999; justify-content:center; align-items:center; padding: 18px;
+  }
+  .modal-content {
+    background:#fff; border-radius:10px; width: min(620px, 100%);
+    max-height: min(70vh, 680px); overflow:auto; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  }
+  .modal-header {
+    position: sticky; top: 0; background: #fff; padding: 14px 16px 10px;
+    border-bottom: 1px solid #eee; display:flex; align-items:center;
+    justify-content:space-between; gap: 12px;
+  }
+  .modal-title { margin:0; font-size:16px; }
+  .close-btn {
+    border: 0; background: transparent; font-size: 20px; line-height: 1;
+    cursor: pointer; padding: 6px 8px;
+  }
+  .modal-body { padding: 12px 16px 16px; }
+  #modalList { margin:0; padding-left: 18px; }
+  #modalList li { margin: 6px 0; white-space: pre-wrap; }
+  .modal-subhint { color:#666; font-size:12px; margin-top:10px; }
+  @media (max-width: 1220px) {
+    .app { flex-direction:column; }
+    .sidebar { width:auto; flex: 0 0 auto; height:auto; position: static; }
+    .main { min-width: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar" style="order:0">
+    <h2>지역 필터</h2>
+    <div class="filters" id="regionFilters"></div>
+    <div class="hint">
+      • <b>전체</b>를 체크하면 모든 지역이 표시됩니다.<br/>
+      • 특정 지역만 보고 싶으면 해당 지역만 체크하세요.
+    </div>
+  </aside>
+  <aside class="sidebar" style="order:1">
+    <h2>게임 필터</h2>
+    <div class="filters" id="gameFilters"></div>
+    <div class="hint">
+      • <b>전체</b>를 체크하면 모든 게임이 표시됩니다.<br/>
+      • Month에서 날짜 칸 어디를 눌러도 해당 날짜 일정이 뜹니다.
+    </div>
+  </aside>
+  <main class="main" style="order:2">
+    <div id="calendar"></div>
+  </main>
+</div>
+
+<div id="modal" class="modal" aria-hidden="true">
+  <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modalDate">
+    <div class="modal-header">
+      <h3 id="modalDate" class="modal-title"></h3>
+      <button class="close-btn" type="button" aria-label="닫기" id="closeBtn">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <ul id="modalList"></ul>
+      <div class="modal-subhint" id="modalHint"></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+<script>
+  const masterEvents = [{"title": "[서울] 장한평 마린포드 - ONE PIECE", "start": "2026-02-11T15:00:00"}, {"title": "[서울] 장한평 마린포드 - ONE PIECE", "start": "2026-02-11T16:00:00"}, {"title": "[서울] 장한평 마린포드 - NIVEL ARENA", "start": "2026-02-11T16:00:00"}, {"title": "[서울] 구로 카드숲 - ONE PIECE", "start": "2026-02-11T17:00:00"}, {"title": "[서울] 장한평 마린포드 - HOLOLIVE", "start": "2026-02-11T18:00:00"}, {"title": "[경기] 수원 카드 플래닛 - ONE PIECE", "start": "2026-02-11T18:30:00"}, {"title": "[대구경북] 대구 듀얼스파크 - VANGUARD", "start": "2026-02-11T19:00:00"}, {"title": "[대구경북] 대구 듀얼스파크 - NIVEL ARENA", "start": "2026-02-11T19:00:00"}, {"title": "[서울] 장한평 마린포드 - VANGUARD", "start": "2026-02-11T19:00:00"}, {"title": "[경기] 김포 카드베이스 - NIVEL ARENA", "start": "2026-02-11T19:30:00"}, {"title": "[경기] 수원 카드 플래닛 - ONE PIECE", "start": "2026-02-11T19:30:00"}, {"title": "[대구경북] 대구 듀얼스파크 - DIGIMON", "start": "2026-02-11T19:30:00"}, {"title": "[서울] 장한평 마린포드 - ONE PIECE", "start": "2026-02-11T19:30:00"}, {"title": "[서울] 구로 카드숲 - ONE PIECE", "start": "2026-02-11T20:00:00"}, {"title": "[서울] 구로 카드숲 - DIGIMON", "start": "2026-02-11T20:00:00"}, {"title": "[서울] 신당 카드스퀘어 - DIGIMON", "start": "2026-02-11T20:00:00"}, {"title": "[서울] 장한평 마린포드 - NIVEL ARENA", "start": "2026-02-11T20:00:00"}, {"title": "[서울] 장한평 마린포드 - NIVEL ARENA", "start": "2026-02-12T16:00:00"}, {"title": "[서울] 장한평 마린포드 - SHADOWVERSE EVOLVE", "start": "2026-02-12T18:30:00"}, {"title": "[대구경북] 대구 듀얼스파크 - ONE PIECE", "start": "2026-02-12T19:00:00"}, {"title": "[서울] 장한평 마린포드 - SHADOWVERSE EVOLVE", "start": "2026-02-12T19:00:00"}, {"title": "[서울] 장한평 마린포드 - ONE PIECE", "start": "2026-02-12T19:00:00"}, {"title": "[경기] 김포 카드베이스 - ONE PIECE", "start": "2026-02-12T19:30:00"}, {"title": "[대구경북] 대구 듀얼스파크 - DIGIMON", "start": "2026-02-12T19:30:00"}, {"title": "[서울] 신당 카드스퀘어 - ONE PIECE", "start": "2026-02-12T19:30:00"}, {"title": "[서울] 장한평 마린포드 - NIVEL ARENA", "start": "2026-02-12T19:30:00"}, {"title": "[서울] 장한평 마린포드 - HOLOLIVE", "start": "2026-02-12T19:30:00"}, {"title": "[서울] 구로 카드숲 - DIGIMON", "start": "2026-02-12T20:00:00"}, {"title": "[서울] 장한평 마린포드 - DIGIMON", "start": "2026-02-12T20:00:00"}, {"title": "[인천] 주안 티씨지아레나 - DIGIMON", "start": "2026-02-12T20:00:00"}, {"title": "[서울] 장한평 마린포드 - VANGUARD", "start": "2026-02-13T15:00:00"}, {"title": "[대전] 스카이스크레이퍼 대전점 - ONE PIECE", "start": "2026-02-13T16:00:00"}, {"title": "[서울] 장한평 마린포드 - NIVEL ARENA", "start": "2026-02-13T16:00:00"}, {"title": "[서울] 장한평 마린포드 - ONE PIECE", "start": "2026-02-13T16:00:00"}, {"title": "[경기] 일산 듀얼팩토리 - GUNDAM", "start": "2026-02-13T18:00:00"}, {"title": "[경기] 일산 듀얼팩토리 - NIVEL ARENA", "start": "2026-02-13T18:00:00"}, {"title": "[경기] 일산 듀얼팩토리 - HOLOLIVE", "start": "2026-02-13T18:00:00"}, {"title": "[경기] 일산 듀얼팩토리 - UNION ARENA", "start": "2026-02-13T18:00:00"}, {"title": "[대구경북] 대구 듀얼스파크 - ONE PIECE", "start": "2026-02-13T19:00:00"}, {"title": "[대전] 스카이스크레이퍼 대전점 - ONE PIECE", "start": "2026-02-13T19:00:00"}, {"title": "[서울] 당산 카드냥 - VANGUARD", "start": "2026-02-13T19:00:00"}, {"title": "[서울] 장한평 마린포드 - VANGUARD", "start": "2026-02-13T19:00:00"}, {"title": "[서울] 장한평 마린포드 - ONE PIECE", "start": "2026-02-13T19:00:00"}, {"title": "[경기] 김포 카드베이스 - DIGIMON", "start": "2026-02-13T19:30:00"}, {"title": "[경기] 수원 카드 플래닛 - DIGIMON", "start": "2026-02-13T19:30:00"}, {"title": "[대구경북] 대구 듀얼스파크 - HOLOLIVE", "start": "2026-02-13T19:30:00"}, {"title": "[서울] 아현 카드킹덤 - HOLOLIVE", "start": "2026-02-13T19:30:00"}, {"title": "[서울] 아현 카드킹덤 - WEISS SCHWARZ", "start": "2026-02-13T19:30:00"}, {"title": "[서울] 장한평 마린포드 - NIVEL ARENA", "start": "2026-02-13T19:30:00"}, {"title": "[서울] 장한평 마린포드 - GUNDAM", "start": "2026-02-13T19:30:00"}, {"title": "[인천] 주안 티씨지아레나 - ONE PIECE", "start": "2026-02-13T19:30:00"}, {"title": "[대전] 스카이스크레이퍼 대전점 - DIGIMON", "start": "2026-02-13T20:00:00"}, {"title": "[서울] 구로 카드숲 - ONE PIECE", "start": "2026-02-13T20:00:00"}, {"title": "[서울] 신당 카드스퀘어 - DIGIMON", "start": "2026-02-13T20:00:00"}, {"title": "[서울] 장한평 마린포드 - DIGIMON", "start": "2026-02-13T20:00:00"}, {"title": "[인천] 부평 히어로즈 - ONE PIECE", "start": "2026-02-13T20:00:00"}, {"title": "[경남] 울산 던전다이스 - ONE PIECE", "start": "2026-02-14T12:00:00"}, {"title": "[서울] 신당 카드스퀘어 - DIGIMON", "start": "2026-02-14T12:00:00"}, {"title": "[서울] 신당 카드스퀘어 - DIGIMON", "start": "2026-02-14T12:30:00"}, {"title": "[경기] 일산 듀얼팩토리 - ONE PIECE", "start": "2026-02-14T13:00:00"}, {"title": "[경기] 일산 듀얼팩토리 - ULTRAMAN", "start": "2026-02-14T13:00:00"}, {"title": "[경남] 양산 카드캐처 - VANGUARD", "start": "2026-02-14T13:00:00"}, {"title": "[대전] 스카이스크레이퍼 대전점 - WEISS SCHWARZ", "start": "2026-02-14T13:00:00"}, {"title": "[부산] 서면 보드게임카페 미니빌 - SHADOWVERSE EVOLVE", "start": "2026-02-14T13:00:00"}, {"title": "[서울] 강동 카드타운 - WEISS SCHWARZ", "start": "2026-02-14T13:00:00"}, {"title": "[대구경북] 대구 듀얼스파크 - DIGIMON", "start": "2026-02-14T13:30:00"}, {"title": "[대구경북] 대구 듀얼스파크 - NIVEL ARENA", "start": "2026-02-14T13:30:00"}, {"title": "[대구경북] 대구 듀얼챔프 - ONE PIECE", "start": "2026-02-14T13:30:00"}, {"title": "[경남] 울산 던전다이스 - DIGIMON", "start": "2026-02-14T14:00:00"}, {"title": "[대전] 스카이스크레이퍼 대전점 - VANGUARD", "start": "2026-02-14T14:00:00"}, {"title": "[부산] 서면 보드게임카페 미니빌 - SHADOWVERSE EVOLVE", "start": "2026-02-14T14:00:00"}, {"title": "[서울] 강동 카드타운 - HOLOLIVE", "start": "2026-02-14T14:00:00"}, {"title": "[서울] 구로 카드숲 - HOLOLIVE", "start": "2026-02-14T14:00:00"}, {"title": "[인천] 주안 티씨지아레나 - VANGUARD", "start": "2026-02-14T14:30:00"}, {"title": "[경기] 일산 듀얼팩토리 - NIVEL ARENA", "start": "2026-02-14T15:00:00"}, {"title": "[경기] 일산 듀얼팩토리 - HOLOLIVE", "start": "2026-02-14T15:00:00"}, {"title": "[경기] 일산 듀얼팩토리 - UNION ARENA", "start": "2026-02-14T15:00:00"}, {"title": "[대전] 스카이스크레이퍼 대전점 - DIGIMON", "start": "2026-02-14T15:00:00"}, {"title": "[서울] 구로 카드숲 - HOLOLIVE", "start": "2026-02-14T15:00:00"}, {"title": "[서울] 아현 카드킹덤 - ONE PIECE", "start": "2026-02-14T15:00:00"}, {"title": "[서울] 아현 카드킹덤 - VANGUARD", "start": "2026-02-14T15:00:00"}, {"title": "[서울] 장한평 마린포드 - DIGIMON", "start": "2026-02-14T15:00:00"}, {"title": "[서울] 신당 카드스퀘어 - VANGUARD", "start": "2026-02-14T15:30:00"}, {"title": "[인천] 주안 티씨지아레나 - NIVEL ARENA", "start": "2026-02-14T15:30:00"}, {"title": "[경기] 일산 듀얼팩토리 - ONE PIECE", "start": "2026-02-14T16:00:00"}, {"title": "[경남] 양산 카드캐처 - NIVEL ARENA", "start": "2026-02-14T16:00:00"}, {"title": "[서울] 구로 카드숲 - ULTRAMAN", "start": "2026-02-14T16:00:00"}, {"title": "[서울] 구로 카드숲 - GUNDAM", "start": "2026-02-14T16:00:00"}, {"title": "[서울] 장한평 마린포드 - ONE PIECE", "start": "2026-02-14T16:00:00"}, {"title": "[인천] 부평 히어로즈 - HOLOLIVE", "start": "2026-02-14T16:00:00"}, {"title": "[인천] 주안 티씨지아레나 - DIGIMON", "start": "2026-02-14T16:00:00"}, {"title": "[경기] 김포 카드베이스 - WEISS SCHWARZ", "start": "2026-02-14T16:30:00"}, {"title": "[대구경북] 대구 듀얼챔프 - SHADOWVERSE EVOLVE", "start": "2026-02-14T16:30:00"}, {"title": "[대전] 스카이스크레이퍼 대전점 - VANGUARD", "start": "2026-02-14T16:30:00"}, {"title": "[인천] 주안 티씨지아레나 - WEISS SCHWARZ", "start": "2026-02-14T16:30:00"}, {"title": "[경기] 김포 카드베이스 - ONE PIECE", "start": "2026-02-14T17:00:00"}, {"title": "[경기] 수원 TCG TracerZ - HOLOLIVE", "start": "2026-02-14T17:00:00"}, {"title": "[경기] 일산 듀얼팩토리 - GUNDAM", "start": "2026-02-14T17:00:00"}, {"title": "[대전] 스카이스크레이퍼 대전점 - HOLOLIVE", "start": "2026-02-14T17:00:00"}, {"title": "[서울] 강동 카드타운 - HOLOLIVE", "start": "2026-02-14T17:00:00"}, {"title": "[서울] 구로 카드숲 - ULTRAMAN", "start": "2026-02-14T17:00:00"}, {"title": "[서울] 역삼 카드냥 - SHADOWVERSE EVOLVE", "start": "2026-02-14T17:00:00"}, {"title": "[인천] 부평 히어로즈 - ULTRAMAN", "start": "2026-02-14T17:00:00"}, {"title": "[대구경북] 대구 듀얼스파크 - VANGUARD", "start": "2026-02-14T17:30:00"}, {"title": "[서울] 신당 카드스퀘어 - ONE PIECE", "start": "2026-02-14T17:30:00"}, {"title": "[대구경북] 대구 듀얼챔프 - WEISS SCHWARZ", "start": "2026-02-14T18:30:00"}, {"title": "[서울] 장한평 마린포드 - DIGIMON", "start": "2026-02-14T18:30:00"}, {"title": "[대구경북] 대구 듀얼스파크 - GUNDAM", "start": "2026-02-14T19:00:00"}, {"title": "[대구경북] 대구 듀얼스파크 - WEISS SCHWARZ", "start": "2026-02-14T19:00:00"}, {"title": "[대구경북] 대구 듀얼챔프 - HOLOLIVE", "start": "2026-02-14T19:00:00"}, {"title": "[서울] 구로 카드숲 - DIGIMON", "start": "2026-02-14T19:00:00"}, {"title": "[서울] 장한평 마린포드 - ONE PIECE", "start": "2026-02-14T19:00:00"}, {"title": "[서울] 장한평 마린포드 - NIVEL ARENA", "start": "2026-02-14T19:00:00"}, {"title": "[대구경북] 대구 듀얼스파크 - WEISS SCHWARZ", "start": "2026-02-14T19:30:00"}, {"title": "[대구경북] 대구 듀얼스파크 - DIGIMON", "start": "2026-02-14T19:30:00"}, {"title": "[대구경북] 대구 듀얼스파크 - VANGUARD", "start": "2026-02-14T19:30:00"}, {"title": "[경기] 수원 카드 플래닛 - GUNDAM", "start": "2026-02-14T:00"}, {"title": "[경기] 서현역 라이프링크 - SHADOWVERSE EVOLVE", "start": "2026-02-15T12:00:00"}, {"title": "[경기] 김포 카드베이스 - HOLOLIVE", "start": "2026-02-15T13:00:00"}, {"title": "[경기] 일산 듀얼팩토리 - ULTRAMAN", "start": "2026-02-15T13:00:00"}, {"title": "[대구경북] 대구 듀얼스파크 - ONE PIECE", "start": "2026-02-15T13:00:00"}, {"title": "[대전] 스카이스크레이퍼 대전점 - WEISS SCHWARZ", "start": "2026-02-15T13:00:00"}, {"title": "[대전] 스카이스크레이퍼 대전점 - HOLOLIVE", "start": "2026-02-15T13:00:00"}, {"title": "[서울] 장한평 마린포드 - NIVEL ARENA", "start": "2026-02-15T13:00:00"}, {"title": "[대구경북] 대구 듀얼스파크 - SHADOWVERSE EVOLVE", "start": "2026-02-15T13:30:00"}, {"title": "[인천] 주안 티씨지아레나 - GUNDAM", "start": "2026-02-15T13:30:00"}, {"title": "[경기] 김포 카드베이스 - HOLOLIVE", "start": "2026-02-15T14:00:00"}, {"title": "[경기] 수원 TCG TracerZ - DIGIMON", "start": "2026-02-15T14:00:00"}, {"title": "[대구경북] 대구 듀얼스파크 - GUNDAM", "start": "2026-02-15T14:00:00"}, {"title": "[대구경북] 대구 듀얼스파크 - VANGUARD", "start": "2026-02-15T14:00:00"}, {"title": "[인천] 주안 티씨지아레나 - HOLOLIVE", "start": "2026-02-15T14:00:00"}, {"title": "[경기] 서현역 라이프링크 - WEISS SCHWARZ", "start": "2026-02-15T15:00:00"}, {"title": "[경기] 일산 듀얼팩토리 - NIVEL ARENA", "start": "2026-02-15T15:00:00"}, {"title": "[경기] 일산 듀얼팩토리 - HOLOLIVE", "start": "2026-02-15T15:00:00"}, {"title": "[경기] 일산 듀얼팩토리 - UNION ARENA", "start": "2026-02-15T15:00:00"}, {"title": "[대전] 스카이스크레이퍼 대전점 - WEISS SCHWARZ", "start": "2026-02-15T15:00:00"}, {"title": "[서울] 구로 카드숲 - VANGUARD", "start": "2026-02-15T15:00:00"}, {"title": "[서울] 구로 카드숲 - WEISS SCHWARZ", "start": "2026-02-15T15:00:00"}, {"title": "[서울] 신당 카드스퀘어 - SHADOWVERSE EVOLVE", "start": "2026-02-15T15:00:00"}, {"title": "[서울] 장한평 마린포드 - SHADOWVERSE EVOLVE", "start": "2026-02-15T15:00:00"}, {"title": "[인천] 부평 히어로즈 - DIGIMON", "start": "2026-02-15T15:00:00"}, {"title": "[인천] 주안 티씨지아레나 - SHADOWVERSE EVOLVE", "start": "2026-02-15T15:00:00"}, {"title": "[대구경북] 대구 듀얼스파크 - WEISS SCHWARZ", "start": "2026-02-15T15:30:00"}, {"title": "[인천] 주안 티씨지아레나 - VANGUARD", "start": "2026-02-15T15:30:00"}, {"title": "[대구경북] 대구 듀얼스파크 - SHADOWVERSE EVOLVE", "start": "2026-02-15T16:00:00"}, {"title": "[대구경북] 대구 듀얼챔프 - HOLOLIVE", "start": "2026-02-15T16:00:00"}, {"title": "[서울] 구로 카드숲 - ONE PIECE", "start": "2026-02-15T16:00:00"}, {"title": "[인천] 주안 티씨지아레나 - HOLOLIVE", "start": "2026-02-15T16:00:00"}, {"title": "[대전] 스카이스크레이퍼 대전점 - NIVEL ARENA", "start": "2026-02-15T16:30:00"}, {"title": "[인천] 주안 티씨지아레나 - ONE PIECE", "start": "2026-02-15T16:30:00"}, {"title": "[경기] 김포 카드베이스 - VANGUARD", "start": "2026-02-15T17:00:00"}, {"title": "[경기] 수원 TCG TracerZ - DIGIMON", "start": "2026-02-15T17:00:00"}, {"title": "[경기] 일산 듀얼팩토리 - GUNDAM", "start": "2026-02-15T17:00:00"}, {"title": "[경남] 양산 카드캐처 - NIVEL ARENA", "start": "2026-02-15T17:00:00"}, {"title": "[대전] 스카이스크레이퍼 대전점 - WEISS SCHWARZ", "start": "2026-02-15T17:00:00"}, {"title": "[인천] 부평 히어로즈 - ULTRAMAN", "start": "2026-02-15T17:00:00"}, {"title": "[인천] 부평 히어로즈 - DIGIMON", "start": "2026-02-15T17:00:00"}, {"title": "[인천] 부평 히어로즈 - ONE PIECE", "start": "2026-02-15T17:00:00"}, {"title": "[인천] 주안 티씨지아레나 - SHADOWVERSE EVOLVE", "start": "2026-02-15T17:00:00"}, {"title": "[서울] 구로 카드숲 - ULTRAMAN", "start": "2026-02-15T18:00:00"}, {"title": "[서울] 구로 카드숲 - VANGUARD", "start": "2026-02-15T18:00:00"}, {"title": "[서울] 장한평 마린포드 - ONE PIECE", "start": "2026-02-15T18:00:00"}, {"title": "[대구경북] 대구 듀얼스파크 - ONE PIECE", "start": "2026-02-15T18:30:00"}, {"title": "[서울] 장한평 마린포드 - DIGIMON", "start": "2026-02-15T18:30:00"}, {"title": "[서울] 장한평 마린포드 - NIVEL ARENA", "start": "2026-02-15T19:00:00"}, {"title": "[경기] 김포 카드베이스 - DIGIMON", "start": "2026-02-15T20:00:00"}, {"title": "[경기] 김포 카드베이스 - ONE PIECE", "start": "2026-02-15T20:00:00"}, {"title": "[경기] 김포 카드베이스 - WEISS SCHWARZ", "start": "2026-02-15T22:30:00"}, {"title": "[경기] 김포 카드베이스 - ONE PIECE", "start": "2026-02-15T22:30:00"}, {"title": "[경남] 울산 던전다이스 - ONE PIECE", "start": "2026-02-16T14:00:00"}, {"title": "[경남] 울산 던전다이스 - DIGIMON", "start": "2026-02-16T14:00:00"}, {"title": "[경기] 일산 듀얼팩토리 - NIVEL ARENA", "start": "2026-02-16T15:00:00"}, {"title": "[경기] 일산 듀얼팩토리 - HOLOLIVE", "start": "2026-02-16T15:00:00"}, {"title": "[경기] 일산 듀얼팩토리 - UNION ARENA", "start": "2026-02-16T15:00:00"}, {"title": "[인천] 주안 티씨지아레나 - NIVEL ARENA", "start": "2026-02-16T15:00:00"}, {"title": "[인천] 부평 히어로즈 - ULTRAMAN", "start": "2026-02-16T15:30:00"}, {"title": "[인천] 주안 티씨지아레나 - DIGIMON", "start": "2026-02-16T16:00:00"}, {"title": "[경기] 일산 듀얼팩토리 - GUNDAM", "start": "2026-02-16T17:00:00"}, {"title": "[경기] 대화 듀얼위너 - HOLOLIVE", "start": "2026-02-16T18:00:00"}, {"title": "[서울] 신당 카드스퀘어 - HOLOLIVE", "start": "2026-02-16T18:30:00"}, {"title": "[경기] 대화 듀얼위너 - GUNDAM", "start": "2026-02-16T19:00:00"}, {"title": "[서울] 신당 카드스퀘어 - HOLOLIVE", "start": "2026-02-16T19:00:00"}, {"title": "[경기] 일산 듀얼팩토리 - NIVEL ARENA", "start": "2026-02-17T15:00:00"}, {"title": "[경기] 일산 듀얼팩토리 - HOLOLIVE", "start": "2026-02-17T15:00:00"}, {"title": "[경기] 일산 듀얼팩토리 - UNION ARENA", "start": "2026-02-17T15:00:00"}, {"title": "[인천] 주안 티씨지아레나 - VANGUARD", "start": "2026-02-17T15:00:00"}, {"title": "[인천] 부평 히어로즈 - ULTRAMAN", "start": "2026-02-17T15:30:00"}, {"title": "[인천] 주안 티씨지아레나 - ONE PIECE", "start": "2026-02-17T16:00:00"}, {"title": "[경기] 일산 듀얼팩토리 - GUNDAM", "start": "2026-02-17T17:00:00"}, {"title": "[경기] 대화 듀얼위너 - HOLOLIVE", "start": "2026-02-17T18:00:00"}, {"title": "[경기] 대화 듀얼위너 - GUNDAM", "start": "2026-02-17T19:00:00"}, {"title": "[대구경북] 대구 듀얼스파크 - VANGUARD", "start": "2026-02-17T19:00:00"}, {"title": "[대구경북] 대구 듀얼스파크 - ONE PIECE", "start": "2026-02-17T19:00:00"}, {"title": "[서울] 신당 카드스퀘어 - WEISS SCHWARZ", "start": "2026-02-17T19:30:00"}, {"title": "[서울] 신당 카드스퀘어 - ONE PIECE", "start": "2026-02-17T19:30:00"}, {"title": "[서울] 신당 카드스퀘어 - DIGIMON", "start": "2026-02-17T20:00:00"}, {"title": "[경남] 울산 던전다이스 - ONE PIECE", "start": "2026-02-18T12:00:00"}, {"title": "[경남] 울산 던전다이스 - DIGIMON", "start": "2026-02-18T14:00:00"}, {"title": "[인천] 주안 티씨지아레나 - GUNDAM", "start": "2026-02-18T14:00:00"}, {"title": "[인천] 주안 티씨지아레나 - VANGUARD", "start": "2026-02-18T14:30:00"}, {"title": "[경기] 일산 듀얼팩토리 - NIVEL ARENA", "start": "2026-02-18T15:00:00"}, {"title": "[경기] 일산 듀얼팩토리 - HOLOLIVE", "start": "2026-02-18T15:00:00"}, {"title": "[경기] 일산 듀얼팩토리 - UNION ARENA", "start": "2026-02-18T15:00:00"}, {"title": "[인천] 주안 티씨지아레나 - HOLOLIVE", "start": "2026-02-18T16:00:00"}, {"title": "[경기] 일산 듀얼팩토리 - GUNDAM", "start": "2026-02-18T17:00:00"}, {"title": "[대구경북] 대구 듀얼스파크 - UNION ARENA", "start": "2026-02-18T17:30:00"}, {"title": "[경기] 대화 듀얼위너 - HOLOLIVE", "start": "2026-02-18T18:00:00"}, {"title": "[경기] 대화 듀얼위너 - GUNDAM", "start": "2026-02-18T19:00:00"}, {"title": "[경남] 울산 던전다이스 - ONE PIECE", "start": "2026-02-18T19:00:00"}, {"title": "[대구경북] 대구 듀얼스파크 - NIVEL ARENA", "start": "2026-02-18T19:00:00"}, {"title": "[대구경북] 대구 듀얼스파크 - DIGIMON", "start": "2026-02-18T19:30:00"}, {"title": "[서울] 신당 카드스퀘어 - DIGIMON", "start": "2026-02-18T20:00:00"}, {"title": "[경남] 울산 던전다이스 - ONE PIECE", "start": "2026-02-19T19:00:00"}, {"title": "[경남] 울산 던전다이스 - DIGIMON", "start": "2026-02-19T19:00:00"}, {"title": "[대구경북] 대구 듀얼스파크 - ONE PIECE", "start": "2026-02-19T19:00:00"}, {"title": "[대구경북] 대구 듀얼스파크 - DIGIMON", "start": "2026-02-19T19:30:00"}];
+
+  const GAME_COLORS = {
+    "VANGUARD": "#1f77b4",
+    "DIGIMON": "#2ca02c",
+    "ONE PIECE": "#ff7f0e",
+    "NIVEL ARENA": "#d62728",
+    "HOLOLIVE": "#9467bd",
+    "SHADOWVERSE EVOLVE": "#8c564b",
+    "GUNDAM": "#e377c2",
+    "ULTRAMAN": "#17becf",
+    "WEISS SCHWARZ": "#7f7f7f",
+    "UNION ARENA": "#bcbd22",
+  };
+
+  const REGION_PALETTE = ["#0b7285","#5f3dc4","#d9480f","#2f9e44","#c92a2a","#1c7ed6","#862e9c","#e03131","#0c8599","#6741d9","#f08c00","#099268"];
+  const REGION_COLORS = {};
+  const REGION_LIST = ["경기", "경남", "대구경북", "대전", "부산", "서울", "인천"];
+  REGION_LIST.forEach((r, i) => REGION_COLORS[r] = REGION_PALETTE[i % REGION_PALETTE.length]);
+
+  const ALIAS = {
+    "니벨아레나": "NIVEL ARENA",
+    "NIVEL ARENA": "NIVEL ARENA",
+    "WEIS SCHWARZ": "WEISS SCHWARZ",
+    "WEISS SCHWARZ": "WEISS SCHWARZ",
+    "VANGUARD": "VANGUARD",
+    "DIGIMON": "DIGIMON",
+    "ONE PIECE": "ONE PIECE",
+    "HOLOLIVE": "HOLOLIVE",
+    "SHADOWVERSE EVOLVE": "SHADOWVERSE EVOLVE",
+    "GUNDAM": "GUNDAM",
+    "ULTRAMAN": "ULTRAMAN",
+    "UNION ARENA": "UNION ARENA",
+  };
+
+  const GAME_LABEL = {
+    "VANGUARD":"뱅가드", "DIGIMON":"디지몬", "ONE PIECE":"원피스",
+    "NIVEL ARENA":"니벨아레나", "HOLOLIVE":"홀로라이브",
+    "SHADOWVERSE EVOLVE":"섀도우버스 이볼브", "GUNDAM":"건담",
+    "ULTRAMAN":"울트라맨", "WEISS SCHWARZ":"바이스 슈발츠",
+    "UNION ARENA":"유니온 아레나",
+  };
+
+  function escapeHtml(s) {
+    return String(s ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#39;");
+  }
+
+  function isValidIsoStart(s) {
+    return /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/.test(String(s||""));
+  }
+
+  function parseTitle(title) {
+    const t = String(title || "");
+    const m = t.match(/^\s*\[([^\]]+)\]\s*(.*?)\s*-\s*(.+?)\s*$/);
+    if (m) {
+      const region = (m[1]||"").trim();
+      const store = (m[2]||"").trim();
+      const rawGame = (m[3]||"").trim();
+      const gameKey = ALIAS[rawGame] || rawGame;
+      return { regionKey: region, storeKey: store, gameKey };
+    }
+    const parts = t.split(" - ");
+    const store = (parts[0]||"").trim();
+    const rawGame = (parts[1]||"").trim();
+    const gameKey = ALIAS[rawGame] || rawGame;
+    return { regionKey:"", storeKey: store, gameKey };
+  }
+
+  const enrichedMaster = masterEvents
+    .filter(e => e && e.start && isValidIsoStart(e.start))
+    .map(e => {
+      const p = parseTitle(e.title);
+      const gameColor = GAME_COLORS[p.gameKey] || "";
+      return {
+        ...e,
+        backgroundColor: gameColor || e.backgroundColor,
+        borderColor: gameColor || e.borderColor,
+        textColor: e.textColor,
+        extendedProps: {
+          ...(e.extendedProps||{}),
+          regionKey: p.regionKey,
+          storeKey: p.storeKey,
+          gameKey: p.gameKey,
+        }
+      };
+    });
+
+  const regionFiltersEl = document.getElementById('regionFilters');
+  const gameFiltersEl = document.getElementById('gameFilters');
+
+  const REGION_DEFS = [{ key: "ALL", label: "전체" }, ...REGION_LIST.map(r => ({ key: r, label: r }))];
+  const GAME_DEFS = [{"key": "ALL", "label": "전체"}, {"key": "DIGIMON", "label": "디지몬"}, {"key": "GUNDAM", "label": "건담"}, {"key": "HOLOLIVE", "label": "홀로라이브"}, {"key": "NIVEL ARENA", "label": "니벨아레나"}, {"key": "ONE PIECE", "label": "원피스"}, {"key": "SHADOWVERSE EVOLVE", "label": "섀도우버스 이볼브"}, {"key": "ULTRAMAN", "label": "울트라맨"}, {"key": "UNION ARENA", "label": "유니온 아레나"}, {"key": "VANGUARD", "label": "뱅가드"}, {"key": "WEISS SCHWARZ", "label": "바이스 슈발츠"}];
+
+  function countBy(list, keyFn, defs) {
+    const counts = new Map();
+    defs.forEach(d => counts.set(d.key, 0));
+    for (const e of list) {
+      const k = keyFn(e);
+      if (counts.has(k)) counts.set(k, counts.get(k) + 1);
+      counts.set("ALL", counts.get("ALL") + 1);
+    }
+    return counts;
+  }
+
+  const regionCounts = countBy(enrichedMaster, e => (e.extendedProps?.regionKey||""), REGION_DEFS);
+  const gameCounts   = countBy(enrichedMaster, e => (e.extendedProps?.gameKey||""),   GAME_DEFS);
+
+  function renderCheckboxList(container, defs, counts, colorFn, groupName) {
+    container.innerHTML = "";
+    for (const def of defs) {
+      const id = groupName + "_" + String(def.key).replace(/\s+/g, "_");
+      const row = document.createElement('label');
+      row.className = "chk";
+      row.setAttribute("for", id);
+      const color = colorFn ? colorFn(def.key) : "";
+      const chip = (def.key !== "ALL" && color) ? `<span class="color-chip" style="background:${color}"></span>` : `<span style="width:10px;display:inline-block"></span>`;
+      row.innerHTML = `
+        <input type="checkbox" id="${id}" data-key="${def.key}" data-group="${groupName}">
+        ${chip}
+        <span>${def.label}</span>
+        <span class="badge">${counts.get(def.key) || 0}</span>
+      `;
+      container.appendChild(row);
+    }
+    const all = container.querySelector('input[data-key="ALL"]');
+    if (all) all.checked = true;
+  }
+
+  renderCheckboxList(regionFiltersEl, REGION_DEFS, regionCounts, (k)=> REGION_COLORS[k] || "", "region");
+  renderCheckboxList(gameFiltersEl, GAME_DEFS, gameCounts, (k)=> GAME_COLORS[k] || "", "game");
+
+  function getSelectedKeys(container) {
+    const checked = Array.from(container.querySelectorAll('input[type="checkbox"]:checked'))
+      .map(x => x.getAttribute('data-key'));
+    if (checked.includes("ALL") || checked.length === 0) return ["ALL"];
+    return checked;
+  }
+
+  function applyAllBehavior(container, changedKey) {
+    const all = container.querySelector('input[data-key="ALL"]');
+    const others = Array.from(container.querySelectorAll('input[data-key]:not([data-key="ALL"])'));
+    if (!all) return;
+    if (changedKey === "ALL") {
+      if (all.checked) { others.forEach(o => o.checked = false); }
+      else { const anyOther = others.some(o => o.checked); if (!anyOther) all.checked = true; }
+    } else {
+      if (all.checked) all.checked = false;
+      const anyOther = others.some(o => o.checked);
+      if (!anyOther) all.checked = true;
+    }
+  }
+
+  const modal = document.getElementById('modal');
+  const modalDate = document.getElementById('modalDate');
+  const modalList = document.getElementById('modalList');
+  const modalHint = document.getElementById('modalHint');
+
+  function closeModal() {
+    modal.style.display = "none";
+    modal.setAttribute("aria-hidden", "true");
+  }
+  document.getElementById('closeBtn').addEventListener('click', closeModal);
+  modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.style.display === 'flex') closeModal(); });
+
+  let calendar;
+  let currentVisibleEvents = enrichedMaster;
+
+  function filterEvents() {
+    const selRegions = getSelectedKeys(regionFiltersEl);
+    const selGames = getSelectedKeys(gameFiltersEl);
+    const regionAll = selRegions.includes("ALL");
+    const gameAll = selGames.includes("ALL");
+    const regionSet = new Set(selRegions);
+    const gameSet = new Set(selGames);
+    return enrichedMaster.filter(e => {
+      const r = e.extendedProps?.regionKey || "";
+      const g = e.extendedProps?.gameKey || "";
+      return (regionAll || regionSet.has(r)) && (gameAll || gameSet.has(g));
+    });
+  }
+
+  function buildByDate(eventsArr) {
+    const map = new Map();
+    for (const e of eventsArr) {
+      const d = e.start.substring(0,10);
+      if (!map.has(d)) map.set(d, []);
+      map.get(d).push(e);
+    }
+    for (const [d, arr] of map.entries()) {
+      arr.sort((a,b) => (a.extendedProps?.regionKey||"").localeCompare(b.extendedProps?.regionKey||"")
+        || (a.extendedProps?.storeKey||"").localeCompare(b.extendedProps?.storeKey||"")
+        || (a.extendedProps?.gameKey||"").localeCompare(b.extendedProps?.gameKey||"")
+        || a.start.localeCompare(b.start));
+    }
+    return map;
+  }
+
+  function openModal(dateStr) {
+    const list = buildByDate(currentVisibleEvents).get(dateStr) || [];
+    if (list.length === 0) return;
+    modalDate.textContent = dateStr + " 일정";
+    modalList.innerHTML = "";
+    for (const e of list) {
+      const li = document.createElement('li');
+      const time = e.start.substring(11,16);
+      const r = e.extendedProps?.regionKey || "";
+      const store = e.extendedProps?.storeKey || "";
+      const g = e.extendedProps?.gameKey || "";
+      const rColor = REGION_COLORS[r] || "#111";
+      const gLabel = GAME_LABEL[g] || g;
+      li.innerHTML = `${time} | <span class="tcg-region-tag" style="color:${rColor}">[${r}]</span> ${store} - ${gLabel}`;
+      modalList.appendChild(li);
+    }
+    const sr = getSelectedKeys(regionFiltersEl);
+    const sg = getSelectedKeys(gameFiltersEl);
+    modalHint.textContent = `현재 필터: 지역=${sr.includes("ALL") ? "전체" : sr.join(", ")} / 게임=${sg.includes("ALL") ? "전체" : sg.join(", ")}`;
+    modal.style.display = "flex";
+    modal.setAttribute("aria-hidden", "false");
+  }
+
+  function applyListGrouping() {
+    try {
+      if (!calendar || !(calendar.view && String(calendar.view.type).startsWith('list'))) return;
+      const calEl = document.getElementById('calendar');
+      const table = calEl.querySelector('.fc-list-table');
+      if (!table) return;
+      table.querySelectorAll('tr.tcg-group-row').forEach(tr => tr.remove());
+      const tbody = table.querySelector('tbody');
+      if (!tbody) return;
+      let currentRegion = null, currentStore = null, currentGame = null;
+      const rows = Array.from(tbody.querySelectorAll('tr'));
+      for (const tr of rows) {
+        if (tr.classList.contains('fc-list-day')) { currentRegion = null; currentStore = null; currentGame = null; continue; }
+        if (!tr.classList.contains('fc-list-event')) continue;
+        const regionKey = (tr.dataset.regionKey || '').trim();
+        const storeKey  = (tr.dataset.storeKey  || '').trim();
+        const gameKey   = (tr.dataset.gameKey   || '').trim();
+        const gameLabel = GAME_LABEL[gameKey] || gameKey;
+        if (regionKey && regionKey !== currentRegion) {
+          currentRegion = regionKey; currentStore = null; currentGame = null;
+          const c = REGION_COLORS[regionKey] || "#111";
+          const hdr = document.createElement('tr');
+          hdr.className = 'tcg-group-row tcg-region-row';
+          hdr.innerHTML = `<td colspan="3" style="padding:11px 14px; background:#f8f9ff; font-weight:900; border-top:1px solid #dde2ff; color:${c};">[${regionKey}]</td>`;
+          tr.parentNode.insertBefore(hdr, tr);
+        }
+        if (storeKey && storeKey !== currentStore) {
+          currentStore = storeKey; currentGame = null;
+          const hdr = document.createElement('tr');
+          hdr.className = 'tcg-group-row tcg-store-row';
+          hdr.innerHTML = `<td colspan="3" style="padding:10px 14px; background:#f6f7f9; font-weight:700; border-top:1px solid #e9ecef;">${storeKey}</td>`;
+          tr.parentNode.insertBefore(hdr, tr);
+        }
+        if (gameLabel && gameLabel !== currentGame) {
+          currentGame = gameLabel;
+          const sub = document.createElement('tr');
+          sub.className = 'tcg-group-row tcg-game-row';
+          sub.innerHTML = `<td colspan="3" style="padding:7px 14px; background:#fff; font-weight:700; color:#333; border-top:1px dashed #eee;">• ${gameLabel}</td>`;
+          tr.parentNode.insertBefore(sub, tr);
+        }
+      }
+    } catch (e) {}
+  }
+
+  function applyFilterAndRerender() {
+    currentVisibleEvents = filterEvents();
+    calendar.removeAllEvents();
+    calendar.addEventSource(currentVisibleEvents);
+    calendar.refetchEvents();
+    setTimeout(applyListGrouping, 0);
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const calendarEl = document.getElementById('calendar');
+
+    calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: 'dayGridMonth',
+      initialDate: '2026-02-15',
+      locale: 'ko',
+      headerToolbar: {
+        left:'prev,next today',
+        center:'title',
+        right:'dayGridMonth,listWeek'
+      },
+      dayMaxEvents: true,
+      fixedWeekCount: true,
+      expandRows: true,
+      height: 820,
+
+      eventOrder: function(a, b) {
+        const ar = (a.extendedProps?.regionKey || "");
+        const br = (b.extendedProps?.regionKey || "");
+        if (ar !== br) return ar.localeCompare(br, "ko");
+        const as = (a.extendedProps?.storeKey || "");
+        const bs = (b.extendedProps?.storeKey || "");
+        if (as !== bs) return as.localeCompare(bs, "ko");
+        const ag = (a.extendedProps?.gameKey || "");
+        const bg = (b.extendedProps?.gameKey || "");
+        if (ag !== bg) return ag.localeCompare(bg, "ko");
+        return (a.startStr || "").localeCompare(b.startStr || "");
+      },
+
+      events: currentVisibleEvents,
+
+      eventDidMount: function(info) {
+        try {
+          const ext = info.event.extendedProps || {};
+          const viewType = info.view && info.view.type ? info.view.type : '';
+          const g = ext.gameKey || '';
+          const dotColor = GAME_COLORS[g] || info.event.borderColor || info.event.backgroundColor;
+          if (viewType.startsWith('list') && info.el) {
+            info.el.dataset.regionKey = ext.regionKey || '';
+            info.el.dataset.storeKey = ext.storeKey || '';
+            info.el.dataset.gameKey  = ext.gameKey  || '';
+            const dot = info.el.querySelector('.fc-list-event-dot');
+            if (dot && dotColor) { dot.style.borderColor = dotColor; dot.style.backgroundColor = dotColor; }
+          }
+          if (viewType === 'dayGridMonth' && info.el) {
+            const dot = info.el.querySelector('.fc-daygrid-event-dot');
+            if (dot && dotColor) { dot.style.borderColor = dotColor; dot.style.backgroundColor = dotColor; }
+          }
+        } catch(e) {}
+      },
+
+      eventContent: function(arg) {
+        const ext = arg.event.extendedProps || {};
+        const region = ext.regionKey || "";
+        const store  = ext.storeKey  || "";
+        const gameKey = ext.gameKey || "";
+        const gameLabel = GAME_LABEL[gameKey] || gameKey;
+        const rColor = REGION_COLORS[region] || "#111";
+        const regionHtml = region ? `<span class="tcg-region-tag" style="color:${rColor}">[${region}]</span>` : "";
+        const text = `${store} - ${gameLabel}`;
+        return { html: `<span class="tcg-event-text">${regionHtml}${escapeHtml(text)}</span>` };
+      },
+
+      eventClick: function(info) {
+        info.jsEvent.preventDefault();
+        openModal(info.event.startStr.substring(0,10));
+      },
+      moreLinkClick: function(info) {
+        openModal(info.dateStr);
+        return 'none';
+      },
+      views: {
+        listWeek: { noEventsContent: '일정이 없습니다.' }
+      },
+      eventTimeFormat: {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      },
+      datesSet: function() {
+        setTimeout(applyListGrouping, 0);
+      }
+    });
+
+    calendar.render();
+
+    calendarEl.addEventListener('click', (ev) => {
+      if (calendar.view.type !== 'dayGridMonth') return;
+      const dayCell = ev.target.closest('.fc-daygrid-day[data-date]');
+      if (!dayCell) return;
+      const dateStr = dayCell.getAttribute('data-date');
+      if (!dateStr) return;
+      ev.preventDefault();
+      openModal(dateStr);
+    }, true);
+
+    regionFiltersEl.addEventListener('change', (ev) => {
+      const t = ev.target;
+      if (!t || t.type !== 'checkbox') return;
+      applyAllBehavior(regionFiltersEl, t.getAttribute('data-key'));
+      applyFilterAndRerender();
+    });
+    gameFiltersEl.addEventListener('change', (ev) => {
+      const t = ev.target;
+      if (!t || t.type !== 'checkbox') return;
+      applyAllBehavior(gameFiltersEl, t.getAttribute('data-key'));
+      applyFilterAndRerender();
+    });
+  });
+</script>
+</body>
+</html>
