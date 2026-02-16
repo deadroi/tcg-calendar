@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>TCG 일정 캘린더</title>
+<title>TCG 대회 일정 수집기</title>
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
 <style>
   :root { --panel-w: 260px; }
@@ -61,6 +61,21 @@
   #modalList li { margin: 6px 0; white-space: pre-wrap; }
   #modalList li a:hover { text-decoration: underline !important; color: #1a73e8 !important; }
   .modal-subhint { color:#666; font-size:12px; margin-top:10px; }
+  .page-header {
+    text-align: center; padding: 18px 14px 10px;
+    border-bottom: 1px solid #eee; background: #fff;
+  }
+  .page-header h1 {
+    margin: 0; font-size: 22px; color: #111; font-weight: 800;
+  }
+  .notice {
+    max-width: 1200px; margin: 20px auto 0; padding: 14px 18px;
+    background: #fff9db; border: 1px solid #ffe066; border-radius: 10px;
+    font-size: 13px; color: #555; line-height: 1.6;
+  }
+  .notice h3 { margin: 0 0 6px; font-size: 14px; color: #e67700; }
+  .notice ul { margin: 4px 0 0; padding-left: 18px; }
+  .notice li { margin: 3px 0; }
   @media (max-width: 1220px) {
     .app { flex-direction:column; }
     .sidebar { width:auto; flex: 0 0 auto; height:auto; position: static; }
@@ -69,6 +84,10 @@
 </style>
 </head>
 <body>
+
+<div class="page-header">
+  <h1>TCG 대회 일정 수집기</h1>
+</div>
 
 <div class="app">
   <aside class="sidebar" style="order:0">
@@ -89,6 +108,14 @@
   </aside>
   <main class="main" style="order:2">
     <div id="calendar"></div>
+    <div class="notice">
+      <h3>주의사항</h3>
+      <ul>
+        <li>해당 TCG샵 X에서 검색을 허용해야 수집이 됩니다. (검색 허용 OFF, 외부 노출 제한, 로그인 안 하면 못 보는 글, Follow해야만 보이는 글은 수집 불가)</li>
+        <li>X에서 TCG샵 대회 정보를 수집합니다. (내용에 '대회' 또는 '일정' 또는 '스케줄' 이라는 단어가 있으면 수집이 잘 됩니다)</li>
+        <li>또한 날짜 정보나 시간 정보가 명확하게 있어야 수집합니다.</li>
+      </ul>
+    </div>
   </main>
 </div>
 
