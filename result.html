@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>TCG 대회 결과 수집기</title>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4158709673269015"
+     crossorigin="anonymous"></script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-9N9WTDYW2G"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-9N9WTDYW2G');
+</script>
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
+<style>
+  :root { --panel-w: 260px; }
+  body { font-family: system-ui, -apple-system, Segoe UI, Roboto, 'Noto Sans KR', sans-serif; margin:0; background:#fff; }
+  .app { display:flex; gap:16px; padding:20px 14px; max-width: 1600px; margin:0 auto; align-items:flex-start; }
+  .sidebar {
+    width: var(--panel-w); flex: 0 0 var(--panel-w);
+    border: 1px solid #eee; border-radius: 12px; padding: 14px 12px;
+    position: sticky; top: 20px; overflow:auto; max-height: calc(100vh - 40px); background:#fff;
+  }
+  .sidebar h2 { margin: 2px 6px 10px; font-size: 14px; color:#111; }
+  .filters { display:flex; flex-direction:column; gap:8px; padding: 0 6px 6px; }
+  .chk {
+    display:flex; align-items:center; gap:10px;
+    padding: 8px 8px; border-radius: 10px; cursor:pointer; user-select:none;
+  }
+  .chk:hover { background:#f6f7f9; }
+  .chk input { width: 16px; height: 16px; }
+  .badge {
+    margin-left:auto; font-size: 12px; color:#555;
+    background:#f1f3f5; padding: 2px 8px; border-radius: 999px;
+  }
+  .color-chip {
+    width: 10px; height: 10px; border-radius: 999px; display:inline-block;
+    border: 1px solid rgba(0,0,0,0.08);
+  }
+  .hint { margin: 10px 8px 0; font-size: 12px; color:#666; line-height: 1.35; }
+  .main { flex: 1 1 auto; min-width: 740px; }
+  #calendar { max-width:1200px; margin:0 auto; padding:0 10px; }
+  .fc .fc-daygrid-day-frame { min-height: 110px; }
+  .fc .fc-daygrid-day-events { max-height: 74px; overflow: hidden; }
+  .fc .fc-daygrid-day { cursor: pointer; }
+  .tcg-region-tag { font-weight: 700; margin-right: 6px; }
+  .tcg-event-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .modal {
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45);
+    z-index: 9999; justify-content:center; align-items:center; padding: 18px;
+  }
+  .modal-content {
+    background:#fff; border-radius:10px; width: min(680px, 100%);
+    max-height: min(75vh, 700px); overflow:auto; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  }
+  .modal-header {
+    position: sticky; top: 0; background: #fff; padding: 14px 16px 10px;
+    border-bottom: 1px solid #eee; display:flex; align-items:center;
+    justify-content:space-between; gap: 12px;
+  }
+  .modal-title { margin:0; font-size:16px; }
+  .close-btn {
+    border: 0; background: transparent; font-size: 20px; line-height: 1;
+    cursor: pointer; padding: 6px 8px;
+  }
+  .modal-body { padding: 12px 16px 16px; }
+  #modalList { margin:0; padding-left: 0; list-style: none; }
+  #modalList li {
+    margin: 6px 0; padding: 10px 12px; border-radius: 8px;
+    background: #f8f9fa; border-left: 4px solid #dee2e6;
+  }
+  #modalList li.has-link { border-left-color: #1a73e8; }
+  #modalList li .result-store { font-weight: 700; font-size: 13px; }
+  #modalList li .result-game { font-size: 12px; color: #666; margin: 2px 0; }
+  #modalList li .result-title { font-size: 13px; color: #222; margin-top: 4px; }
+  #modalList li a { color: inherit; text-decoration: none; }
+  #modalList li a:hover .result-title { text-decoration: underline; color: #1a73e8; }
+  .modal-subhint { color:#666; font-size:12px; margin-top:10px; }
+  .page-header {
+    text-align: center; padding: 18px 14px 10px;
+    border-bottom: 1px solid #eee; background: #fff;
+  }
+  .page-header h1 {
+    margin: 0; font-size: 22px; color: #111; font-weight: 800;
+  }
+  @media (max-width: 1220px) {
+    .app { flex-direction:column; }
+    .sidebar { width:auto; flex: 0 0 auto; height:auto; position: static; }
+    .main { min-width: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>TCG 대회 결과</h1>
+</div>
+
+<div class="app">
+  <aside class="sidebar" style="order:0">
+    <h2>지역 필터</h2>
+    <div class="filters" id="regionFilters"></div>
+    <div class="hint">
+      • <b>전체</b>를 체크하면 모든 지역이 표시됩니다.<br/>
+      • 특정 지역만 보고 싶으면 해당 지역만 체크하세요.
+    </div>
+  </aside>
+  <aside class="sidebar" style="order:1">
+    <h2>게임 필터</h2>
+    <div class="filters" id="gameFilters"></div>
+    <div class="hint">
+      • <b>전체</b>를 체크하면 모든 게임이 표시됩니다.<br/>
+      • 날짜 칸을 클릭하면 해당 날의 결과 목록이 뜹니다.
+    </div>
+  </aside>
+  <main class="main" style="order:2">
+    <div id="calendar"></div>
+  </main>
+</div>
+
+<div id="modal" class="modal" aria-hidden="true">
+  <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modalDate">
+    <div class="modal-header">
+      <h3 id="modalDate" class="modal-title"></h3>
+      <button class="close-btn" type="button" aria-label="닫기" id="closeBtn">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <ul id="modalList"></ul>
+      <div class="modal-subhint" id="modalHint"></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+<script>
+  const masterEvents = [{"title": "[경기] 수내 카드빈 - DIGIMON", "start": "2026-02-21", "allDay": true, "resultTitle": "디지몬 위클리 이벤트 결과", "xUrl": "https://x.com/i/status/2025181269387284819"}, {"title": "[경기] 안산 LAS TCG - DIGIMON", "start": "2026-02-21", "allDay": true, "resultTitle": "디지몬 미니리그 결과", "xUrl": "https://x.com/i/status/2025186324056260838"}, {"title": "[경기] 안산 LAS TCG - HOLOLIVE", "start": "2026-02-21", "allDay": true, "resultTitle": "홀로라이브 공인대회 결과", "xUrl": "https://x.com/i/status/2025185867183333462"}, {"title": "[경기] 일산 듀얼팩토리 - VANGUARD", "start": "2026-02-21", "allDay": true, "resultTitle": "뱅가드 D 시즌 일본판 풀 대회 결과", "xUrl": "https://x.com/i/status/2025152346024796168"}, {"title": "[경기] 일산 듀얼팩토리 - NIVEL ARENA", "start": "2026-02-21", "allDay": true, "resultTitle": "니벨아레나 비공인 대회 결과", "xUrl": "https://x.com/i/status/2025149169846157661"}, {"title": "[경기] 일산 듀얼팩토리 - DIGIMON", "start": "2026-02-21", "allDay": true, "resultTitle": "디지몬 카드게임 일본판 테이머 배틀 대회 결과", "xUrl": "https://x.com/i/status/2025147936037073113"}, {"title": "[경기] 일산 듀얼팩토리 - DIGIMON", "start": "2026-02-21", "allDay": true, "resultTitle": "디지몬 카드게임 한글판 테이머 배틀 대회 결과", "xUrl": "https://x.com/i/status/2025138083424075862"}, {"title": "[경기] 일산 듀얼팩토리 - HOLOLIVE", "start": "2026-02-21", "allDay": true, "resultTitle": "홀로라이브 OCG 공인 대회 결과", "xUrl": "https://x.com/i/status/2025121163018695000"}, {"title": "[경남] 울산 던전다이스 - YUGIOH", "start": "2026-02-21", "allDay": true, "resultTitle": "유희왕 일판풀 비공인 대회 결과", "xUrl": "https://x.com/i/status/2025135776607137815"}, {"title": "[대구경북] 대구 듀얼챔프 - WEISS SCHWARZ", "start": "2026-02-21", "allDay": true, "resultTitle": "바이스 슈발츠 대회 결과", "xUrl": "https://x.com/i/status/2025117173522616794"}, {"title": "[대구경북] 대구 듀얼챔프 - HOLOLIVE", "start": "2026-02-21", "allDay": true, "resultTitle": "홀로라이브 대회 결과", "xUrl": "https://x.com/i/status/2025117173522616794"}, {"title": "[대구경북] 대구 듀얼챔프 - YUGIOH", "start": "2026-02-21", "allDay": true, "resultTitle": "유희왕 설연휴 대회 결과", "xUrl": "https://x.com/i/status/2025115647102124318"}, {"title": "[서울] 당산 카드냥 - DIGIMON", "start": "2026-02-21", "allDay": true, "resultTitle": "디지몬 테이머배틀 결과", "xUrl": "https://x.com/i/status/2025179684884099334"}, {"title": "[서울] 당산 카드냥 - YUGIOH RUSH DUEL", "start": "2026-02-21", "allDay": true, "resultTitle": "러시듀얼 먼슬리 토너먼트 결과", "xUrl": "https://x.com/i/status/2025179390452375798"}, {"title": "[서울] 장한평 마린포드 - DIGIMON", "start": "2026-02-21", "allDay": true, "resultTitle": "디지몬 테이머 배틀 결과", "xUrl": "https://x.com/i/status/2025141515375239334"}, {"title": "[서울] 장한평 마린포드 - GUNDAM", "start": "2026-02-21", "allDay": true, "resultTitle": "건담카드게임 뉴타입 챌린지 결과", "xUrl": "https://x.com/i/status/2025138557082357787"}, {"title": "[인천] 부평 히어로즈 - YUGIOH", "start": "2026-02-21", "allDay": true, "resultTitle": "부평히어로즈 유희왕 비공인대회 결과", "xUrl": "https://x.com/i/status/2025166068306833811"}, {"title": "[전라제주] 목포 TCG팩토리 - POKEMON", "start": "2026-02-21", "allDay": true, "resultTitle": "포켓몬 카드게임 미니리그 결과", "xUrl": "https://x.com/i/status/2025133406435283144"}, {"title": "[전라제주] 목포 TCG팩토리 - ONE PIECE", "start": "2026-02-21", "allDay": true, "resultTitle": "원피스 카드게임 플래그쉽 배틀 결과", "xUrl": "https://x.com/i/status/2025108718715896027"}, {"title": "[경기] 김포 카드베이스 - DIGIMON", "start": "2026-02-20", "allDay": true, "resultTitle": "디지몬 카드게임 평일 위클리 미니대회 결과", "xUrl": "https://x.com/i/status/2025207069641736294"}, {"title": "[경기] 수원 TCG TracerZ - ONE PIECE", "start": "2026-02-20", "allDay": true, "resultTitle": "원피스 스탠다드배틀 결과", "xUrl": "https://x.com/i/status/2024811156783988823"}, {"title": "[경기] 수원 TCG TracerZ - YUGIOH", "start": "2026-02-20", "allDay": true, "resultTitle": "유희왕 금요 토너먼트 결과", "xUrl": "https://x.com/i/status/2024806464846799356"}, {"title": "[서울] 당산 카드냥 - HOLOLIVE", "start": "2026-02-20", "allDay": true, "resultTitle": "홀로라이브 공인 샵대회 결과", "xUrl": "https://x.com/i/status/2024796662942798051"}, {"title": "[서울] 장한평 마린포드 - YUGIOH", "start": "2026-02-20", "allDay": true, "resultTitle": "유희왕 2 월 3 주차 대회 결산 결과", "xUrl": "https://x.com/i/status/2024738877785985369"}, {"title": "[서울] 장한평 마린포드 - NIVEL ARENA", "start": "2026-02-20", "allDay": true, "resultTitle": "니벨아레나 미니대회 결과", "xUrl": "https://x.com/i/status/2025140251606602196"}, {"title": "[서울] 장한평 마린포드 - ONE PIECE", "start": "2026-02-20", "allDay": true, "resultTitle": "원피스 한글판 대회 결과", "xUrl": "https://x.com/i/status/2025139830305477033"}, {"title": "[서울] 장한평 마린포드 - YUGIOH", "start": "2026-02-20", "allDay": true, "resultTitle": "유희왕 일본판 미니대회 결과", "xUrl": "https://x.com/i/status/2025138870401335506"}, {"title": "[전라제주] 목포 TCG팩토리 - POKEMON", "start": "2026-02-20", "allDay": true, "resultTitle": "포켓몬카드 강습회 대회 결과", "xUrl": "https://x.com/i/status/2024757011469258875"}, {"title": "[경기] 수내 카드빈 - POKEMON", "start": "2026-02-19", "allDay": true, "resultTitle": "포켓몬 미니리그 공인 대회 결과", "xUrl": "https://x.com/i/status/2024477784027124218"}, {"title": "[서울] 장한평 마린포드 - NIVEL ARENA", "start": "2026-02-19", "allDay": true, "resultTitle": "니벨아레나 미니대회 입상덱 결과", "xUrl": "https://x.com/i/status/2024469887670968756"}, {"title": "[서울] 장한평 마린포드 - HOLOLIVE", "start": "2026-02-19", "allDay": true, "resultTitle": "홀로라이브 OCG 공인샵 대회 결과", "xUrl": "https://x.com/i/status/2024469187083522181"}, {"title": "[서울] 장한평 마린포드 - YUGIOH", "start": "2026-02-19", "allDay": true, "resultTitle": "유희왕 일본판 미니대회 입상덱 결과", "xUrl": "https://x.com/i/status/2024468783621165137"}, {"title": "[서울] 장한평 마린포드 - DIGIMON", "start": "2026-02-19", "allDay": true, "resultTitle": "디지몬카드게임 일본판 테이머 배틀 입상덱 결과", "xUrl": "https://x.com/i/status/2024467938842202328"}, {"title": "[경기] 안산 LAS TCG - SHADOWVERSE EVOLVE", "start": "2026-02-18", "allDay": true, "resultTitle": "섀도우버스 이볼브 공인대회 결과", "xUrl": "https://x.com/i/status/2024424640232431992"}, {"title": "[경기] 안성 하얀숲 카드하우스 - YUGIOH", "start": "2026-02-18", "allDay": true, "resultTitle": "유희왕 설날 대회 결과", "xUrl": "https://x.com/i/status/2024100880711106655"}, {"title": "[경기] 일산 듀얼팩토리 - DIGIMON", "start": "2026-02-18", "allDay": true, "resultTitle": "디지몬 카드게임 일본판 대회 결과", "xUrl": "https://x.com/i/status/2024059237165375743"}, {"title": "[경남] 울산 던전다이스 - DIGIMON", "start": "2026-02-18", "allDay": true, "resultTitle": "디지몬 에볼컵 대회 결과", "xUrl": "https://x.com/i/status/2025136201880281591"}, {"title": "[대구경북] 대구 듀얼스파크 - UNION ARENA", "start": "2026-02-18", "allDay": true, "resultTitle": "유니온 아레나 교류회 결과", "xUrl": "https://x.com/i/status/2024060603707297818"}, {"title": "[대전] 대전 듀얼몰 - YUGIOH", "start": "2026-02-18", "allDay": true, "resultTitle": "대전 듀얼몰 유희왕 대회 결과", "xUrl": "https://x.com/i/status/2024027015087784367"}, {"title": "[부산] 양정 J클로버 - YUGIOH", "start": "2026-02-18", "allDay": true, "resultTitle": "유희왕 평일 대회 결과", "xUrl": "https://x.com/i/status/2024363048086249520"}, {"title": "[부산] 양정 J클로버 - VANGUARD", "start": "2026-02-18", "allDay": true, "resultTitle": "카드파이트 뱅가드 평일 대회 결과", "xUrl": "https://x.com/i/status/2024363048086249520"}, {"title": "[부산] 양정 J클로버 - DIGIMON", "start": "2026-02-18", "allDay": true, "resultTitle": "디지몬 카드게임 평일 대회 결과", "xUrl": "https://x.com/i/status/2024363048086249520"}, {"title": "[서울] 구로 카드숲 - ONE PIECE", "start": "2026-02-18", "allDay": true, "resultTitle": "원피스 스탠다드배틀 결과", "xUrl": "https://x.com/i/status/2024102097038229879"}, {"title": "[서울] 구로 카드숲 - DIGIMON", "start": "2026-02-18", "allDay": true, "resultTitle": "디지몬 테이머배틀 결과", "xUrl": "https://x.com/i/status/2024101561430057183"}, {"title": "[서울] 당산 카드냥 - DIGIMON", "start": "2026-02-18", "allDay": true, "resultTitle": "디지몬 테이머배틀 결과", "xUrl": "https://x.com/i/status/2024091191864943026"}, {"title": "[서울] 신당 카드스퀘어 - DIGIMON", "start": "2026-02-18", "allDay": true, "resultTitle": "디지몬 수요일을 달리는 테이머 결과", "xUrl": "https://x.com/i/status/2024098475236003853"}, {"title": "[서울] 장한평 마린포드 - YUGIOH", "start": "2026-02-18", "allDay": true, "resultTitle": "유희왕 일본판 미니대회 결과", "xUrl": "https://x.com/i/status/2024107827384684784"}, {"title": "[서울] 장한평 마린포드 - NIVEL ARENA", "start": "2026-02-18", "allDay": true, "resultTitle": "니벨아레나 설날 기념 대회 결과", "xUrl": "https://x.com/i/status/2024107211887362266"}, {"title": "[서울] 장한평 마린포드 - ONE PIECE", "start": "2026-02-18", "allDay": true, "resultTitle": "원피스 카드게임 한글판 대회 결과", "xUrl": "https://x.com/i/status/2024082052837200372"}, {"title": "[서울] 장한평 마린포드 - DIGIMON", "start": "2026-02-18", "allDay": true, "resultTitle": "디지몬 카드게임 에볼루션 컵 결과", "xUrl": "https://x.com/i/status/2024061002745356538"}, {"title": "[경기] 일산 듀얼팩토리 - VANGUARD", "start": "2026-02-17", "allDay": true, "resultTitle": "뱅가드 D 시즌 일본판 풀 대회 결과", "xUrl": "https://x.com/i/status/2023742579729138067"}, {"title": "[경기] 일산 듀얼팩토리 - DIGIMON", "start": "2026-02-17", "allDay": true, "resultTitle": "디지몬 카드게임 일본판 대회 결과", "xUrl": "https://x.com/i/status/2023709973847699869"}, {"title": "[대구경북] 대구 듀얼스파크 - VANGUARD", "start": "2026-02-17", "allDay": true, "resultTitle": "뱅가드 평일 대회 결과", "xUrl": "https://x.com/i/status/2023914778125795356"}, {"title": "[서울] 신당 카드스퀘어 - YUGIOH", "start": "2026-02-17", "allDay": true, "resultTitle": "유희왕 1923CS 개인전 결과", "xUrl": "https://x.com/i/status/2023749784834875830"}, {"title": "[서울] 신당 카드스퀘어 - DIGIMON", "start": "2026-02-17", "allDay": true, "resultTitle": "디지몬 일본판 테이머배틀 결과", "xUrl": "https://x.com/i/status/2023739831725994040"}, {"title": "[서울] 신당 카드스퀘어 - ONE PIECE", "start": "2026-02-17", "allDay": true, "resultTitle": "원피스 라프텔 CS 결과", "xUrl": "https://x.com/i/status/2023725193659818404"}, {"title": "[서울] 장한평 마린포드 - VANGUARD", "start": "2026-02-17", "allDay": true, "resultTitle": "뱅가드 일본판 공인샵 토너먼트 결과", "xUrl": "https://x.com/i/status/2023725823229128888"}, {"title": "[서울] 장한평 마린포드 - NIVEL ARENA", "start": "2026-02-17", "allDay": true, "resultTitle": "니벨아레나 미니대회 입상덱 결과", "xUrl": "https://x.com/i/status/2023725608778559770"}, {"title": "[서울] 장한평 마린포드 - YUGIOH", "start": "2026-02-17", "allDay": true, "resultTitle": "유희왕 설날 기념 CS 결과", "xUrl": "https://x.com/i/status/2023725338833154373"}, {"title": "[경기] 김포 카드베이스 - DIGIMON", "start": "2026-02-16", "allDay": true, "resultTitle": "디지몬 설날기념 이벤트 매치 결과", "xUrl": "https://x.com/i/status/2023233845068439710"}, {"title": "[경기] 신중동역 하비게임몰 - NIVEL ARENA", "start": "2026-02-16", "allDay": true, "resultTitle": "니벨아레나 설날기념 매트대회 결과", "xUrl": "https://x.com/i/status/2023423487457775897"}, {"title": "[경기] 일산 듀얼팩토리 - NIVEL ARENA", "start": "2026-02-16", "allDay": true, "resultTitle": "니벨아레나 비공인 대회 결과", "xUrl": "https://x.com/i/status/2023329427686572410"}, {"title": "[경기] 일산 듀얼팩토리 - VANGUARD", "start": "2026-02-16", "allDay": true, "resultTitle": "카드파이트 뱅가드 D 시즌 일본판 풀 대회 결과", "xUrl": "https://x.com/i/status/2023327347672506651"}, {"title": "[서울] 장한평 마린포드 - ONE PIECE", "start": "2026-02-16", "allDay": true, "resultTitle": "원피스 일본판 대회 결과", "xUrl": "https://x.com/i/status/2023381349437198776"}, {"title": "[서울] 장한평 마린포드 - DIGIMON", "start": "2026-02-16", "allDay": true, "resultTitle": "디지몬 카드게임 대회 결과", "xUrl": "https://x.com/i/status/2023379689642082419"}, {"title": "[서울] 장한평 마린포드 - VANGUARD", "start": "2026-02-16", "allDay": true, "resultTitle": "뱅가드 미니대회 결과", "xUrl": "https://x.com/i/status/2023379340915023879"}, {"title": "[서울] 장한평 마린포드 - YUGIOH", "start": "2026-02-16", "allDay": true, "resultTitle": "유희왕 일본판 미니대회 결과", "xUrl": "https://x.com/i/status/2023379134056214662"}, {"title": "[서울] 장한평 마린포드 - ONE PIECE", "start": "2026-02-16", "allDay": true, "resultTitle": "원피스 한글판 대회 결과", "xUrl": "https://x.com/i/status/2023378857848406307"}, {"title": "[서울] 장한평 마린포드 - ONE PIECE", "start": "2026-02-16", "allDay": true, "resultTitle": "원피스 한글판 설날 CS 결과", "xUrl": "https://x.com/i/status/2023378626859999740"}, {"title": "[인천] 부평 히어로즈 - YUGIOH", "start": "2026-02-16", "allDay": true, "resultTitle": "부평히어로즈 유희왕 비공인대회 결과", "xUrl": "https://x.com/i/status/2023382798321807847"}, {"title": "[경기] 김포 카드베이스 - ONE PIECE", "start": "2026-02-15", "allDay": true, "resultTitle": "원피스 설날기념 이벤트 매치 결과", "xUrl": "https://x.com/i/status/2023233423410876423"}, {"title": "[경기] 김포 카드베이스 - DIGIMON", "start": "2026-02-15", "allDay": true, "resultTitle": "디지몬 설날기념 이벤트 매치 결과", "xUrl": "https://x.com/i/status/2023233019436536263"}, {"title": "[경기] 김포 카드베이스 - VANGUARD", "start": "2026-02-15", "allDay": true, "resultTitle": "뱅가드 샵 토너먼트 결과", "xUrl": "https://x.com/i/status/2023232950058532998"}, {"title": "[경기] 김포 카드베이스 - HOLOLIVE", "start": "2026-02-15", "allDay": true, "resultTitle": "홀로라이브 먼슬리 샵 토너먼트 결과", "xUrl": "https://x.com/i/status/2023232873076257277"}, {"title": "[경남] 울산 듀얼팩토리 - DIGIMON", "start": "2026-02-15", "allDay": true, "resultTitle": "디지몬 테이머배틀 결과", "xUrl": "https://x.com/i/status/2023693987362828305"}, {"title": "[경남] 울산 듀얼팩토리 - DIGIMON", "start": "2026-02-15", "allDay": true, "resultTitle": "디지몬 에볼루션 컵 결과", "xUrl": "https://x.com/i/status/2023693847633817869"}, {"title": "[서울] 구로 카드숲 - VANGUARD", "start": "2026-02-15", "allDay": true, "resultTitle": "뱅가드 트리오파이트 결과", "xUrl": "https://x.com/i/status/2024100185413206524"}];
+
+  const GAME_COLORS = {
+    "VANGUARD": "#1f77b4",
+    "DIGIMON": "#2ca02c",
+    "ONE PIECE": "#ff7f0e",
+    "NIVEL ARENA": "#d62728",
+    "HOLOLIVE": "#9467bd",
+    "SHADOWVERSE EVOLVE": "#8c564b",
+    "GUNDAM": "#e377c2",
+    "ULTRAMAN": "#17becf",
+    "WEISS SCHWARZ": "#7f7f7f",
+    "UNION ARENA": "#bcbd22",
+    "YUGIOH": "#d62700",
+    "YUGIOH RUSH DUEL": "#ff6347",
+    "POKEMON": "#f0c040",
+  };
+
+  const REGION_PALETTE = ["#0b7285","#5f3dc4","#d9480f","#2f9e44","#c92a2a","#1c7ed6","#862e9c","#e03131","#0c8599","#6741d9","#f08c00","#099268"];
+  const REGION_COLORS = {};
+  const REGION_LIST = ["경기", "경남", "대구경북", "대전", "부산", "서울", "인천", "전라제주"];
+  REGION_LIST.forEach((r, i) => REGION_COLORS[r] = REGION_PALETTE[i % REGION_PALETTE.length]);
+
+  const ALIAS = {
+    "니벨아레나": "NIVEL ARENA", "NIVEL ARENA": "NIVEL ARENA",
+    "WEIS SCHWARZ": "WEISS SCHWARZ", "WEISS SCHWARZ": "WEISS SCHWARZ",
+    "VANGUARD": "VANGUARD", "DIGIMON": "DIGIMON", "ONE PIECE": "ONE PIECE",
+    "HOLOLIVE": "HOLOLIVE", "SHADOWVERSE EVOLVE": "SHADOWVERSE EVOLVE",
+    "GUNDAM": "GUNDAM", "ULTRAMAN": "ULTRAMAN", "UNION ARENA": "UNION ARENA",
+    "YUGIOH": "YUGIOH", "유희왕": "YUGIOH",
+    "YUGIOH RUSH DUEL": "YUGIOH RUSH DUEL", "유희왕 러쉬듀얼": "YUGIOH RUSH DUEL",
+    "POKEMON": "POKEMON", "포켓몬": "POKEMON",
+  };
+
+  const GAME_LABEL = {
+    "VANGUARD":"뱅가드", "DIGIMON":"디지몬", "ONE PIECE":"원피스",
+    "NIVEL ARENA":"니벨아레나", "HOLOLIVE":"홀로라이브",
+    "SHADOWVERSE EVOLVE":"섀도우버스 이볼브", "GUNDAM":"건담",
+    "ULTRAMAN":"울트라맨", "WEISS SCHWARZ":"바이스 슈발츠",
+    "UNION ARENA":"유니온 아레나", "YUGIOH":"유희왕",
+    "YUGIOH RUSH DUEL":"유희왕 러쉬듀얼", "POKEMON":"포켓몬",
+  };
+
+  function parseTitle(title) {
+    const t = String(title || "");
+    const m = t.match(/^\s*\[([^\]]+)\]\s*(.*?)\s*-\s*(.+?)\s*$/);
+    if (m) {
+      const region = (m[1]||"").trim();
+      const store = (m[2]||"").trim();
+      const rawGame = (m[3]||"").trim();
+      const gameKey = ALIAS[rawGame] || rawGame;
+      return { regionKey: region, storeKey: store, gameKey };
+    }
+    const parts = t.split(" - ");
+    const store = (parts[0]||"").trim();
+    const rawGame = (parts[1]||"").trim();
+    const gameKey = ALIAS[rawGame] || rawGame;
+    return { regionKey:"", storeKey: store, gameKey };
+  }
+
+  const enrichedMaster = masterEvents.map(e => {
+    const p = parseTitle(e.title);
+    const gameColor = GAME_COLORS[p.gameKey] || "";
+    return {
+      ...e,
+      backgroundColor: gameColor || e.backgroundColor,
+      borderColor: gameColor || e.borderColor,
+      extendedProps: {
+        ...(e.extendedProps||{}),
+        regionKey: p.regionKey,
+        storeKey: p.storeKey,
+        gameKey: p.gameKey,
+        xUrl: e.xUrl || "",
+        resultTitle: e.resultTitle || "",
+      }
+    };
+  });
+
+  const regionFiltersEl = document.getElementById('regionFilters');
+  const gameFiltersEl = document.getElementById('gameFilters');
+
+  const REGION_DEFS = [{ key: "ALL", label: "전체" }, ...REGION_LIST.map(r => ({ key: r, label: r }))];
+  const GAME_DEFS = [{"key": "ALL", "label": "전체"}, {"key": "DIGIMON", "label": "디지몬"}, {"key": "GUNDAM", "label": "건담"}, {"key": "HOLOLIVE", "label": "홀로라이브"}, {"key": "NIVEL ARENA", "label": "니벨아레나"}, {"key": "ONE PIECE", "label": "원피스"}, {"key": "POKEMON", "label": "포켓몬"}, {"key": "SHADOWVERSE EVOLVE", "label": "섀도우버스 이볼브"}, {"key": "UNION ARENA", "label": "유니온 아레나"}, {"key": "VANGUARD", "label": "뱅가드"}, {"key": "WEISS SCHWARZ", "label": "바이스 슈발츠"}, {"key": "YUGIOH", "label": "유희왕"}, {"key": "YUGIOH RUSH DUEL", "label": "유희왕 러쉬듀얼"}];
+
+  function countBy(list, keyFn, defs) {
+    const counts = new Map();
+    defs.forEach(d => counts.set(d.key, 0));
+    for (const e of list) {
+      const k = keyFn(e);
+      if (counts.has(k)) counts.set(k, counts.get(k) + 1);
+      counts.set("ALL", counts.get("ALL") + 1);
+    }
+    return counts;
+  }
+
+  const regionCounts = countBy(enrichedMaster, e => (e.extendedProps?.regionKey||""), REGION_DEFS);
+  const gameCounts   = countBy(enrichedMaster, e => (e.extendedProps?.gameKey||""),   GAME_DEFS);
+
+  function renderCheckboxList(container, defs, counts, colorFn, groupName) {
+    container.innerHTML = "";
+    for (const def of defs) {
+      const id = groupName + "_" + String(def.key).replace(/\s+/g, "_");
+      const row = document.createElement('label');
+      row.className = "chk";
+      row.setAttribute("for", id);
+      const color = colorFn ? colorFn(def.key) : "";
+      const chip = (def.key !== "ALL" && color)
+        ? `<span class="color-chip" style="background:${color}"></span>`
+        : `<span style="width:10px;display:inline-block"></span>`;
+      row.innerHTML = `
+        <input type="checkbox" id="${id}" data-key="${def.key}" data-group="${groupName}">
+        ${chip}
+        <span>${def.label}</span>
+        <span class="badge">${counts.get(def.key) || 0}</span>
+      `;
+      container.appendChild(row);
+    }
+    const all = container.querySelector('input[data-key="ALL"]');
+    if (all) all.checked = true;
+  }
+
+  renderCheckboxList(regionFiltersEl, REGION_DEFS, regionCounts, (k)=> REGION_COLORS[k] || "", "region");
+  renderCheckboxList(gameFiltersEl, GAME_DEFS, gameCounts, (k)=> GAME_COLORS[k] || "", "game");
+
+  function getSelectedKeys(container) {
+    const checked = Array.from(container.querySelectorAll('input[type="checkbox"]:checked'))
+      .map(x => x.getAttribute('data-key'));
+    if (checked.includes("ALL") || checked.length === 0) return ["ALL"];
+    return checked;
+  }
+
+  function applyAllBehavior(container, changedKey) {
+    const all = container.querySelector('input[data-key="ALL"]');
+    const others = Array.from(container.querySelectorAll('input[data-key]:not([data-key="ALL"])'));
+    if (!all) return;
+    if (changedKey === "ALL") {
+      if (all.checked) { others.forEach(o => o.checked = false); }
+      else { const anyOther = others.some(o => o.checked); if (!anyOther) all.checked = true; }
+    } else {
+      if (all.checked) all.checked = false;
+      const anyOther = others.some(o => o.checked);
+      if (!anyOther) all.checked = true;
+    }
+  }
+
+  const modal = document.getElementById('modal');
+  const modalDate = document.getElementById('modalDate');
+  const modalList = document.getElementById('modalList');
+  const modalHint = document.getElementById('modalHint');
+
+  function closeModal() {
+    modal.style.display = "none";
+    modal.setAttribute("aria-hidden", "true");
+  }
+  document.getElementById('closeBtn').addEventListener('click', closeModal);
+  modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.style.display === 'flex') closeModal(); });
+
+  let calendar;
+  let currentVisibleEvents = enrichedMaster;
+
+  function filterEvents() {
+    const selRegions = getSelectedKeys(regionFiltersEl);
+    const selGames = getSelectedKeys(gameFiltersEl);
+    const regionAll = selRegions.includes("ALL");
+    const gameAll = selGames.includes("ALL");
+    const regionSet = new Set(selRegions);
+    const gameSet = new Set(selGames);
+    return enrichedMaster.filter(e => {
+      const r = e.extendedProps?.regionKey || "";
+      const g = e.extendedProps?.gameKey || "";
+      return (regionAll || regionSet.has(r)) && (gameAll || gameSet.has(g));
+    });
+  }
+
+  function buildByDate(eventsArr) {
+    const map = new Map();
+    for (const e of eventsArr) {
+      const d = String(e.start).substring(0, 10);
+      if (!map.has(d)) map.set(d, []);
+      map.get(d).push(e);
+    }
+    for (const [d, arr] of map.entries()) {
+      arr.sort((a,b) =>
+        (a.extendedProps?.regionKey||"").localeCompare(b.extendedProps?.regionKey||"")
+        || (a.extendedProps?.storeKey||"").localeCompare(b.extendedProps?.storeKey||"")
+        || (a.extendedProps?.gameKey||"").localeCompare(b.extendedProps?.gameKey||""));
+    }
+    return map;
+  }
+
+  function openModal(dateStr) {
+    const list = buildByDate(currentVisibleEvents).get(dateStr) || [];
+    if (list.length === 0) return;
+    modalDate.textContent = dateStr + " 대회 결과";
+    modalList.innerHTML = "";
+    for (const e of list) {
+      const li = document.createElement('li');
+      const r = e.extendedProps?.regionKey || "";
+      const store = e.extendedProps?.storeKey || "";
+      const g = e.extendedProps?.gameKey || "";
+      const gLabel = GAME_LABEL[g] || g;
+      const xUrl = e.extendedProps?.xUrl || "";
+      const resultTitle = e.extendedProps?.resultTitle || "";
+      const rColor = REGION_COLORS[r] || "#111";
+      const gColor = GAME_COLORS[g] || "#666";
+
+      const inner = `
+        <div class="result-store">
+          <span style="color:${rColor}">[${r}]</span> ${store}
+        </div>
+        <div class="result-game" style="color:${gColor}">● ${gLabel}</div>
+        ${resultTitle ? `<div class="result-title">${resultTitle}</div>` : ""}
+      `;
+
+      if (xUrl) {
+        li.classList.add('has-link');
+        li.innerHTML = `<a href="${xUrl}" target="_blank">${inner}<span style="font-size:11px;color:#1a73e8;margin-top:4px;display:block;">🔗 원문 보기</span></a>`;
+      } else {
+        li.innerHTML = inner;
+      }
+      modalList.appendChild(li);
+    }
+    const sr = getSelectedKeys(regionFiltersEl);
+    const sg = getSelectedKeys(gameFiltersEl);
+    modalHint.textContent = `현재 필터: 지역=${sr.includes("ALL") ? "전체" : sr.join(", ")} / 게임=${sg.includes("ALL") ? "전체" : sg.join(", ")}`;
+    modal.style.display = "flex";
+    modal.setAttribute("aria-hidden", "false");
+  }
+
+  function applyFilterAndRerender() {
+    currentVisibleEvents = filterEvents();
+    calendar.removeAllEvents();
+    calendar.addEventSource(currentVisibleEvents);
+    calendar.refetchEvents();
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const calendarEl = document.getElementById('calendar');
+
+    calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: 'dayGridMonth',
+      initialDate: '2026-02-22',
+      locale: 'ko',
+      headerToolbar: {
+        left:'prev,next today',
+        center:'title',
+        right:'dayGridMonth,listWeek'
+      },
+      dayMaxEvents: true,
+      fixedWeekCount: true,
+      expandRows: true,
+      height: 820,
+
+      eventOrder: function(a, b) {
+        const ar = (a.extendedProps?.regionKey || "");
+        const br = (b.extendedProps?.regionKey || "");
+        if (ar !== br) return ar.localeCompare(br, "ko");
+        const as_ = (a.extendedProps?.storeKey || "");
+        const bs_ = (b.extendedProps?.storeKey || "");
+        if (as_ !== bs_) return as_.localeCompare(bs_, "ko");
+        const ag = (a.extendedProps?.gameKey || "");
+        const bg = (b.extendedProps?.gameKey || "");
+        return ag.localeCompare(bg, "ko");
+      },
+
+      events: currentVisibleEvents,
+
+      eventDidMount: function(info) {
+        try {
+          const ext = info.event.extendedProps || {};
+          const viewType = info.view && info.view.type ? info.view.type : '';
+          const g = ext.gameKey || '';
+          const dotColor = GAME_COLORS[g] || info.event.borderColor || info.event.backgroundColor;
+          if (viewType.startsWith('list') && info.el) {
+            const dot = info.el.querySelector('.fc-list-event-dot');
+            if (dot && dotColor) { dot.style.borderColor = dotColor; dot.style.backgroundColor = dotColor; }
+          }
+          if (viewType === 'dayGridMonth' && info.el) {
+            const dot = info.el.querySelector('.fc-daygrid-event-dot');
+            if (dot && dotColor) { dot.style.borderColor = dotColor; dot.style.backgroundColor = dotColor; }
+          }
+        } catch(e) {}
+      },
+
+      eventContent: function(arg) {
+        const ext = arg.event.extendedProps || {};
+        const region = ext.regionKey || "";
+        const store  = ext.storeKey  || "";
+        const gameKey = ext.gameKey || "";
+        const gameLabel = GAME_LABEL[gameKey] || gameKey;
+        const rColor = REGION_COLORS[region] || "#111";
+        const regionHtml = region ? `<span class="tcg-region-tag" style="color:${rColor}">[${region}]</span>` : "";
+        const text = `${store} - ${gameLabel}`;
+        return { html: `<span class="tcg-event-text">${regionHtml}${text}</span>` };
+      },
+
+      eventClick: function(info) {
+        info.jsEvent.preventDefault();
+        const viewType = calendar.view.type;
+        if (viewType === 'listWeek') {
+          const xUrl = info.event.extendedProps.xUrl;
+          if (xUrl) window.open(xUrl, '_blank');
+        } else {
+          openModal(info.event.startStr.substring(0, 10));
+        }
+      },
+      moreLinkClick: function(info) {
+        openModal(info.dateStr);
+        return 'none';
+      },
+      views: {
+        listWeek: { noEventsContent: '결과가 없습니다.' }
+      },
+      datesSet: function() {}
+    });
+
+    calendar.render();
+
+    calendarEl.addEventListener('click', (ev) => {
+      if (calendar.view.type !== 'dayGridMonth') return;
+      const dayCell = ev.target.closest('.fc-daygrid-day[data-date]');
+      if (!dayCell) return;
+      const dateStr = dayCell.getAttribute('data-date');
+      if (!dateStr) return;
+      ev.preventDefault();
+      openModal(dateStr);
+    }, true);
+
+    regionFiltersEl.addEventListener('change', (ev) => {
+      const t = ev.target;
+      if (!t || t.type !== 'checkbox') return;
+      applyAllBehavior(regionFiltersEl, t.getAttribute('data-key'));
+      applyFilterAndRerender();
+    });
+    gameFiltersEl.addEventListener('change', (ev) => {
+      const t = ev.target;
+      if (!t || t.type !== 'checkbox') return;
+      applyAllBehavior(gameFiltersEl, t.getAttribute('data-key'));
+      applyFilterAndRerender();
+    });
+  });
+</script>
+</body>
+</html>
