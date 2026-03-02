@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TCG 스위스 라운드 시스템</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif; background: #f0f2f5; color: #1a1a2e; font-size: 14px; }
+#app { min-height: 100vh; }
+.container { max-width: 960px; margin: 0 auto; padding: 16px; }
+.site-nav { background: #0d0d1a; }
+.site-nav-inner { max-width: 960px; margin: 0 auto; padding: 0 16px; display: flex; justify-content: center; }
+.site-nav-link { display: inline-block; padding: 10px 14px; color: #adb5bd; text-decoration: none; font-size: 13px; font-weight: 600; border-bottom: 3px solid transparent; transition: color .15s; white-space: nowrap; }
+.site-nav-link:hover { color: #fff; }
+.site-nav-link.active { color: #fff; border-bottom-color: #4ccfac; }
+header { background: #1a1a2e; color: white; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+header h1 { font-size: 17px; letter-spacing: -.3px; }
+.header-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+.btn { padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer; font-size: 13px; font-family: inherit; transition: opacity .15s, transform .1s; }
+.btn:hover { opacity: .85; }
+.btn:active { transform: scale(.97); }
+.btn-primary { background: #4361ee; color: #fff; }
+.btn-success { background: #2ec4b6; color: #fff; }
+.btn-danger  { background: #e63946; color: #fff; }
+.btn-warn    { background: #f4a261; color: #fff; }
+.btn-gray    { background: #6c757d; color: #fff; }
+.btn-sm { padding: 3px 9px; font-size: 12px; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+nav { background: #fff; border-bottom: 2px solid #e9ecef; display: flex; }
+nav button { padding: 11px 22px; border: none; background: none; cursor: pointer; font-size: 14px; font-family: inherit; color: #666; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: color .15s; }
+nav button.active { color: #4361ee; border-bottom-color: #4361ee; font-weight: 700; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+.card { background: #fff; border-radius: 8px; padding: 18px; margin-top: 14px; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+.card-title { font-size: 14px; font-weight: 700; margin-bottom: 14px; color: #333; border-left: 3px solid #4361ee; padding-left: 8px; }
+.form-row { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
+.form-row label { font-size: 13px; color: #555; min-width: 82px; }
+.form-row input, .form-row select { padding: 6px 10px; border: 1px solid #dee2e6; border-radius: 5px; font-size: 13px; font-family: inherit; }
+.form-row input[type=text] { flex: 1; min-width: 140px; }
+.form-row input[type=number] { width: 72px; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { background: #f8f9fa; padding: 8px 10px; text-align: left; border-bottom: 2px solid #dee2e6; color: #555; font-weight: 600; }
+td { padding: 8px 10px; border-bottom: 1px solid #f1f3f5; vertical-align: middle; }
+tr:hover td { background: #f8f9ff; }
+.rank-gold td { background: #fffde7 !important; }
+.rank-silver td { background: #fafafa !important; }
+.rank-bronze td { background: #fff8f0 !important; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 700; }
+.badge-win  { background: #d4edda; color: #155724; }
+.badge-loss { background: #f8d7da; color: #721c24; }
+.badge-draw { background: #d1ecf1; color: #0c5460; }
+.badge-bye  { background: #e9ecef; color: #495057; }
+.badge-cut  { background: #cce5ff; color: #004085; }
+.badge-drop { background: #f5c6cb; color: #721c24; }
+.badge-dl   { background: #343a40; color: #fff; }
+.info-box { background: #e8f4fd; border: 1px solid #bee3f8; border-radius: 6px; padding: 10px 14px; font-size: 13px; color: #2c5282; margin-bottom: 12px; line-height: 1.6; }
+.warn-box { background: #fff3cd; border: 1px solid #ffc107; border-radius: 6px; padding: 10px 14px; font-size: 13px; color: #856404; margin-bottom: 12px; }
+.player-list { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 4px; }
+.player-chip { display: flex; align-items: center; gap: 6px; background: #f0f4ff; border: 1px solid #c3cff7; border-radius: 20px; padding: 5px 10px 5px 12px; font-size: 13px; }
+.player-chip.dropped { background: #fde8ea; border-color: #f5b8be; color: #999; }
+.player-chip.dropped .chip-name { text-decoration: line-through; }
+.seed { color: #aaa; font-size: 11px; margin-right: 2px; }
+.round-tabs { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 12px; }
+.round-tab { padding: 4px 14px; border: 1px solid #dee2e6; border-radius: 14px; cursor: pointer; font-size: 13px; background: #fff; font-family: inherit; transition: all .15s; }
+.round-tab.active { background: #4361ee; color: #fff; border-color: #4361ee; }
+.result-btns { display: flex; gap: 4px; flex-wrap: wrap; }
+.score-input { display: flex; align-items: center; gap: 5px; }
+.score-input input { width: 42px; text-align: center; padding: 4px; border: 1px solid #dee2e6; border-radius: 4px; font-size: 13px; }
+.pts { font-size: 11px; color: #888; margin-left: 3px; }
+.subinfo { font-size: 11px; color: #999; }
+.hint { color: #888; font-size: 12px; }
+@media (max-width: 600px) {
+  .container { padding: 8px; }
+  nav button { padding: 9px 14px; font-size: 13px; }
+  table { font-size: 12px; }
+  th, td { padding: 6px 7px; }
+}
+/* ─── 결선 브래킷 ─── */
+.bracket-wrap { overflow-x: auto; padding: 8px 0 16px; }
+.bracket { display: inline-flex; gap: 0; align-items: stretch; min-width: 100%; }
+.br-col { display: flex; flex-direction: column; justify-content: space-around; min-width: 190px; }
+.br-col + .br-col { margin-left: 36px; position: relative; }
+.br-col + .br-col::before { content: ''; position: absolute; left: -18px; top: 0; bottom: 0; border-left: 2px dashed #dee2e6; }
+.br-col-title { text-align: center; font-size: 13px; font-weight: 700; color: #4361ee; margin-bottom: 10px; padding: 4px 0; border-bottom: 2px solid #e9ecef; }
+.br-match { border: 1px solid #dee2e6; border-radius: 6px; overflow: hidden; background: #fff; margin: 5px 0; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+.br-player { padding: 8px 12px; font-size: 13px; border-bottom: 1px solid #f1f3f5; display: flex; justify-content: space-between; align-items: center; min-height: 36px; gap: 8px; }
+.br-player:last-child { border-bottom: none; }
+.br-player.winner { background: #d4edda; font-weight: 700; }
+.br-player.loser  { color: #aaa; background: #fafafa; }
+.br-player.tbd    { color: #ccc; font-style: italic; }
+.br-score { font-size: 12px; color: #888; min-width: 16px; text-align: right; }
+.br-score.win { color: #155724; font-weight: 700; }
+.br-input { padding: 8px 10px; border-top: 1px dashed #dee2e6; background: #f8f9ff; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.champion-box { text-align: center; padding: 24px; margin-top: 16px; background: linear-gradient(135deg,#fff9c4,#ffe57f); border-radius: 12px; border: 2px solid #ffd600; }
+.champion-box .trophy { font-size: 40px; margin-bottom: 6px; }
+.champion-box .champ-name { font-size: 22px; font-weight: 900; color: #c17900; }
+.champion-box .champ-label { color: #888; font-size: 13px; margin-top: 4px; }
+/* ─── 대회 목록 ─── */
+.tour-item { display:flex; align-items:center; justify-content:space-between; padding:12px 14px; border:1px solid #e9ecef; border-radius:7px; margin-bottom:8px; gap:10px; background:#fafbff; transition: border-color .15s, background .15s; }
+.tour-item:hover { border-color:#4361ee; background:#f0f4ff; }
+.tour-item-name { font-weight:700; font-size:14px; color:#1a1a2e; margin-bottom:3px; }
+.tour-item-meta { font-size:12px; color:#888; }
+.tour-item-btns { display:flex; gap:6px; flex-shrink:0; }
+.tour-empty { color:#aaa; text-align:center; padding:30px 0; font-size:13px; line-height:2; }
+@media print {
+  header .header-btns, nav, .no-print { display: none !important; }
+  body { background: #fff; }
+  .card { box-shadow: none; border: 1px solid #ddd; page-break-inside: avoid; }
+  .container { padding: 0; max-width: 100%; }
+}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <div class="site-nav-inner">
+    <a href="https://tcg-calendar.co.kr" class="site-nav-link">📅 TCG 대회 일정 수집기</a>
+    <a href="https://tcg-calendar.co.kr/result.html" class="site-nav-link">📋 대회 결과 수집기</a>
+    <a href="https://tcg-calendar.co.kr/tcg-swisssystem.html" class="site-nav-link active">🏆 스위스라운드 시스템</a>
+  </div>
+</nav>
+<div id="app">
+<header>
+  <h1 id="headerTitle">TCG 스위스 라운드 시스템</h1>
+  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+    <button id="headerBackBtn" class="btn btn-gray btn-sm no-print" onclick="backToList()" style="display:none">← 목록</button>
+    <div class="header-btns no-print" id="headerTourBtns" style="display:none">
+      <button class="btn btn-gray btn-sm" onclick="exportJSON()">💾 대회정보 백업</button>
+      <button class="btn btn-gray btn-sm" onclick="importJSON()">📂 대회정보 불러오기</button>
+      <button class="btn btn-gray btn-sm" onclick="window.print()">🖨️ 인쇄</button>
+      <button class="btn btn-gray btn-sm" onclick="saveImage()">🖼️ 이미지 저장</button>
+      <button class="btn btn-danger btn-sm" onclick="resetAll()">🗑️ 초기화</button>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+<!-- ─── 대회 목록 뷰 ─── -->
+<div id="view-list">
+  <div class="card" style="margin-top:14px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div class="card-title" style="margin:0">대회 목록</div>
+      <button class="btn btn-primary" onclick="createTournament()">＋ 새 대회 만들기</button>
+    </div>
+    <div id="tourList"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">스위스 라운드 시스템 안내</div>
+    <div style="line-height:1.9;font-size:13px;color:#444">
+      <p style="margin-bottom:10px">
+        스위스 라운드는 탈락 없이 모든 참가자가 동일한 라운드 수를 치르는 토너먼트 방식입니다.<br>
+        매 라운드마다 비슷한 승점의 참가자끼리 매칭되며, 최종 순위는 아래 타이브레이커 순으로 결정됩니다.
+      </p>
+      <b>타이브레이커 (동점 시 순위 결정 순서)</b>
+      <ol style="margin:8px 0 12px 20px;line-height:2">
+        <li><b>승점 (Match Points)</b> — 승 3점, 무 1점, 패 0점</li>
+        <li><b>OMW% (Opponents' Match-Win %)</b> — 상대들의 매치 승률 평균 (최소 33%)</li>
+        <li><b>GW% (Game-Win %)</b> — 본인의 개별 게임 승률 (최소 33%)</li>
+        <li><b>OGW% (Opponents' Game-Win %)</b> — 상대들의 GW% 평균</li>
+        <li><b>맞대결 결과</b> — 동률 두 참가자가 서로 대전한 결과</li>
+      </ol>
+      <div class="info-box" style="margin-bottom:10px">
+         <b>크롬(Chrome) 또는 엣지(Edge) 브라우저 사용을 권장합니다.</b><br>
+        대회 정보는 사용자 PC의 브라우저 내부(IndexedDB)에만 저장되며, 외부 서버로 전송되지 않습니다.
+      </div>
+      <div class="info-box">
+         <b>드랍 처리</b>는 라운드 진행 중 <b>설정/참가자</b> 탭에서 할 수 있습니다.<br>
+        드랍된 참가자는 이후 라운드 페어링에서 제외되며, 기존 성적은 순위표에 유지됩니다.
+      </div>
+      <div class="info-box">
+         <b>오류발생</b><br>
+         오류내용을 알려주시면 감사합니다 <a href="https://form.naver.com/response/bAscebbcjKNYYnmKWDiznQ">오류 신고</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── 대회 상세 뷰 ─── -->
+<div id="view-tournament" style="display:none">
+<nav>
+  <button class="active" onclick="showTab('setup')">⚙️ 설정/참가자</button>
+  <button onclick="showTab('rounds')">🎮 라운드</button>
+  <button onclick="showTab('standings')">📊 라운드순위표</button>
+  <button onclick="showTab('bracket')">🏅 토너먼트</button>
+  <button onclick="showTab('final')">🏆 최종순위표</button>
+</nav>
+
+<!-- ─── 설정/참가자 탭 ─── -->
+<div id="tab-setup" class="tab-content active">
+  <div class="card">
+    <div class="card-title">대회 설정</div>
+    <div class="form-row">
+      <label>대회명</label>
+      <input type="text" id="tName" placeholder="대회 이름">
+    </div>
+    <div class="form-row">
+      <label>매치 방식</label>
+      <select id="tFormat" onchange="updateRoundsHint()">
+        <option value="bo1">단판 (BO1)</option>
+        <option value="bo3">3판 2승 (BO3)</option>
+        <option value="bo5">5판 3승 (BO5)</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>라운드 수</label>
+      <input type="number" id="tRounds" min="1" max="15" oninput="updateRoundsHint()">
+      <span id="roundsHint" class="hint"></span>
+    </div>
+    <div class="form-row">
+      <label>결선 토너먼트</label>
+      <select id="tTopCut">
+        <option value="0">없음 (스위스만)</option>
+        <option value="4">Top 4</option>
+        <option value="8" selected>Top 8</option>
+        <option value="16">Top 16</option>
+        <option value="32">Top 32</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" onclick="saveSettings()">설정 저장</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">참가자 등록</div>
+    <div class="form-row">
+      <input type="text" id="playerName" placeholder="참가자 이름 입력"
+        onkeydown="if(event.key==='Enter')addPlayer()">
+      <button class="btn btn-primary" onclick="addPlayer()">추가</button>
+    </div>
+    <div id="playerCount" class="hint" style="margin-bottom:10px"></div>
+    <div id="playerList" class="player-list"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">스위스 라운드 시스템 안내</div>
+    <div style="line-height:1.9;font-size:13px;color:#444">
+      <p style="margin-bottom:10px">
+        스위스 라운드는 탈락 없이 모든 참가자가 동일한 라운드 수를 치르는 토너먼트 방식입니다.<br>
+        매 라운드마다 비슷한 승점의 참가자끼리 매칭되며, 최종 순위는 아래 타이브레이커 순으로 결정됩니다.
+      </p>
+      <b>타이브레이커 (동점 시 순위 결정 순서)</b>
+      <ol style="margin:8px 0 12px 20px;line-height:2">
+        <li><b>승점 (Match Points)</b> — 승 3점, 무 1점, 패 0점</li>
+        <li><b>OMW% (Opponents' Match-Win %)</b> — 상대들의 매치 승률 평균 (최소 33%)</li>
+        <li><b>GW% (Game-Win %)</b> — 본인의 개별 게임 승률 (최소 33%)</li>
+        <li><b>OGW% (Opponents' Game-Win %)</b> — 상대들의 GW% 평균</li>
+        <li><b>맞대결 결과</b> — 동률 두 참가자가 서로 대전한 결과</li>
+      </ol>
+      <div class="info-box" style="margin-bottom:10px">
+         <b>크롬(Chrome) 또는 엣지(Edge) 브라우저 사용을 권장합니다.</b><br>
+        대회 정보는 사용자 PC의 브라우저 내부(IndexedDB)에만 저장되며, 외부 서버로 전송되지 않습니다.
+      </div>
+      <div class="info-box">
+         <b>드랍 처리</b>는 라운드 진행 중 <b>설정/참가자</b> 탭에서 할 수 있습니다.<br>
+        드랍된 참가자는 이후 라운드 페어링에서 제외되며, 기존 성적은 순위표에 유지됩니다.
+      </div>
+      <div class="info-box">
+         <b>오류발생</b><br>
+         오류내용을 알려주시면 감사합니다 <a href="https://form.naver.com/response/bAscebbcjKNYYnmKWDiznQ">오류 신고</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── 라운드 탭 ─── -->
+<div id="tab-rounds" class="tab-content">
+  <div class="card">
+    <div class="card-title">라운드 관리</div>
+    <div id="roundInfo" class="info-box">대회 정보 로딩 중...</div>
+    <div class="round-tabs no-print" id="roundTabs"></div>
+    <div class="no-print" style="margin-bottom:14px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-primary" id="btnCreateRound" onclick="createRound()">▶ 다음 라운드 생성</button>
+      <span id="createRoundMsg" class="hint" style="align-self:center"></span>
+    </div>
+    <div id="roundContent"></div>
+  </div>
+</div>
+
+<!-- ─── 순위표 탭 ─── -->
+<div id="tab-standings" class="tab-content">
+  <div class="card">
+    <div class="card-title">현재 순위표</div>
+    <div id="standingsTable"></div>
+  </div>
+</div>
+<!-- ─── 결선 토너먼트 탭 ─── -->
+<div id="tab-bracket" class="tab-content">
+  <div class="card">
+    <div class="card-title">토너먼트 브래킷</div>
+    <div id="bracketContent"></div>
+  </div>
+</div>
+
+<!-- ─── 최종순위표 탭 ─── -->
+<div id="tab-final" class="tab-content">
+  <div class="card">
+    <div class="card-title">최종순위표</div>
+    <div id="finalStandingsTable"></div>
+  </div>
+</div>
+</div><!-- /view-tournament -->
+</div><!-- /container -->
+</div><!-- /app -->
+
+<input type="file" id="fileInput" accept=".json" style="display:none" onchange="loadJSONFile(event)">
+
+<script>
+// ═══════════════════════════════════════════════════
+// 상태
+// ═══════════════════════════════════════════════════
+let T = null;            // 현재 열린 대회 데이터
+let currentTourId = null;
+let viewRound = 0;
+
+function newTournamentData(name = 'TCG 대회') {
+  return { name, format: 'bo1', totalRounds: 4, topCut: 8,
+           players: [], rounds: [], bracket: null, nextId: 1 };
+}
+
+// ═══════════════════════════════════════════════════
+// IndexedDB (v2 — 다중 대회)
+// ═══════════════════════════════════════════════════
+const DB_NAME = 'SwissSystemDB', DB_VER = 2, STORE = 'tournaments';
+let db;
+
+function initDB() {
+  const req = indexedDB.open(DB_NAME, DB_VER);
+  req.onupgradeneeded = e => {
+    const udb = e.target.result, tx = e.target.transaction;
+    if (!udb.objectStoreNames.contains(STORE))
+      udb.createObjectStore(STORE, { keyPath: 'id' });
+    // v1 → v2 마이그레이션
+    if (e.oldVersion === 1 && udb.objectStoreNames.contains('state')) {
+      const r = tx.objectStore('state').get(1);
+      r.onsuccess = ev => {
+        if (ev.target.result?.data)
+          tx.objectStore(STORE).put({ id: Date.now(), data: ev.target.result.data });
+      };
+    }
+  };
+  req.onsuccess = e => { db = e.target.result; renderList(); };
+  req.onerror   = ()  => renderList();
+}
+
+function save() {
+  if (!db || !currentTourId || !T) return;
+  db.transaction(STORE, 'readwrite')
+    .objectStore(STORE)
+    .put({ id: currentTourId, data: JSON.parse(JSON.stringify(T)) });
+}
+
+function getAllTournaments(cb) {
+  if (!db) { cb([]); return; }
+  const r = db.transaction(STORE, 'readonly').objectStore(STORE).getAll();
+  r.onsuccess = e => cb(e.target.result || []);
+  r.onerror   = () => cb([]);
+}
+
+// ═══════════════════════════════════════════════════
+// 대회 목록 뷰
+// ═══════════════════════════════════════════════════
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+                  .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function showView(name) {
+  document.getElementById('view-list').style.display       = name === 'list'       ? '' : 'none';
+  document.getElementById('view-tournament').style.display = name === 'tournament' ? '' : 'none';
+  document.getElementById('headerBackBtn').style.display   = name === 'tournament' ? '' : 'none';
+  document.getElementById('headerTourBtns').style.display  = name === 'tournament' ? '' : 'none';
+  document.getElementById('headerTitle').textContent =
+    (name === 'tournament' && T) ? T.name : 'TCG 스위스 라운드 시스템';
+}
+
+function renderList() {
+  showView('list');
+  getAllTournaments(list => {
+    const el = document.getElementById('tourList');
+    if (!list.length) {
+      el.innerHTML = '<div class="tour-empty">저장된 대회가 없습니다.<br>새 대회를 만들어보세요!</div>';
+      return;
+    }
+    list.sort((a, b) => b.id - a.id);
+    el.innerHTML = list.map(rec => {
+      const d = rec.data;
+      const active = (d.players || []).filter(p => !p.dropped).length;
+      const rounds = (d.rounds || []).length;
+      const total  = d.totalRounds || '?';
+      const fmt    = { bo1: 'BO1', bo3: 'BO3', bo5: 'BO5' }[d.format] || '';
+      const cutStr = d.topCut > 0 ? ` · Top${d.topCut}` : '';
+      const dateStr = new Date(rec.id).toLocaleDateString('ko-KR');
+      return `<div class="tour-item">
+        <div class="tour-item-info">
+          <div class="tour-item-name">${escHtml(d.name)}</div>
+          <div class="tour-item-meta">${dateStr} · ${fmt}${cutStr} · 참가 ${active}명 · ${rounds}/${total}라운드</div>
+        </div>
+        <div class="tour-item-btns">
+          <button class="btn btn-primary btn-sm" onclick="openTournament(${rec.id})">열기</button>
+          <button class="btn btn-danger btn-sm"  onclick="deleteTournament(${rec.id})">삭제</button>
+        </div>
+      </div>`;
+    }).join('');
+  });
+}
+
+function createTournament() {
+  if (!db) { alert('DB 오류'); return; }
+  const id = Date.now(), data = newTournamentData();
+  const tx = db.transaction(STORE, 'readwrite');
+  tx.objectStore(STORE).put({ id, data });
+  tx.oncomplete = () => openTournament(id);
+}
+
+function openTournament(id) {
+  if (!db) return;
+  const r = db.transaction(STORE, 'readonly').objectStore(STORE).get(id);
+  r.onsuccess = e => {
+    if (!e.target.result) { alert('대회를 찾을 수 없습니다.'); return; }
+    T = e.target.result.data;
+    if (!T.bracket) T.bracket = null;
+    currentTourId = id;
+    viewRound = Math.max(0, (T.rounds || []).length - 1);
+    showView('tournament');
+    render();
+  };
+}
+
+function deleteTournament(id) {
+  getAllTournaments(list => {
+    const name = list.find(r => r.id === id)?.data?.name || '대회';
+    if (!confirm(`"${name}"을(를) 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) return;
+    db.transaction(STORE, 'readwrite').objectStore(STORE).delete(id);
+    setTimeout(() => renderList(), 50);
+  });
+}
+
+function backToList() {
+  save();
+  T = null; currentTourId = null; viewRound = 0;
+  renderList();
+}
+
+// ═══════════════════════════════════════════════════
+// 헬퍼
+// ═══════════════════════════════════════════════════
+function winsNeeded() { return T.format === 'bo1' ? 1 : T.format === 'bo3' ? 2 : 3; }
+function maxGames()   { return T.format === 'bo1' ? 1 : T.format === 'bo3' ? 3 : 5; }
+function pName(id)    { if (id === null) return '👤 BYE'; const p = T.players.find(p => p.id === id); return p ? p.name : '?'; }
+
+function recRounds(n) { return n < 2 ? 0 : Math.max(3, Math.ceil(Math.log2(n))); }
+
+function hasPlayed(id1, id2) {
+  return T.rounds.some(r =>
+    r.pairings.some(p =>
+      (p.p1Id === id1 && p.p2Id === id2) ||
+      (p.p1Id === id2 && p.p2Id === id1)
+    )
+  );
+}
+
+function getOpponents(pid) {
+  const res = [];
+  T.rounds.forEach(r => r.pairings.forEach(p => {
+    if (p.p2Id === null) return;
+    if (p.p1Id === pid) res.push(p.p2Id);
+    else if (p.p2Id === pid) res.push(p.p1Id);
+  }));
+  return res;
+}
+
+// ═══════════════════════════════════════════════════
+// 통계 계산
+// ═══════════════════════════════════════════════════
+function calcStats(pid) {
+  let wins = 0, losses = 0, draws = 0, pts = 0, byeCount = 0;
+  T.rounds.forEach(r => r.pairings.forEach(p => {
+    if (p.p2Id === null && p.p1Id === pid) { byeCount++; wins++; pts += 3; return; }
+    if (p.p1Id !== pid && p.p2Id !== pid) return;
+    if (!p.done) return;
+    if (p.dl) { losses++; return; } // 쌍방패: 둘 다 패, 0점
+    const isP1 = p.p1Id === pid;
+    const mw = isP1 ? p.p1w : p.p2w;
+    const ow = isP1 ? p.p2w : p.p1w;
+    if (mw > ow)      { wins++;   pts += 3; }
+    else if (mw < ow) { losses++; }
+    else              { draws++;  pts += 1; }
+  }));
+  return { wins, losses, draws, pts, byeCount, played: wins + losses + draws };
+}
+
+// OMW% = 상대 매치 승점 / (상대 경기 수 × 3), 최소 33% (MTG/Pokémon 공식)
+function calcOMW(pid) {
+  const opps = getOpponents(pid);
+  if (!opps.length) return 0.33;
+  const rates = opps.map(oid => {
+    const s = calcStats(oid);
+    if (s.played === 0) return 0.33;
+    return Math.max(0.33, s.pts / (s.played * 3));
+  });
+  return rates.reduce((a, b) => a + b, 0) / rates.length;
+}
+
+// GW% = 본인 게임 승수 / 전체 게임 수, 최소 33% (MTG 3순위)
+function calcGW(pid) {
+  let gw = 0, total = 0;
+  T.rounds.forEach(r => r.pairings.forEach(p => {
+    if (p.p2Id === null && p.p1Id === pid) { gw += 1; total += 1; return; } // BYE
+    if (p.p1Id !== pid && p.p2Id !== pid) return;
+    if (!p.done || p.dl) return;
+    const isP1 = p.p1Id === pid;
+    const mw = isP1 ? p.p1w : p.p2w;
+    const ow = isP1 ? p.p2w : p.p1w;
+    gw += mw; total += mw + ow;
+  }));
+  if (total === 0) return 0.33;
+  return Math.max(0.33, gw / total);
+}
+
+// OGW% = 상대 GW% 평균 (MTG 4순위)
+function calcOGW(pid) {
+  const opps = getOpponents(pid);
+  if (!opps.length) return 0.33;
+  const rates = opps.map(oid => calcGW(oid));
+  return rates.reduce((a, b) => a + b, 0) / rates.length;
+}
+
+// 맞대결 결과 비교 (5순위) — sort comparator로 직접 사용
+// 반환값: 음수=a가 앞(a가 b를 이긴 경우), 양수=b가 앞, 0=대전 없음
+function headToHead(aId, bId) {
+  for (const r of T.rounds) {
+    for (const p of r.pairings) {
+      if (p.p1Id === aId && p.p2Id === bId && p.done && !p.dl)
+        return p.p2w - p.p1w; // negative if a(p1) won
+      if (p.p1Id === bId && p.p2Id === aId && p.done && !p.dl)
+        return p.p1w - p.p2w; // positive if b(p1) won
+    }
+  }
+  return 0;
+}
+
+function getStandings(withDropped = false) {
+  const players = withDropped ? T.players : T.players.filter(p => !p.dropped);
+  return players.map(p => {
+    const s = calcStats(p.id);
+    return { ...p, ...s, omw: calcOMW(p.id), gw: calcGW(p.id), ogw: calcOGW(p.id) };
+  }).sort((a, b) =>
+    b.pts - a.pts ||
+    b.omw - a.omw ||
+    b.gw  - a.gw  ||
+    b.ogw - a.ogw ||
+    headToHead(a.id, b.id) ||
+    a.name.localeCompare(b.name)
+  );
+}
+
+// ═══════════════════════════════════════════════════
+// 스위스 페어링 (그리디 + 재매칭 방지)
+// ═══════════════════════════════════════════════════
+function generatePairings() {
+  const sorted = getStandings(); // 승점 내림차순
+  let pool = [...sorted];
+  const pairings = [];
+
+  // BYE 처리 (홀수 인원)
+  if (pool.length % 2 === 1) {
+    // 최하위 점수 중 BYE 받은 적 없는 사람 우선
+    let byeIdx = pool.length - 1;
+    for (let i = pool.length - 1; i >= 0; i--) {
+      if (pool[i].byeCount === 0) { byeIdx = i; break; }
+    }
+    const byeP = pool.splice(byeIdx, 1)[0];
+    pairings.push({ p1Id: byeP.id, p2Id: null, p1w: 0, p2w: 0, done: true });
+  }
+
+  // 그리디 페어링: 재매칭 방지 우선, 불가피시 허용
+  while (pool.length >= 2) {
+    const p1 = pool.shift();
+    let partnered = false;
+    for (let j = 0; j < pool.length; j++) {
+      if (!hasPlayed(p1.id, pool[j].id)) {
+        const p2 = pool.splice(j, 1)[0];
+        pairings.push({ p1Id: p1.id, p2Id: p2.id, p1w: 0, p2w: 0, done: false });
+        partnered = true;
+        break;
+      }
+    }
+    if (!partnered) {
+      // 재매칭 불가피 - 가장 가까운 상대와 강제 매칭
+      const p2 = pool.shift();
+      pairings.push({ p1Id: p1.id, p2Id: p2.id, p1w: 0, p2w: 0, done: false });
+    }
+  }
+
+  return pairings;
+}
+
+// ═══════════════════════════════════════════════════
+// 라운드 생성
+// ═══════════════════════════════════════════════════
+function createRound() {
+  const active = T.players.filter(p => !p.dropped);
+  if (active.length < 2) { alert('참가자가 2명 이상 필요합니다.'); return; }
+
+  if (T.rounds.length > 0) {
+    const last = T.rounds[T.rounds.length - 1];
+    const incomplete = last.pairings.filter(p => p.p2Id !== null && !p.done);
+    if (incomplete.length > 0) {
+      alert(`이전 라운드에 미입력 결과가 ${incomplete.length}건 있습니다.\n모두 입력한 후 다음 라운드를 생성해주세요.`);
+      return;
+    }
+  }
+
+  if (T.rounds.length >= T.totalRounds) {
+    alert(`설정된 총 라운드(${T.totalRounds})를 모두 완료했습니다.`);
+    return;
+  }
+
+  T.rounds.push({ pairings: generatePairings() });
+  viewRound = T.rounds.length - 1;
+  save();
+  showTab('rounds');
+  render();
+}
+
+// ═══════════════════════════════════════════════════
+// 결과 입력
+// ═══════════════════════════════════════════════════
+function setResult(rIdx, pIdx, p1w, p2w) {
+  const p = T.rounds[rIdx].pairings[pIdx];
+  if (p.p2Id === null) return;
+  const maxW = winsNeeded();
+  p.p1w = Math.min(Math.max(0, p1w), maxW);
+  p.p2w = Math.min(Math.max(0, p2w), maxW);
+  p.done = true;
+  save();
+  renderRound(rIdx);
+  renderStandings();
+}
+
+function setDoubleLoss(rIdx, pIdx) {
+  const p = T.rounds[rIdx].pairings[pIdx];
+  if (p.p2Id === null) return;
+  p.p1w = 0; p.p2w = 0; p.dl = true; p.done = true;
+  save();
+  renderRound(rIdx);
+  renderStandings();
+}
+
+function clearResult(rIdx, pIdx) {
+  const p = T.rounds[rIdx].pairings[pIdx];
+  p.p1w = 0; p.p2w = 0; p.dl = false; p.done = false;
+  save();
+  renderRound(rIdx);
+  renderStandings();
+}
+
+// ═══════════════════════════════════════════════════
+// 참가자 관리
+// ═══════════════════════════════════════════════════
+function addPlayer() {
+  const inp = document.getElementById('playerName');
+  const name = inp.value.trim();
+  if (!name) return;
+  if (T.players.some(p => p.name === name)) { alert('이미 등록된 이름입니다.'); return; }
+  T.players.push({ id: T.nextId++, name, dropped: false });
+  inp.value = '';
+  save();
+  updateRoundsHint();
+  renderPlayers();
+}
+
+function dropPlayer(id) {
+  const p = T.players.find(p => p.id === id);
+  if (!p) return;
+  if (T.rounds.length > 0) {
+    p.dropped = !p.dropped;
+  } else {
+    if (!confirm(`${p.name}을(를) 목록에서 삭제하시겠습니까?`)) return;
+    T.players = T.players.filter(pl => pl.id !== id);
+  }
+  save();
+  updateRoundsHint();
+  renderPlayers();
+  renderStandings();
+}
+
+// ═══════════════════════════════════════════════════
+// 설정
+// ═══════════════════════════════════════════════════
+function saveSettings() {
+  T.name        = document.getElementById('tName').value.trim() || 'TCG 대회';
+  T.format      = document.getElementById('tFormat').value;
+  T.totalRounds = parseInt(document.getElementById('tRounds').value) || 4;
+  T.topCut      = parseInt(document.getElementById('tTopCut').value) || 0;
+  save();
+  document.getElementById('headerTitle').textContent = T.name;
+  render();
+  alert('설정이 저장되었습니다.');
+}
+
+function applySettingsUI() {
+  document.getElementById('tName').value    = T.name;
+  document.getElementById('tFormat').value  = T.format;
+  document.getElementById('tRounds').value  = T.totalRounds;
+  document.getElementById('tTopCut').value  = T.topCut;
+}
+
+function updateRoundsHint() {
+  const n = T.players.filter(p => !p.dropped).length;
+  const hint = document.getElementById('roundsHint');
+  if (n < 2) { hint.textContent = ''; return; }
+  const rec = recRounds(n);
+  hint.textContent = `참가자 ${n}명 → 권장 ${rec}라운드`;
+  if (!document.getElementById('tRounds').value) {
+    document.getElementById('tRounds').value = rec;
+    T.totalRounds = rec;
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// 렌더링
+// ═══════════════════════════════════════════════════
+function renderPlayers() {
+  const active  = T.players.filter(p => !p.dropped).length;
+  const dropped = T.players.filter(p =>  p.dropped).length;
+  document.getElementById('playerCount').textContent =
+    `총 ${T.players.length}명 (참가 ${active}명${dropped ? `, 드랍 ${dropped}명` : ''})`;
+
+  document.getElementById('playerList').innerHTML = T.players.map((p, i) => `
+    <div class="player-chip ${p.dropped ? 'dropped' : ''}">
+      <span class="seed">${i + 1}.</span>
+      <span class="chip-name">${p.name}</span>
+      <button class="btn btn-sm ${p.dropped ? 'btn-success' : 'btn-warn'}"
+        onclick="dropPlayer(${p.id})">
+        ${T.rounds.length > 0 ? (p.dropped ? '복귀' : '드랍') : '삭제'}
+      </button>
+    </div>
+  `).join('');
+}
+
+function renderRoundTabs() {
+  document.getElementById('roundTabs').innerHTML = T.rounds.map((_, i) => `
+    <button class="round-tab ${i === viewRound ? 'active' : ''}"
+      onclick="viewRound=${i};renderRound(${i})">${i + 1}라운드</button>
+  `).join('');
+}
+
+function renderRoundInfo() {
+  const done  = T.rounds.length;
+  const total = T.totalRounds;
+  const active = T.players.filter(p => !p.dropped).length;
+  const fmt = { bo1: '단판(BO1)', bo3: '3판2승(BO3)', bo5: '5판3승(BO5)' }[T.format];
+  const cut = T.topCut > 0 ? `Top ${T.topCut}` : '스위스만';
+  document.getElementById('roundInfo').innerHTML =
+    `<b>${T.name}</b> &nbsp;|&nbsp; ${fmt} &nbsp;|&nbsp; ` +
+    `라운드 ${done} / ${total} &nbsp;|&nbsp; 참가 ${active}명 &nbsp;|&nbsp; ${cut}`;
+
+  // 버튼 상태
+  const btn = document.getElementById('btnCreateRound');
+  const msg = document.getElementById('createRoundMsg');
+  if (done >= total) {
+    btn.disabled = true;
+    msg.textContent = '모든 라운드 완료';
+  } else if (done > 0) {
+    const last = T.rounds[done - 1];
+    const incomplete = last.pairings.filter(p => p.p2Id !== null && !p.done).length;
+    btn.disabled = incomplete > 0;
+    msg.textContent = incomplete > 0 ? `⚠ 미입력 ${incomplete}건` : `${done + 1}라운드 생성 가능`;
+  } else {
+    btn.disabled = false;
+    msg.textContent = '1라운드 생성 가능';
+  }
+}
+
+function renderRound(rIdx) {
+  renderRoundTabs();
+  renderRoundInfo();
+
+  const round = T.rounds[rIdx];
+  if (!round) {
+    document.getElementById('roundContent').innerHTML =
+      '<p style="color:#aaa;text-align:center;padding:30px">라운드를 생성해주세요.</p>';
+    return;
+  }
+
+  const maxW = winsNeeded();
+  const fmtLabel = { bo1: '단판', bo3: '3판2승', bo5: '5판3승' }[T.format];
+  const incomplete = round.pairings.filter(p => p.p2Id !== null && !p.done).length;
+
+  let html = `<div class="subinfo" style="margin-bottom:8px">
+    ${rIdx + 1}라운드 (${fmtLabel}) — ${round.pairings.length}경기
+    ${incomplete > 0 ? `&nbsp;<span style="color:#e63946">미입력 ${incomplete}건</span>` : '<span style="color:#2ec4b6">✓ 전체 입력 완료</span>'}
+  </div>`;
+
+  html += `<table><thead><tr>
+    <th style="width:32px">#</th>
+    <th>플레이어 1</th>
+    <th style="text-align:center">결과</th>
+    <th>플레이어 2</th>
+    <th class="no-print" style="width:200px">입력</th>
+  </tr></thead><tbody>`;
+
+  round.pairings.forEach((p, pi) => {
+    const isBye = p.p2Id === null;
+    const n1 = pName(p.p1Id);
+    const n2 = pName(p.p2Id);
+    const s1 = calcStats(p.p1Id);
+    const s2 = p.p2Id ? calcStats(p.p2Id) : null;
+    const pt1 = `<span class="pts">${s1.pts}pt</span>`;
+    const pt2 = s2 ? `<span class="pts">${s2.pts}pt</span>` : '';
+
+    let resultCell = '', inputCell = '';
+
+    if (isBye) {
+      resultCell = '<span class="badge badge-bye">BYE</span>';
+      inputCell  = '—';
+    } else if (p.done) {
+      let badge;
+      if (p.dl) {
+        badge = `<span class="badge badge-dl">쌍방패</span>`;
+      } else {
+        const winner = p.p1w > p.p2w ? n1 : p.p1w < p.p2w ? n2 : null;
+        badge = winner
+          ? `<span class="badge badge-win">${winner} 승</span>`
+          : `<span class="badge badge-draw">무승부</span>`;
+      }
+      const score = p.dl ? '' : `<span class="subinfo">&nbsp;${p.p1w}-${p.p2w}</span>`;
+      resultCell = badge + score;
+      inputCell  = `<button class="btn btn-sm btn-gray no-print" onclick="clearResult(${rIdx},${pi})">수정</button>`;
+    } else {
+      resultCell = '<span style="color:#ccc;font-size:12px">미입력</span>';
+      if (T.format === 'bo1') {
+        inputCell = `<div class="result-btns no-print">
+          <button class="btn btn-sm btn-primary" onclick="setResult(${rIdx},${pi},1,0)">${n1}</button>
+          <button class="btn btn-sm btn-gray"    onclick="setResult(${rIdx},${pi},0,0)">무승부</button>
+          <button class="btn btn-sm btn-danger"  onclick="setDoubleLoss(${rIdx},${pi})">쌍방패</button>
+          <button class="btn btn-sm btn-primary" onclick="setResult(${rIdx},${pi},0,1)">${n2}</button>
+        </div>`;
+      } else {
+        inputCell = `<div class="score-input no-print" style="flex-wrap:wrap;gap:6px">
+          <input type="number" id="r${rIdx}p${pi}a" min="0" max="${maxW}" value="0">
+          <span>-</span>
+          <input type="number" id="r${rIdx}p${pi}b" min="0" max="${maxW}" value="0">
+          <button class="btn btn-sm btn-primary" onclick="
+            setResult(${rIdx},${pi},
+              +document.getElementById('r${rIdx}p${pi}a').value,
+              +document.getElementById('r${rIdx}p${pi}b').value)">확인</button>
+          <button class="btn btn-sm btn-danger" onclick="setDoubleLoss(${rIdx},${pi})">쌍방패</button>
+        </div>`;
+      }
+    }
+
+    html += `<tr>
+      <td>${pi + 1}</td>
+      <td>${n1} ${pt1}</td>
+      <td style="text-align:center">${resultCell}</td>
+      <td>${n2} ${pt2}</td>
+      <td>${inputCell}</td>
+    </tr>`;
+  });
+
+  html += '</tbody></table>';
+  document.getElementById('roundContent').innerHTML = html;
+}
+
+function renderStandings() {
+  const list = getStandings(true);
+  if (!list.length) {
+    document.getElementById('standingsTable').innerHTML =
+      '<p style="color:#aaa;text-align:center;padding:30px">참가자를 등록해주세요.</p>';
+    return;
+  }
+
+  let html = `<table><thead><tr>
+    <th>순위</th><th>이름</th>
+    <th title="승">W</th><th title="무">D</th><th title="패">L</th>
+    <th>승점(Pts)</th>
+    <th title="상대 매치 승률 평균, 최소33% — 2순위 타이브레이커">OMW%</th>
+    <th title="본인 게임 승률, 최소33% — 3순위 타이브레이커">GW%</th>
+    <th title="상대 게임 승률 평균 — 4순위 타이브레이커">OGW%</th>
+    <th>상태</th>
+  </tr></thead><tbody>`;
+
+  list.forEach((p, i) => {
+    const rankClass = i === 0 ? 'rank-gold' : i === 1 ? 'rank-silver' : i === 2 ? 'rank-bronze' : '';
+    let status = '';
+    if (p.dropped) status = '<span class="badge badge-drop">드랍</span>';
+    else if (T.topCut > 0 && i < T.topCut) status = '<span class="badge badge-cut">컷</span>';
+
+    html += `<tr class="${rankClass}">
+      <td><b>${i + 1}</b>${i < 3 ? ['🥇','🥈','🥉'][i] : ''}</td>
+      <td><b>${p.name}</b></td>
+      <td>${p.wins}</td>
+      <td>${p.draws}</td>
+      <td>${p.losses}</td>
+      <td><b>${p.pts}</b></td>
+      <td>${(p.omw * 100).toFixed(1)}%</td>
+      <td>${(p.gw  * 100).toFixed(1)}%</td>
+      <td>${(p.ogw * 100).toFixed(1)}%</td>
+      <td>${status}</td>
+    </tr>`;
+  });
+
+  html += '</tbody></table>';
+  document.getElementById('standingsTable').innerHTML = html;
+}
+
+function render() {
+  if (!T) return;
+  applySettingsUI();
+  updateRoundsHint();
+  renderPlayers();
+  renderRoundInfo();
+  renderRoundTabs();
+  renderRound(viewRound);
+  renderStandings();
+  renderBracket();
+  renderFinalStandings();
+}
+
+// ═══════════════════════════════════════════════════
+// 탭 전환
+// ═══════════════════════════════════════════════════
+function showTab(name) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  const idx = ['setup', 'rounds', 'standings', 'bracket', 'final'].indexOf(name);
+  document.querySelectorAll('nav button')[idx].classList.add('active');
+  if (name === 'rounds')    { renderRoundInfo(); renderRoundTabs(); renderRound(viewRound); }
+  if (name === 'standings') { renderStandings(); }
+  if (name === 'bracket')   { renderBracket(); }
+  if (name === 'final')     { renderFinalStandings(); }
+}
+
+// ═══════════════════════════════════════════════════
+// 최종순위표
+// ═══════════════════════════════════════════════════
+function renderFinalStandings() {
+  const el = document.getElementById('finalStandingsTable');
+  if (!el) return;
+
+  if (!T.bracket || !T.bracket.started) {
+    const msg = T.topCut > 0
+      ? '결선 토너먼트가 아직 시작되지 않았습니다.<br>스위스 라운드 완료 후 결선 토너먼트를 시작해주세요.'
+      : '설정에서 결선 토너먼트(Top 컷)를 선택하지 않았습니다.<br>스위스 라운드 순위표를 확인하세요.';
+    el.innerHTML = `<p style="color:#aaa;text-align:center;padding:30px;line-height:2">${msg}</p>`;
+    return;
+  }
+
+  const bRounds = T.bracket.rounds;
+  const n = bRounds.length;
+  const placed = new Set();
+  const rows = []; // {id, label, medal, rankClass, badge}
+
+  // ── 결승: 1위·2위 ──
+  const finalMatch = bRounds[n - 1].matches[0];
+  if (finalMatch.done && finalMatch.winnerId) {
+    rows.push({ id: finalMatch.winnerId, label: '1위', medal: '🥇', rankClass: 'rank-gold', badge: '우승' });
+    placed.add(finalMatch.winnerId);
+    const ru = finalMatch.p1Id === finalMatch.winnerId ? finalMatch.p2Id : finalMatch.p1Id;
+    if (ru && !placed.has(ru)) {
+      rows.push({ id: ru, label: '2위', medal: '🥈', rankClass: 'rank-silver', badge: '준우승' });
+      placed.add(ru);
+    }
+  }
+
+  // ── 이전 라운드 역순: 3-4위, 5-8위 … ──
+  let nextPlace = rows.length + 1;
+  for (let rIdx = n - 2; rIdx >= 0; rIdx--) {
+    const isSemiFinal = rIdx === n - 2;
+    const tp = T.bracket.thirdPlace;
+    const losers = [];
+    bRounds[rIdx].matches.forEach(m => {
+      if (!m.done || !m.winnerId) return;
+      const loserId = m.p1Id === m.winnerId ? m.p2Id : m.p1Id;
+      if (loserId && !placed.has(loserId)) { losers.push(loserId); placed.add(loserId); }
+    });
+
+    if (isSemiFinal && tp && tp.done && tp.winnerId) {
+      // 3위 결정전 완료 → 3위·4위 개별 확정
+      const w3 = tp.winnerId;
+      const l4 = tp.p1Id === tp.winnerId ? tp.p2Id : tp.p1Id;
+      rows.push({ id: w3, label: '3위', medal: '🥉', rankClass: 'rank-bronze', badge: '결선' });
+      if (l4) rows.push({ id: l4, label: '4위', medal: '', rankClass: '', badge: '결선' });
+    } else {
+      const placeEnd = nextPlace + losers.length - 1;
+      const pending = isSemiFinal && tp && !tp.done && losers.length > 1;
+      const label = losers.length === 1
+        ? `${nextPlace}위`
+        : `${nextPlace}~${placeEnd}위${pending ? ' (3위전 대기)' : ''}`;
+      const medal = nextPlace === 3 ? '🥉' : '';
+      const rankClass = nextPlace === 3 ? 'rank-bronze' : '';
+      losers.forEach(id => rows.push({ id, label, medal, rankClass, badge: '결선' }));
+    }
+    nextPlace += losers.length;
+  }
+
+  // ── 스위스 라운드 탈락자 ──
+  const swissOnly = getStandings(false).filter(p => !placed.has(p.id));
+
+  // ── 브래킷 진행 중 경고 ──
+  const incomplete = bRounds.some(r => r.matches.some(m => !m.done && m.p1Id && m.p2Id));
+  let html = '';
+  if (incomplete) html += `<div class="warn-box">⚠ 결선 토너먼트가 아직 진행 중입니다. 결과가 확정된 것만 표시됩니다.</div>`;
+
+  html += `<table><thead><tr>
+    <th style="width:90px">순위</th><th>이름</th><th>비고</th>
+  </tr></thead><tbody>`;
+
+  rows.forEach(r => {
+    html += `<tr class="${r.rankClass}">
+      <td><b>${r.label}</b> ${r.medal}</td>
+      <td><b>${pName(r.id)}</b></td>
+      <td><span class="badge badge-cut">${r.badge}</span></td>
+    </tr>`;
+  });
+
+  let swissStart = (T.topCut || 0) + 1;
+  swissOnly.forEach((p, i) => {
+    html += `<tr>
+      <td>${swissStart + i}위</td>
+      <td>${escHtml(p.name)}${p.dropped ? ' <span class="badge badge-drop">드랍</span>' : ''}</td>
+      <td><span class="subinfo">스위스 ${p.pts}pt · OMW ${(p.omw*100).toFixed(1)}%</span></td>
+    </tr>`;
+  });
+
+  html += '</tbody></table>';
+  el.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════
+// 백업 / 복원 / 인쇄 / 이미지 저장
+// ═══════════════════════════════════════════════════
+function exportJSON() {
+  const blob = new Blob([JSON.stringify(T, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `swiss_${T.name}_${new Date().toISOString().slice(0, 10)}.json`;
+  a.click();
+}
+
+function importJSON() { document.getElementById('fileInput').click(); }
+
+function loadJSONFile(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const imported = JSON.parse(ev.target.result);
+      if (!imported.bracket) imported.bracket = null;
+      // 새 대회로 임포트
+      const id = Date.now();
+      const tx = db.transaction(STORE, 'readwrite');
+      tx.objectStore(STORE).put({ id, data: imported });
+      tx.oncomplete = () => openTournament(id);
+    } catch { alert('파일 형식이 올바르지 않습니다.'); }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+function saveImage() {
+  if (typeof html2canvas === 'undefined') {
+    alert('이미지 저장 라이브러리를 불러올 수 없습니다. (인터넷 연결 필요)');
+    return;
+  }
+  html2canvas(document.getElementById('app'), { scale: 2, useCORS: true }).then(canvas => {
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL('image/png');
+    a.download = `swiss_${T.name}_${new Date().toISOString().slice(0, 10)}.png`;
+    a.click();
+  }).catch(() => alert('이미지 저장에 실패했습니다.'));
+}
+
+function resetAll() {
+  if (!confirm(`"${T.name}"을(를) 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) return;
+  db.transaction(STORE, 'readwrite').objectStore(STORE).delete(currentTourId);
+  T = null; currentTourId = null; viewRound = 0;
+  renderList();
+}
+
+// ═══════════════════════════════════════════════════
+// 결선 토너먼트
+// ═══════════════════════════════════════════════════
+
+// 표준 시드 배치 순서 생성 (n은 2의 거듭제곱)
+function bracketOrder(n) {
+  if (n === 1) return [1];
+  const half = bracketOrder(n / 2);
+  const res = [];
+  for (const s of half) { res.push(s); res.push(n + 1 - s); }
+  return res;
+}
+
+// 라운드 이름
+function brRoundName(totalRounds, rIdx) {
+  const left = totalRounds - rIdx;
+  if (left === 1) return '결승';
+  if (left === 2) return '4강';
+  if (left === 3) return '8강';
+  if (left === 4) return '16강';
+  return `${Math.pow(2, left)}강`;
+}
+
+// 승자 다음 라운드로 진출 (실제 경기 결과 시: TBD 슬롯을 BYE로 잘못 판단하지 않도록 자동진출 없음)
+function advanceWinner(rounds, rIdx, mIdx, winnerId) {
+  if (rIdx + 1 >= rounds.length) return;
+  const nm = rounds[rIdx + 1].matches[Math.floor(mIdx / 2)];
+  if (mIdx % 2 === 0) nm.p1Id = winnerId;
+  else                nm.p2Id = winnerId;
+}
+
+// 승자 제거 (결과 수정 시)
+function removeWinner(rIdx, playerId) {
+  if (!T.bracket || rIdx >= T.bracket.rounds.length) return;
+  T.bracket.rounds[rIdx].matches.forEach((m, mi) => {
+    if (m.p1Id === playerId || m.p2Id === playerId) {
+      if (m.p1Id === playerId) m.p1Id = null;
+      else                     m.p2Id = null;
+      const prevWin = m.winnerId;
+      m.p1w = 0; m.p2w = 0; m.done = false; m.winnerId = null;
+      if (prevWin) removeWinner(rIdx + 1, prevWin);
+    }
+  });
+}
+
+// 브래킷 초기화
+function initBracket() {
+  if (T.topCut === 0) { alert('설정에서 결선 토너먼트(Top 컷)를 선택해주세요.'); return; }
+  if (T.rounds.length > 0) {
+    const last = T.rounds[T.rounds.length - 1];
+    if (last.pairings.filter(p => p.p2Id !== null && !p.done).length > 0) {
+      alert('스위스 라운드에 미입력 결과가 있습니다.\n모두 입력 후 결선 토너먼트를 시작해주세요.');
+      return;
+    }
+  }
+  if (T.bracket && T.bracket.started) {
+    if (!confirm('이미 토너먼트가 시작되었습니다. 초기화하고 다시 시작하시겠습니까?')) return;
+  }
+
+  const standings = getStandings(false);
+  const n = T.topCut;
+  const seeds = standings.slice(0, n);
+  // 2의 거듭제곱으로 올림 (BYE 슬롯 처리)
+  const size = Math.pow(2, Math.ceil(Math.log2(Math.max(n, 2))));
+  const order = bracketOrder(size); // e.g. [1,8,4,5,2,7,3,6]
+
+  // 1라운드 매치 생성
+  const firstMatches = [];
+  for (let i = 0; i < order.length; i += 2) {
+    const p1 = seeds[order[i] - 1] || null;
+    const p2 = seeds[order[i + 1] - 1] || null;
+    if (!p1 && !p2) continue;
+    const m = { p1Id: p1 ? p1.id : null, p2Id: p2 ? p2.id : null,
+                p1w: 0, p2w: 0, done: false, winnerId: null };
+    // 한쪽이 BYE면 자동 승리
+    if (!p2 && p1) { m.done = true; m.winnerId = p1.id; }
+    else if (!p1 && p2) { m.done = true; m.winnerId = p2.id; }
+    firstMatches.push(m);
+  }
+
+  // 전체 라운드 구조 생성
+  const totalRounds = Math.ceil(Math.log2(size));
+  const allRounds = [{ name: brRoundName(totalRounds, 0), matches: firstMatches }];
+  let cnt = firstMatches.length;
+  while (cnt > 1) {
+    cnt = Math.ceil(cnt / 2);
+    allRounds.push({
+      name: brRoundName(totalRounds, allRounds.length),
+      matches: Array.from({ length: cnt }, () =>
+        ({ p1Id: null, p2Id: null, p1w: 0, p2w: 0, done: false, winnerId: null }))
+    });
+  }
+
+  // 1라운드 BYE 자동 진출 처리 (초기화 시에만: TBD 슬롯과 혼동 없이 직접 배치)
+  if (allRounds.length > 1) {
+    firstMatches.forEach((m, mi) => {
+      if (m.done && m.winnerId !== null) {
+        const nm = allRounds[1].matches[Math.floor(mi / 2)];
+        if (mi % 2 === 0) nm.p1Id = m.winnerId;
+        else              nm.p2Id = m.winnerId;
+      }
+    });
+  }
+
+  // 3위 결정전: 4강 이상(2라운드 이상)일 때만 생성
+  const thirdPlace = allRounds.length >= 2
+    ? { p1Id: null, p2Id: null, p1w: 0, p2w: 0, done: false, winnerId: null }
+    : null;
+
+  T.bracket = { started: true, rounds: allRounds, thirdPlace };
+  save();
+  renderBracket();
+}
+
+// 브래킷 결과 입력
+function setBracketResult(rIdx, mIdx, p1w, p2w) {
+  const m = T.bracket.rounds[rIdx].matches[mIdx];
+  const maxW = winsNeeded();
+  m.p1w = Math.min(Math.max(0, p1w), maxW);
+  m.p2w = Math.min(Math.max(0, p2w), maxW);
+  if (m.p1w === m.p2w) { alert('토너먼트는 무승부가 없습니다. 승자를 확정해주세요.'); return; }
+  m.winnerId = m.p1w > m.p2w ? m.p1Id : m.p2Id;
+  m.done = true;
+  advanceWinner(T.bracket.rounds, rIdx, mIdx, m.winnerId);
+  // 4강(semi-final) 패자 → 3위 결정전 배치
+  const n = T.bracket.rounds.length;
+  if (T.bracket.thirdPlace && rIdx === n - 2) {
+    const loserId = m.winnerId === m.p1Id ? m.p2Id : m.p1Id;
+    if (mIdx % 2 === 0) T.bracket.thirdPlace.p1Id = loserId;
+    else                T.bracket.thirdPlace.p2Id = loserId;
+  }
+  save();
+  renderBracket();
+  renderFinalStandings();
+}
+
+// 브래킷 결과 수정
+function clearBracketResult(rIdx, mIdx) {
+  const m = T.bracket.rounds[rIdx].matches[mIdx];
+  const prevWin = m.winnerId;
+  m.p1w = 0; m.p2w = 0; m.done = false; m.winnerId = null;
+  if (prevWin) removeWinner(rIdx + 1, prevWin);
+  // 4강 결과 수정 시 3위 결정전 슬롯·결과 초기화
+  const n = T.bracket.rounds.length;
+  if (T.bracket.thirdPlace && rIdx === n - 2) {
+    const tp = T.bracket.thirdPlace;
+    if (mIdx % 2 === 0) tp.p1Id = null;
+    else                tp.p2Id = null;
+    tp.p1w = 0; tp.p2w = 0; tp.done = false; tp.winnerId = null;
+  }
+  save();
+  renderBracket();
+  renderFinalStandings();
+}
+
+// 3위 결정전 결과 입력
+function setThirdPlaceResult(p1w, p2w) {
+  const tp = T.bracket.thirdPlace;
+  const maxW = winsNeeded();
+  tp.p1w = Math.min(Math.max(0, p1w), maxW);
+  tp.p2w = Math.min(Math.max(0, p2w), maxW);
+  if (tp.p1w === tp.p2w) { alert('토너먼트는 무승부가 없습니다. 승자를 확정해주세요.'); return; }
+  tp.winnerId = tp.p1w > tp.p2w ? tp.p1Id : tp.p2Id;
+  tp.done = true;
+  save();
+  renderBracket();
+  renderFinalStandings();
+}
+
+// 3위 결정전 결과 수정
+function clearThirdPlaceResult() {
+  const tp = T.bracket.thirdPlace;
+  tp.p1w = 0; tp.p2w = 0; tp.done = false; tp.winnerId = null;
+  save();
+  renderBracket();
+  renderFinalStandings();
+}
+
+// 브래킷 렌더링
+function renderBracket() {
+  const el = document.getElementById('bracketContent');
+
+  if (!T.bracket || !T.bracket.started) {
+    if (T.topCut === 0) {
+      el.innerHTML = '<p style="color:#aaa;text-align:center;padding:30px">설정에서 결선 토너먼트(Top 컷)를 선택해주세요.</p>';
+      return;
+    }
+    const swissDone = T.rounds.length >= T.totalRounds;
+    const lastOk = T.rounds.length === 0 ||
+      T.rounds[T.rounds.length - 1].pairings.filter(p => p.p2Id !== null && !p.done).length === 0;
+    const standings = getStandings(false);
+    const seeds = standings.slice(0, T.topCut);
+
+    let html = '';
+    if (!swissDone) html += `<div class="warn-box">⚠ 스위스 라운드가 아직 끝나지 않았습니다. (${T.rounds.length}/${T.totalRounds})</div>`;
+    if (!lastOk)    html += `<div class="warn-box">⚠ 마지막 라운드에 미입력 결과가 있습니다.</div>`;
+
+    html += `<div class="info-box"><b>Top ${T.topCut} 진출 예정자</b> (스위스 순위 기준)</div>`;
+    html += `<table><thead><tr><th>시드</th><th>이름</th><th>승점</th><th>OMW%</th><th>GW%</th></tr></thead><tbody>`;
+    seeds.forEach((p, i) => {
+      html += `<tr><td><b>${i + 1}</b></td><td>${p.name}</td><td>${p.pts}</td><td>${(p.omw*100).toFixed(1)}%</td><td>${(p.gw*100).toFixed(1)}%</td></tr>`;
+    });
+    html += `</tbody></table>`;
+    html += `<br><button class="btn btn-primary no-print" onclick="initBracket()">🏅 토너먼트 시작</button>`;
+    el.innerHTML = html;
+    return;
+  }
+
+  // 브래킷 표시
+  let html = `<div class="no-print" style="margin-bottom:12px">
+    <button class="btn btn-warn btn-sm" onclick="if(confirm('브래킷을 초기화하시겠습니까?')){T.bracket=null;save();renderBracket();}">브래킷 초기화</button>
+  </div>`;
+
+  html += `<div class="bracket-wrap"><div class="bracket">`;
+
+  T.bracket.rounds.forEach((round, rIdx) => {
+    const isLast = rIdx === T.bracket.rounds.length - 1;
+    html += `<div class="br-col">`;
+    html += `<div class="br-col-title">${round.name}</div>`;
+
+    round.matches.forEach((m, mIdx) => {
+      const p1n = m.p1Id ? pName(m.p1Id) : '?';
+      const p2n = m.p2Id ? pName(m.p2Id) : '?';
+      const p1tbd = m.p1Id === null, p2tbd = m.p2Id === null;
+      const p1win = m.done && m.winnerId === m.p1Id;
+      const p2win = m.done && m.winnerId === m.p2Id;
+      const p1cls = p1tbd ? 'tbd' : (p1win ? 'winner' : (m.done ? 'loser' : ''));
+      const p2cls = p2tbd ? 'tbd' : (p2win ? 'winner' : (m.done ? 'loser' : ''));
+      const s1 = m.done ? `<span class="br-score ${p1win ? 'win' : ''}">${m.p1w}</span>` : '';
+      const s2 = m.done ? `<span class="br-score ${p2win ? 'win' : ''}">${m.p2w}</span>` : '';
+
+      html += `<div class="br-match">
+        <div class="br-player ${p1cls}"><span>${p1n}</span>${s1}</div>
+        <div class="br-player ${p2cls}"><span>${p2n}</span>${s2}</div>`;
+
+      // 입력 UI: 양쪽 확정 & 미입력
+      if (!m.done && !p1tbd && !p2tbd) {
+        if (T.format === 'bo1') {
+          html += `<div class="br-input no-print">
+            <button class="btn btn-sm btn-primary" onclick="setBracketResult(${rIdx},${mIdx},1,0)">${p1n}</button>
+            <button class="btn btn-sm btn-primary" onclick="setBracketResult(${rIdx},${mIdx},0,1)">${p2n}</button>
+          </div>`;
+        } else {
+          const maxW = winsNeeded();
+          html += `<div class="br-input no-print">
+            <input type="number" id="br${rIdx}m${mIdx}a" min="0" max="${maxW}" value="0" style="width:38px;padding:3px;border:1px solid #ddd;border-radius:3px;text-align:center">
+            <span>-</span>
+            <input type="number" id="br${rIdx}m${mIdx}b" min="0" max="${maxW}" value="0" style="width:38px;padding:3px;border:1px solid #ddd;border-radius:3px;text-align:center">
+            <button class="btn btn-sm btn-primary" onclick="setBracketResult(${rIdx},${mIdx},
+              +document.getElementById('br${rIdx}m${mIdx}a').value,
+              +document.getElementById('br${rIdx}m${mIdx}b').value)">확인</button>
+          </div>`;
+        }
+      } else if (m.done && !(m.p2Id === null && rIdx === 0)) {
+        html += `<div class="br-input no-print">
+          <button class="btn btn-sm btn-gray" onclick="clearBracketResult(${rIdx},${mIdx})">수정</button>
+        </div>`;
+      }
+
+      html += `</div>`; // br-match
+    });
+
+    html += `</div>`; // br-col
+  });
+
+  html += `</div></div>`; // bracket + bracket-wrap
+
+  // 3위 결정전
+  const tp = T.bracket.thirdPlace;
+  if (tp) {
+    const tp1n = tp.p1Id ? pName(tp.p1Id) : '?';
+    const tp2n = tp.p2Id ? pName(tp.p2Id) : '?';
+    const tp1tbd = tp.p1Id === null, tp2tbd = tp.p2Id === null;
+    const tp1win = tp.done && tp.winnerId === tp.p1Id;
+    const tp2win = tp.done && tp.winnerId === tp.p2Id;
+    const tp1cls = tp1tbd ? 'tbd' : (tp1win ? 'winner' : (tp.done ? 'loser' : ''));
+    const tp2cls = tp2tbd ? 'tbd' : (tp2win ? 'winner' : (tp.done ? 'loser' : ''));
+    const ts1 = tp.done ? `<span class="br-score ${tp1win?'win':''}">${tp.p1w}</span>` : '';
+    const ts2 = tp.done ? `<span class="br-score ${tp2win?'win':''}">${tp.p2w}</span>` : '';
+
+    html += `<div style="margin-top:18px;max-width:220px">
+      <div class="br-col-title">🥉 3위 결정전</div>
+      <div class="br-match">
+        <div class="br-player ${tp1cls}"><span>${tp1n}</span>${ts1}</div>
+        <div class="br-player ${tp2cls}"><span>${tp2n}</span>${ts2}</div>`;
+
+    if (!tp.done && !tp1tbd && !tp2tbd) {
+      if (T.format === 'bo1') {
+        html += `<div class="br-input no-print">
+          <button class="btn btn-sm btn-primary" onclick="setThirdPlaceResult(1,0)">${tp1n}</button>
+          <button class="btn btn-sm btn-primary" onclick="setThirdPlaceResult(0,1)">${tp2n}</button>
+        </div>`;
+      } else {
+        const maxW = winsNeeded();
+        html += `<div class="br-input no-print">
+          <input type="number" id="tp_a" min="0" max="${maxW}" value="0" style="width:38px;padding:3px;border:1px solid #ddd;border-radius:3px;text-align:center">
+          <span>-</span>
+          <input type="number" id="tp_b" min="0" max="${maxW}" value="0" style="width:38px;padding:3px;border:1px solid #ddd;border-radius:3px;text-align:center">
+          <button class="btn btn-sm btn-primary" onclick="setThirdPlaceResult(
+            +document.getElementById('tp_a').value,
+            +document.getElementById('tp_b').value)">확인</button>
+        </div>`;
+      }
+    } else if (tp.done) {
+      html += `<div class="br-input no-print">
+        <button class="btn btn-sm btn-gray" onclick="clearThirdPlaceResult()">수정</button>
+      </div>`;
+    }
+    html += `</div></div>`; // br-match + container
+  }
+
+  // 우승자 표시
+  const finalRound = T.bracket.rounds[T.bracket.rounds.length - 1];
+  const finalMatch = finalRound ? finalRound.matches[0] : null;
+  if (finalMatch && finalMatch.done && finalMatch.winnerId) {
+    html += `<div class="champion-box">
+      <div class="trophy">🏆</div>
+      <div class="champ-name">${pName(finalMatch.winnerId)}</div>
+      <div class="champ-label">🎉 우승 🎉</div>
+    </div>`;
+  }
+
+  el.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════
+// 초기화
+// ═══════════════════════════════════════════════════
+initDB();
+</script>
+</body>
+</html>
