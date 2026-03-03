@@ -22,10 +22,14 @@ body { font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif; backgrou
 #app { min-height: 100vh; }
 .container { max-width: 960px; margin: 0 auto; padding: 16px; }
 .site-nav { background: #0d0d1a; }
-.site-nav-inner { max-width: 960px; margin: 0 auto; padding: 0 16px; display: flex; justify-content: center; }
+.site-nav-inner { max-width: 960px; margin: 0 auto; padding: 0 8px; display: flex; justify-content: center; flex-wrap: wrap; }
 .site-nav-link { display: inline-block; padding: 10px 14px; color: #adb5bd; text-decoration: none; font-size: 13px; font-weight: 600; border-bottom: 3px solid transparent; transition: color .15s; white-space: nowrap; }
 .site-nav-link:hover { color: #fff; }
 .site-nav-link.active { color: #fff; border-bottom-color: #4ccfac; }
+@media (max-width: 480px) {
+  .site-nav-inner { padding: 0; }
+  .site-nav-link { padding: 8px 10px; font-size: 11px; }
+}
 header { background: #1a1a2e; color: white; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
 header h1 { font-size: 17px; letter-spacing: -.3px; }
 .header-btns { display: flex; gap: 6px; flex-wrap: wrap; }
