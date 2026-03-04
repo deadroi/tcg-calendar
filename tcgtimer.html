@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>TCG 타이머</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; overflow: hidden; background: #0d0d0d; touch-action: manipulation; font-family: 'Malgun Gothic', system-ui, sans-serif; color: #fff; }
+
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+/* ── 공통 컨트롤 버튼 ── */
+.ctrl {
+  width: 40px; height: 40px; border-radius: 50%;
+  border: 1.5px solid #2a2a40; background: #1a1a30;
+  color: #999; font-size: 16px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .1s; line-height: 1;
+}
+.ctrl:active { background: #333; color: #fff; }
+.ctrl.active-btn { color: #4ccfac; border-color: #4ccfac; }
+
+/* ── 설정 오버레이 ── */
+#overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.93);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 50;
+}
+#overlay.hidden { display: none; }
+.box {
+  background: #1a1a2e; border-radius: 16px;
+  padding: 20px 22px 22px; width: 380px; max-width: 95vw; color: #fff;
+}
+
+/* 모드 탭 */
+.mode-tabs {
+  display: flex; gap: 6px; margin-bottom: 16px;
+  background: #111128; border-radius: 10px; padding: 4px;
+}
+.mode-tab {
+  flex: 1; padding: 9px 4px; border-radius: 7px; border: none;
+  background: transparent; color: #555;
+  font-size: 12px; font-weight: 700; cursor: pointer; letter-spacing: 0.5px;
+  transition: background .15s, color .15s;
+}
+.mode-tab.on { background: #2a2a4a; color: #4ccfac; }
+
+.box h2 { font-size: 15px; font-weight: 700; text-align: center; margin-bottom: 12px; color: #eee; }
+.presets {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 14px;
+}
+.preset {
+  padding: 9px 2px; background: #22223a; border: 2px solid #2e2e4a;
+  border-radius: 8px; color: #aaa; font-size: 12px; font-weight: 600;
+  text-align: center; cursor: pointer; transition: border-color .15s, color .15s;
+}
+.preset.on { border-color: #4ccfac; color: #4ccfac; background: #162a22; }
+.row { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; }
+.row label { font-size: 12px; color: #888; min-width: 90px; }
+.row input {
+  flex: 1; background: #22223a; border: 1px solid #33334a;
+  border-radius: 8px; color: #fff; padding: 8px 10px; font-size: 14px; outline: none;
+}
+.row input:focus { border-color: #4ccfac; }
+.go {
+  width: 100%; margin-top: 10px; padding: 13px; border-radius: 10px; border: none;
+  background: #4ccfac; color: #111; font-size: 15px; font-weight: 700; cursor: pointer;
+}
+.go:active { opacity: .85; }
+
+/* 배너 */
+#banner {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  background: rgba(0,0,0,0.92); border: 2px solid #ff3333; border-radius: 12px;
+  padding: 14px 28px; color: #ff5555; font-size: clamp(16px,3.5vw,26px);
+  font-weight: 700; text-align: center; z-index: 60; display: none; pointer-events: none;
+}
+
+/* ══════════════════════════════════════════
+   체스 시계 모드
+══════════════════════════════════════════ */
+#chess-app { display: flex; flex-direction: column; height: 100vh; width: 100vw; }
+#chess-app.hidden { display: none; }
+
+#chess-top {
+  height: 38%; flex-shrink: 0;
+  background: #12122a; border-bottom: 2px solid #1e1e3a;
+  display: flex; align-items: center; justify-content: center; position: relative;
+}
+#chess-total-wrap { text-align: center; }
+#chess-total-label {
+  font-size: clamp(10px,1.8vh,14px); color: rgba(255,255,255,0.35);
+  letter-spacing: 2px; text-transform: uppercase; margin-bottom: 2px;
+}
+#chess-total-time {
+  font-size: clamp(44px,16vh,100px); font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  font-family: 'Courier New', Consolas, monospace;
+  color: #fff; letter-spacing: 4px; line-height: 1;
+}
+#chess-total-time.low { color: #ff5555; animation: blink .6s infinite; }
+#chess-turn-label {
+  font-size: clamp(11px,1.6vh,14px); color: rgba(255,255,255,0.3);
+  margin-top: 6px; letter-spacing: 1px; min-height: 1.4em;
+}
+#chess-top-ctrl {
+  position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+  display: flex; flex-direction: column; gap: 8px;
+}
+
+#chess-bottom { display: flex; flex: 1; min-height: 0; }
+.chess-side {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 6px;
+  cursor: pointer; user-select: none; transition: background-color .15s;
+}
+#chess-divider { width: 2px; background: #1a1a1a; flex-shrink: 0; }
+.chess-side.s-waiting  { background: #0d0d0d; }
+.chess-side.s-active   { background: #0f2419; }
+.chess-side.s-inactive { background: #080808; }
+.chess-side.s-paused   { background: #0f0f1a; }
+
+.active-dot { width: 8px; height: 8px; border-radius: 50%; background: #4ccfac; opacity: 0; transition: opacity .2s; }
+.chess-side.s-active .active-dot { opacity: 1; }
+.player-name { font-size: clamp(12px,2vh,16px); color: rgba(255,255,255,0.35); font-weight: 600; letter-spacing: 1px; transition: color .15s; }
+.chess-side.s-active .player-name { color: rgba(255,255,255,0.65); }
+.consumed-time {
+  font-size: clamp(38px,13vh,80px); font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  font-family: 'Courier New', Consolas, monospace;
+  letter-spacing: 2px; color: rgba(255,255,255,0.28); line-height: 1; transition: color .15s;
+}
+.chess-side.s-active .consumed-time { color: #fff; }
+.move-count { font-size: clamp(10px,1.5vh,13px); color: rgba(255,255,255,0.2); }
+.chess-hint { font-size: clamp(10px,1.4vh,13px); color: rgba(255,255,255,0.28); letter-spacing: 1px; }
+
+/* 선공 선택 버튼 */
+.first-btns { display: flex; gap: 6px; flex: 1; }
+.first-btn {
+  flex: 1; padding: 7px 4px; background: #22223a; border: 2px solid #2e2e4a;
+  border-radius: 8px; color: #aaa; font-size: 12px; font-weight: 600;
+  text-align: center; cursor: pointer; transition: border-color .15s, color .15s, background .15s;
+}
+.first-btn.on { border-color: #4ccfac; color: #4ccfac; background: #162a22; }
+
+/* ══════════════════════════════════════════
+   자기관리 타이머 모드
+══════════════════════════════════════════ */
+#self-app { display: flex; flex-direction: column; height: 100vh; }
+#self-app.hidden { display: none; }
+
+#self-header {
+  display: flex; align-items: center; justify-content: flex-end;
+  padding: 8px 12px; background: #0d0d0d;
+  border-bottom: 1px solid #1a1a1a; flex-shrink: 0; gap: 8px;
+}
+#self-total-label { font-size: 12px; color: rgba(255,255,255,0.35); letter-spacing: 2px; margin-bottom: 2px; }
+#self-total-time {
+  font-size: clamp(56px,18vw,120px); font-weight: 700;
+  font-family: 'Courier New', monospace; letter-spacing: 4px; line-height: 1;
+}
+#self-total-time.low { color: #ff5555; animation: blink .6s infinite; }
+
+#self-main {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  flex: 0 0 auto; padding: 10px 12px 12px; gap: 8px; text-align: center;
+}
+#self-status-badge {
+  font-size: 12px; font-weight: 700; letter-spacing: 2px;
+  padding: 4px 14px; border-radius: 999px;
+  background: #1e1e2e; color: rgba(255,255,255,0.3);
+  transition: background .2s, color .2s;
+}
+#self-status-badge.measuring { background: #0f2e1a; color: #4ccfac; }
+#self-status-badge.waiting   { background: #1e1a10; color: #f0a030; }
+
+#self-lap-row {
+  display: flex; align-items: center; gap: 8px;
+  font-size: clamp(13px,3vw,16px); color: rgba(255,255,255,0.4);
+}
+#self-lap-time {
+  font-family: 'Courier New', Consolas, monospace;
+  font-weight: 700; letter-spacing: 1px; transition: color .2s;
+}
+#self-lap-time.measuring { color: #4ccfac; }
+#self-lap-time.waiting   { color: rgba(255,255,255,0.5); }
+
+#self-action-btn {
+  width: clamp(140px,40vw,200px); height: clamp(52px,10vw,68px);
+  border-radius: 999px; border: none;
+  font-size: clamp(14px,3.5vw,19px); font-weight: 700; cursor: pointer; letter-spacing: 1px;
+  transition: background .15s, transform .08s, box-shadow .15s;
+}
+#self-action-btn:active { transform: scale(.96); }
+#self-action-btn:disabled { background: #2a2a3a; color: #555; box-shadow: none; cursor: default; }
+#self-action-btn.start { background: #4ccfac; color: #0d0d0d; box-shadow: 0 4px 20px rgba(76,207,172,0.3); }
+#self-action-btn.start:not(:disabled):active { background: #3ab898; }
+#self-action-btn.stop  { background: #e8604a; color: #fff; box-shadow: 0 4px 20px rgba(232,96,74,0.3); }
+#self-action-btn.stop:active  { background: #c84a36; }
+#self-my-total { font-size: 12px; color: rgba(255,255,255,0.25); letter-spacing: 1px; }
+
+#self-history-wrap { flex: 1; overflow-y: auto; padding: 0 12px 12px; min-height: 0; }
+#self-history-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 4px 8px; font-size: 11px; color: rgba(255,255,255,0.3); letter-spacing: 1px;
+  border-bottom: 1px solid #1e1e1e; position: sticky; top: 0; background: #0d0d0d;
+}
+#self-lap-list { display: flex; flex-direction: column; gap: 4px; padding-top: 6px; }
+.lap-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; background: #111; font-size: clamp(13px,3.2vw,15px); }
+.lap-item.latest  { background: #101e18; border-left: 3px solid #4ccfac; }
+.lap-item.longest { background: #1a1410; border-left: 3px solid #f0a030; }
+.lap-num { min-width: 28px; font-size: 12px; color: rgba(255,255,255,0.3); font-weight: 600; }
+.lap-dur { flex: 1; font-family: 'Courier New', monospace; font-weight: 700; letter-spacing: 1px; }
+.lap-cum { font-size: 11px; color: rgba(255,255,255,0.22); font-family: 'Courier New', monospace; }
+.lap-tag { font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 700; }
+.lap-tag.latest  { background: #1e3a30; color: #4ccfac; }
+.lap-tag.longest { background: #2a1e0a; color: #f0a030; }
+.lap-tag.fastest { background: #1a1e2e; color: #6090ff; }
+#self-no-laps { text-align: center; padding: 30px 0; font-size: 13px; color: rgba(255,255,255,0.2); }
+</style>
+</head>
+<body>
+
+<!-- ── 체스 시계 ── -->
+<div id="chess-app" class="hidden">
+  <div id="chess-top">
+    <div id="chess-total-wrap">
+      <div id="chess-total-label">경과 시간</div>
+      <div id="chess-total-time">0:00.00</div>
+      <div id="chess-turn-label"></div>
+    </div>
+    <div id="chess-top-ctrl">
+      <button class="ctrl" id="chess-btnPause" onclick="chessPause()" title="일시정지">⏸</button>
+      <button class="ctrl" onclick="openSettings()" title="설정">⚙️</button>
+      <button class="ctrl" onclick="chessReset()" title="초기화">↺</button>
+    </div>
+  </div>
+  <div id="chess-bottom">
+    <div class="chess-side s-waiting" id="chess-sideL" onclick="chessTap('L')">
+      <div class="active-dot"></div>
+      <div class="player-name"   id="chess-nameL">플레이어 1</div>
+      <div class="consumed-time" id="chess-timeL">0:00.00</div>
+      <div class="move-count"    id="chess-movesL"></div>
+      <div class="chess-hint"    id="chess-hintL"></div>
+    </div>
+    <div id="chess-divider"></div>
+    <div class="chess-side s-waiting" id="chess-sideR" onclick="chessTap('R')">
+      <div class="active-dot"></div>
+      <div class="player-name"   id="chess-nameR">플레이어 2</div>
+      <div class="consumed-time" id="chess-timeR">0:00.00</div>
+      <div class="move-count"    id="chess-movesR"></div>
+      <div class="chess-hint"    id="chess-hintR"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 자기관리 타이머 ── -->
+<div id="self-app" class="hidden">
+  <div id="self-header">
+    <button class="ctrl" id="self-btnPause" onclick="selfPause()" title="일시정지">⏸</button>
+    <button class="ctrl" onclick="openSettings()" title="설정">⚙️</button>
+    <button class="ctrl" onclick="selfReset()" title="초기화">↺</button>
+  </div>
+  <div id="self-main">
+    <div id="self-total-label">전체 게임 시간</div>
+    <div id="self-total-time">0:00.00</div>
+    <div id="self-lap-row">
+      <span>현재 행동</span>
+      <span id="self-lap-time">0:00.00</span>
+      <div id="self-status-badge">대기 중</div>
+    </div>
+    <button id="self-action-btn" class="start" onclick="selfToggle()" disabled>내 차례 시작</button>
+    <div id="self-my-total"></div>
+  </div>
+  <div id="self-history-wrap">
+    <div id="self-history-header">
+      <span>내 턴 기록</span>
+      <span id="self-stats-label"></span>
+    </div>
+    <div id="self-lap-list">
+      <div id="self-no-laps">버튼을 눌러 시작하세요</div>
+    </div>
+  </div>
+</div>
+
+<div id="banner"></div>
+
+<!-- ── 설정 오버레이 ── -->
+<div id="overlay">
+  <div class="box">
+    <div class="mode-tabs">
+      <button class="mode-tab on" id="tab-chess" onclick="selectModeTab('chess')">2인용 타이머</button>
+      <button class="mode-tab"   id="tab-self"  onclick="selectModeTab('self')">솔로 타이머</button>
+    </div>
+
+    <!-- 체스 시계 설정 -->
+    <div id="settings-chess">
+      <h2>체스 시계 설정</h2>
+      <div class="presets" id="chess-presets"></div>
+      <div class="row">
+        <label>시간 제한 (분)</label>
+        <input type="number" id="chess-inpMin" min="0" max="999" value="0" placeholder="0 = 무제한">
+      </div>
+      <div class="row">
+        <label>플레이어 1</label>
+        <input type="text" id="chess-inpN1" value="플레이어 1" maxlength="10">
+      </div>
+      <div class="row">
+        <label>플레이어 2</label>
+        <input type="text" id="chess-inpN2" value="플레이어 2" maxlength="10">
+      </div>
+      <div class="row">
+        <label>선공</label>
+        <div class="first-btns" id="chess-first-btns">
+          <button class="first-btn on" data-who="tap">직접 탭</button>
+          <button class="first-btn" data-who="L">1P 선공</button>
+          <button class="first-btn" data-who="R">2P 선공</button>
+        </div>
+      </div>
+      <button class="go" onclick="chessStart()">▶ 시작</button>
+    </div>
+
+    <!-- 자기관리 타이머 설정 -->
+    <div id="settings-self" style="display:none">
+      <h2>자기관리 타이머 설정</h2>
+      <div class="presets" id="self-presets"></div>
+      <div class="row">
+        <label>시간 제한 (분)</label>
+        <input type="number" id="self-inpMin" min="0" max="999" value="0" placeholder="0 = 무제한">
+      </div>
+      <button class="go" onclick="selfStart()">▶ 시작</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── 공통 ──────────────────────────────────────────────────
+let currentMode = 'chess'; // 현재 활성 모드 (설정 탭 기준)
+
+function pad(n) { return String(n).padStart(2, '0'); }
+function fmt(ms) {
+  ms = Math.max(0, ms);
+  const t  = Math.floor(ms / 1000);
+  const h  = Math.floor(t / 3600);
+  const m  = Math.floor((t % 3600) / 60);
+  const s  = t % 60;
+  const cs = Math.floor((ms % 1000) / 10);
+  const base = h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
+  return `${base}.${pad(cs)}`;
+}
+function vibrate(p) { try { if (navigator.vibrate) navigator.vibrate(p); } catch(e) {} }
+function showBanner(msg) {
+  const b = document.getElementById('banner');
+  b.textContent = msg;
+  b.style.display = 'block';
+  setTimeout(() => b.style.display = 'none', 3000);
+}
+
+const PRESETS = [
+  { label:'무제한', m:0  }, { label:'10분', m:10 },
+  { label:'20분',  m:20 }, { label:'30분', m:30 },
+  { label:'45분',  m:45 }, { label:'60분', m:60 },
+  { label:'90분',  m:90 }, { label:'직접입력', m:-1 },
+];
+function buildPresets(containerId, inputId) {
+  const el = document.getElementById(containerId);
+  PRESETS.forEach((p, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'preset' + (i === 0 ? ' on' : '');
+    btn.textContent = p.label;
+    btn.onclick = () => {
+      el.querySelectorAll('.preset').forEach(b => b.classList.remove('on'));
+      btn.classList.add('on');
+      if (p.m >= 0) document.getElementById(inputId).value = p.m;
+      else document.getElementById(inputId).focus();
+    };
+    el.appendChild(btn);
+  });
+}
+buildPresets('chess-presets', 'chess-inpMin');
+buildPresets('self-presets',  'self-inpMin');
+
+// 선공 버튼 클릭 핸들러
+document.querySelectorAll('#chess-first-btns .first-btn').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('#chess-first-btns .first-btn').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+  };
+});
+
+// ── 모드 탭 전환 ──────────────────────────────────────────
+function selectModeTab(mode) {
+  currentMode = mode;
+  document.getElementById('tab-chess').classList.toggle('on', mode === 'chess');
+  document.getElementById('tab-self').classList.toggle('on',  mode === 'self');
+  document.getElementById('settings-chess').style.display = mode === 'chess' ? '' : 'none';
+  document.getElementById('settings-self').style.display  = mode === 'self'  ? '' : 'none';
+}
+
+function openSettings() {
+  if (C.state !== 'idle' || S.state !== 'idle') {
+    if (!confirm('현재 게임을 종료하고 설정화면으로 이동할까요?')) return;
+  }
+  chessStopRaf();
+  selfStopRaf();
+  C.state = 'idle';
+  S.state = 'idle';
+  selectModeTab(currentMode);
+  document.getElementById('overlay').classList.remove('hidden');
+}
+
+// ══════════════════════════════════════════
+// 체스 시계
+// ══════════════════════════════════════════
+const C = {
+  state: 'idle', // idle | ready | L | R | paused | end
+  timeLimit: 0, totalElapsed: 0,
+  consumedL: 0, consumedR: 0,
+  movesL: 0, movesR: 0,
+  pausedState: null, lastTick: null, raf: null,
+};
+
+function chessStopRaf() {
+  if (C.raf) { cancelAnimationFrame(C.raf); C.raf = null; }
+}
+
+function chessTick(now) {
+  if (C.state !== 'L' && C.state !== 'R') return;
+  if (C.lastTick === null) { C.lastTick = now; C.raf = requestAnimationFrame(chessTick); return; }
+  const dt = now - C.lastTick;
+  C.lastTick = now;
+  C.totalElapsed += dt;
+  if (C.state === 'L') C.consumedL += dt;
+  else                 C.consumedR += dt;
+  if (C.timeLimit > 0 && C.totalElapsed >= C.timeLimit) {
+    C.totalElapsed = C.timeLimit;
+    chessEnd();
+    return;
+  }
+  chessRender();
+  C.raf = requestAnimationFrame(chessTick);
+}
+
+function chessTap(who) {
+  if (C.state === 'idle' || C.state === 'end' || C.state === 'paused') return;
+  if (C.state === 'ready') {
+    C.state = who; C.lastTick = null;
+    C.raf = requestAnimationFrame(chessTick);
+    chessRender(); vibrate(30);
+    return;
+  }
+  if (C.state !== who) return;
+  if (who === 'L') { C.movesL++; C.state = 'R'; }
+  else             { C.movesR++; C.state = 'L'; }
+  C.lastTick = null;
+  chessRender(); vibrate(30);
+}
+
+function chessPause() {
+  if (C.state === 'idle' || C.state === 'end' || C.state === 'ready') return;
+  if (C.state === 'paused') {
+    C.state = C.pausedState; C.lastTick = null;
+    C.raf = requestAnimationFrame(chessTick);
+  } else {
+    C.pausedState = C.state; C.state = 'paused'; chessStopRaf();
+  }
+  chessRender();
+}
+
+function chessEnd() {
+  C.state = 'end'; chessStopRaf(); chessRender();
+  vibrate([80,40,80]); showBanner('⏰ 시간 종료!');
+}
+
+function chessStart() {
+  const m  = Math.max(0, parseInt(document.getElementById('chess-inpMin').value) || 0);
+  const n1 = document.getElementById('chess-inpN1').value.trim() || '플레이어 1';
+  const n2 = document.getElementById('chess-inpN2').value.trim() || '플레이어 2';
+  const firstWho = document.querySelector('#chess-first-btns .first-btn.on')?.dataset.who || 'tap';
+  chessStopRaf();
+  C.timeLimit = m * 60000; C.totalElapsed = 0;
+  C.consumedL = 0; C.consumedR = 0;
+  C.movesL = 0;    C.movesR = 0;
+  C.lastTick = null;
+  if (firstWho === 'L' || firstWho === 'R') {
+    C.state = firstWho;
+    C.raf = requestAnimationFrame(chessTick);
+  } else {
+    C.state = 'ready';
+  }
+  document.getElementById('chess-nameL').textContent = n1;
+  document.getElementById('chess-nameR').textContent = n2;
+  document.getElementById('banner').style.display = 'none';
+  document.getElementById('overlay').classList.add('hidden');
+  currentMode = 'chess';
+  document.getElementById('chess-app').classList.remove('hidden');
+  document.getElementById('self-app').classList.add('hidden');
+  chessRender();
+}
+
+function chessReset() {
+  if (C.state === 'idle') return;
+  if (!confirm('시계를 초기화할까요?')) return;
+  chessStopRaf(); C.state = 'idle';
+  selectModeTab('chess');
+  document.getElementById('overlay').classList.remove('hidden');
+}
+
+function chessRender() {
+  const totalEl = document.getElementById('chess-total-time');
+  const labelEl = document.getElementById('chess-total-label');
+  const turnEl  = document.getElementById('chess-turn-label');
+  if (C.timeLimit > 0) {
+    const rem = Math.max(0, C.timeLimit - C.totalElapsed);
+    totalEl.textContent = fmt(rem); labelEl.textContent = '남은 시간';
+    totalEl.className = rem < 30000 ? 'low' : '';
+  } else {
+    totalEl.textContent = fmt(C.totalElapsed); labelEl.textContent = '경과 시간';
+    totalEl.className = '';
+  }
+  const n1 = document.getElementById('chess-nameL').textContent;
+  const n2 = document.getElementById('chess-nameR').textContent;
+  if      (C.state === 'L')      turnEl.textContent = `${n1} 차례`;
+  else if (C.state === 'R')      turnEl.textContent = `${n2} 차례`;
+  else if (C.state === 'paused') turnEl.textContent = '일시정지';
+  else if (C.state === 'ready')  turnEl.textContent = '탭하여 시작';
+  else if (C.state === 'end')    turnEl.textContent = '종료';
+  else                           turnEl.textContent = '';
+  document.getElementById('chess-timeL').textContent  = fmt(C.consumedL);
+  document.getElementById('chess-timeR').textContent  = fmt(C.consumedR);
+  document.getElementById('chess-movesL').textContent = C.movesL > 0 ? `${C.movesL}턴` : '';
+  document.getElementById('chess-movesR').textContent = C.movesR > 0 ? `${C.movesR}턴` : '';
+  document.getElementById('chess-hintL').textContent  = C.state === 'ready' ? '탭하여 시작' : '';
+  document.getElementById('chess-hintR').textContent  = C.state === 'ready' ? '탭하여 시작' : '';
+  document.getElementById('chess-sideL').className = `chess-side ${chessSideClass('L')}`;
+  document.getElementById('chess-sideR').className = `chess-side ${chessSideClass('R')}`;
+  const btn = document.getElementById('chess-btnPause');
+  btn.textContent = C.state === 'paused' ? '▶' : '⏸';
+  btn.classList.toggle('active-btn', C.state === 'paused');
+}
+function chessSideClass(who) {
+  if (C.state === 'idle' || C.state === 'ready') return 's-waiting';
+  if (C.state === 'end')    return 's-inactive';
+  if (C.state === 'paused') return 's-paused';
+  return C.state === who ? 's-active' : 's-inactive';
+}
+
+// ══════════════════════════════════════════
+// 자기관리 타이머
+// ══════════════════════════════════════════
+const S = {
+  state: 'idle', // idle | ready | measuring | waiting | paused | end
+  timeLimit: 0, totalElapsed: 0,
+  lapElapsed: 0, myTotal: 0,
+  laps: [],
+  pausedState: null, lastTick: null, raf: null,
+};
+
+function selfStopRaf() {
+  if (S.raf) { cancelAnimationFrame(S.raf); S.raf = null; }
+}
+
+function selfTick(now) {
+  if (S.state !== 'measuring' && S.state !== 'waiting') return;
+  if (S.lastTick === null) { S.lastTick = now; S.raf = requestAnimationFrame(selfTick); return; }
+  const dt = now - S.lastTick;
+  S.lastTick = now;
+  S.totalElapsed += dt;
+  if (S.state === 'measuring') S.lapElapsed += dt;
+  if (S.timeLimit > 0 && S.totalElapsed >= S.timeLimit) {
+    S.totalElapsed = S.timeLimit;
+    if (S.state === 'measuring') selfRecordLap();
+    selfEnd();
+    return;
+  }
+  selfRender();
+  S.raf = requestAnimationFrame(selfTick);
+}
+
+function selfToggle() {
+  if (S.state === 'ready' || S.state === 'waiting') {
+    S.state = 'measuring'; S.lapElapsed = 0; S.lastTick = null;
+    if (!S.raf) S.raf = requestAnimationFrame(selfTick);
+    selfRender(); vibrate(30);
+  } else if (S.state === 'measuring') {
+    selfRecordLap(); S.state = 'waiting';
+    selfRender(); vibrate([30,20,30]);
+  }
+}
+
+function selfRecordLap() {
+  S.myTotal += S.lapElapsed;
+  S.laps.push({ dur: S.lapElapsed, myTotal: S.myTotal });
+  S.lapElapsed = 0;
+}
+
+function selfPause() {
+  if (S.state === 'idle' || S.state === 'end' || S.state === 'ready') return;
+  if (S.state === 'paused') {
+    S.state = S.pausedState; S.lastTick = null;
+    if (!S.raf) S.raf = requestAnimationFrame(selfTick);
+  } else {
+    S.pausedState = S.state; S.state = 'paused'; selfStopRaf();
+  }
+  selfRender();
+}
+
+function selfEnd() {
+  S.state = 'end'; selfStopRaf(); selfRender();
+  vibrate([80,40,80]); showBanner('⏰ 시간 종료!');
+}
+
+function selfStart() {
+  const m = Math.max(0, parseInt(document.getElementById('self-inpMin').value) || 0);
+  selfStopRaf();
+  S.timeLimit = m * 60000; S.totalElapsed = 0;
+  S.lapElapsed = 0; S.myTotal = 0; S.laps = [];
+  S.state = 'waiting'; S.lastTick = null;
+  S.raf = requestAnimationFrame(selfTick);
+  document.getElementById('banner').style.display = 'none';
+  document.getElementById('overlay').classList.add('hidden');
+  currentMode = 'self';
+  document.getElementById('self-app').classList.remove('hidden');
+  document.getElementById('chess-app').classList.add('hidden');
+  selfRender();
+}
+
+function selfReset() {
+  if (S.state === 'idle') return;
+  if (!confirm('기록을 초기화할까요?')) return;
+  selfStopRaf(); S.state = 'idle';
+  selectModeTab('self');
+  document.getElementById('overlay').classList.remove('hidden');
+}
+
+function selfRender() {
+  const totalEl = document.getElementById('self-total-time');
+  const labelEl = document.getElementById('self-total-label');
+  if (S.timeLimit > 0) {
+    const rem = Math.max(0, S.timeLimit - S.totalElapsed);
+    totalEl.textContent = fmt(rem); labelEl.textContent = '남은 시간';
+    totalEl.className = rem < 30000 ? 'low' : '';
+  } else {
+    totalEl.textContent = fmt(S.totalElapsed); labelEl.textContent = '전체 게임 시간';
+    totalEl.className = '';
+  }
+  const badge = document.getElementById('self-status-badge');
+  if      (S.state === 'measuring') { badge.textContent = '내 차례 진행 중'; badge.className = 'measuring'; }
+  else if (S.state === 'waiting')   { badge.textContent = '상대 차례';       badge.className = 'waiting'; }
+  else if (S.state === 'paused')    { badge.textContent = '일시정지';         badge.className = ''; }
+  else if (S.state === 'ready')     { badge.textContent = '시작 대기';        badge.className = ''; }
+  else                              { badge.textContent = '대기 중';          badge.className = ''; }
+
+  const lapEl = document.getElementById('self-lap-time');
+  lapEl.textContent = fmt(S.lapElapsed);
+  lapEl.className = S.state === 'measuring' ? 'measuring' : S.state === 'waiting' ? 'waiting' : '';
+
+  const btn = document.getElementById('self-action-btn');
+  if (S.state === 'idle' || S.state === 'end') {
+    btn.disabled = true; btn.textContent = '종료됨'; btn.className = 'start';
+  } else if (S.state === 'paused') {
+    btn.disabled = true; btn.textContent = '일시정지 중'; btn.className = 'start';
+  } else if (S.state === 'ready' || S.state === 'waiting') {
+    btn.disabled = false; btn.textContent = '내 차례 시작'; btn.className = 'start';
+  } else {
+    btn.disabled = false; btn.textContent = '내 차례 종료'; btn.className = 'stop';
+  }
+
+  const curMyTotal = S.myTotal + (S.state === 'measuring' ? S.lapElapsed : 0);
+  document.getElementById('self-my-total').textContent = curMyTotal > 0 ? `내 누적: ${fmt(curMyTotal)}` : '';
+
+  const pbtn = document.getElementById('self-btnPause');
+  pbtn.textContent = S.state === 'paused' ? '▶' : '⏸';
+  pbtn.classList.toggle('active-btn', S.state === 'paused');
+
+  selfRenderHistory();
+}
+
+function selfRenderHistory() {
+  const list    = document.getElementById('self-lap-list');
+  const statsEl = document.getElementById('self-stats-label');
+  if (S.laps.length === 0) {
+    list.innerHTML = '<div id="self-no-laps">버튼을 눌러 시작하세요</div>';
+    statsEl.textContent = ''; return;
+  }
+  const durs   = S.laps.map(l => l.dur);
+  const maxDur = Math.max(...durs);
+  const minDur = Math.min(...durs);
+  const avgDur = durs.reduce((a,b) => a+b, 0) / durs.length;
+  statsEl.textContent = `평균 ${fmt(avgDur)}`;
+  list.innerHTML = [...S.laps].reverse().map((lap, ri) => {
+    const i = S.laps.length - 1 - ri;
+    const isLatest  = i === S.laps.length - 1;
+    const isLongest = S.laps.length > 1 && lap.dur === maxDur;
+    const isFastest = S.laps.length > 1 && lap.dur === minDur;
+    let cls = 'lap-item';
+    if (isLatest) cls += ' latest'; else if (isLongest) cls += ' longest';
+    let tag = '';
+    if (isLatest)       tag = '<span class="lap-tag latest">최신</span>';
+    else if (isLongest) tag = '<span class="lap-tag longest">최장</span>';
+    else if (isFastest) tag = '<span class="lap-tag fastest">최단</span>';
+    return `<div class="${cls}">
+      <span class="lap-num">#${i+1}</span>
+      <span class="lap-dur">${fmt(lap.dur)}</span>
+      <span class="lap-cum">누적 ${fmt(lap.myTotal)}</span>
+      ${tag}
+    </div>`;
+  }).join('');
+}
+</script>
+</body>
+</html>
