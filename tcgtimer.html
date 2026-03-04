@@ -177,20 +177,21 @@ html, body { height: 100%; overflow: hidden; background: #0d0d0d; touch-action: 
 #self-status-badge.waiting   { background: #1e1a10; color: #f0a030; }
 
 #self-lap-row {
-  display: flex; align-items: center; gap: 8px;
-  font-size: clamp(13px,3vw,16px); color: rgba(255,255,255,0.4);
+  display: flex; align-items: center; gap: 10px;
+  font-size: clamp(12px,2.5vw,14px); color: rgba(255,255,255,0.4);
 }
 #self-lap-time {
   font-family: 'Courier New', Consolas, monospace;
-  font-weight: 700; letter-spacing: 1px; transition: color .2s;
+  font-size: clamp(37px,12vw,80px);
+  font-weight: 700; letter-spacing: 2px; line-height: 1; transition: color .2s;
 }
 #self-lap-time.measuring { color: #4ccfac; }
 #self-lap-time.waiting   { color: rgba(255,255,255,0.5); }
 
 #self-action-btn {
-  width: clamp(140px,40vw,200px); height: clamp(52px,10vw,68px);
+  width: clamp(200px,60vw,320px); height: clamp(68px,14vw,100px);
   border-radius: 999px; border: none;
-  font-size: clamp(14px,3.5vw,19px); font-weight: 700; cursor: pointer; letter-spacing: 1px;
+  font-size: clamp(18px,5vw,26px); font-weight: 700; cursor: pointer; letter-spacing: 1px;
   transition: background .15s, transform .08s, box-shadow .15s;
 }
 #self-action-btn:active { transform: scale(.96); }
