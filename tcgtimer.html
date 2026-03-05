@@ -6,7 +6,30 @@
 <title>TCG 타이머</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html, body { height: 100%; overflow: hidden; background: #0d0d0d; touch-action: manipulation; font-family: 'Malgun Gothic', system-ui, sans-serif; color: #fff; }
+html, body { height: 100%; background: #0d0d0d; touch-action: manipulation; font-family: 'Malgun Gothic', system-ui, sans-serif; color: #fff; }
+body { display: flex; flex-direction: column; overflow: hidden; }
+
+/* ── 사이트 네비게이션 ── */
+.site-nav { background: #0d0d1a; position: relative; z-index: 500; flex-shrink: 0; }
+.site-nav-inner { max-width: 960px; margin: 0 auto; padding: 0 8px; display: flex; align-items: center; justify-content: space-between; }
+.site-nav-links { display: flex; flex-wrap: wrap; justify-content: center; flex: 1; }
+.site-nav-link { display: inline-block; padding: 10px 13px; color: #adb5bd; text-decoration: none; font-size: 13px; font-weight: 600; border-bottom: 3px solid transparent; transition: color .15s; white-space: nowrap; }
+.site-nav-link:hover { color: #fff; }
+.site-nav-link.active { color: #fff; border-bottom-color: #4ccfac; }
+.site-nav-title { color: #4ccfac; font-size: 14px; font-weight: 700; letter-spacing: -.3px; display: none; }
+.site-nav-hamburger { display: none; background: none; border: none; cursor: pointer; padding: 6px; flex-direction: column; gap: 5px; }
+.site-nav-hamburger span { display: block; width: 22px; height: 2px; background: #adb5bd; border-radius: 2px; }
+.site-nav-hamburger:hover span { background: #fff; }
+.site-nav-dropdown { display: none; position: absolute; top: 100%; right: 0; min-width: 220px; background: #13131f; border: 1px solid #2a2a44; border-radius: 0 0 10px 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); overflow: hidden; }
+.site-nav-dropdown.open { display: block; }
+.site-nav-dropdown .site-nav-link { display: flex; align-items: center; gap: 10px; padding: 12px 18px; border-bottom: none; border-left: 3px solid transparent; }
+.site-nav-dropdown .site-nav-link:hover { background: #1e1e35; }
+.site-nav-dropdown .site-nav-link.active { color: #4ccfac; border-left-color: #4ccfac; background: #161628; }
+@media (max-width: 600px) {
+  .site-nav-links { display: none; }
+  .site-nav-title { display: block; }
+  .site-nav-hamburger { display: flex; }
+}
 
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
 
@@ -223,6 +246,34 @@ html, body { height: 100%; overflow: hidden; background: #0d0d0d; touch-action: 
 </style>
 </head>
 <body>
+<nav class="site-nav">
+  <div class="site-nav-inner">
+    <div class="site-nav-links">
+      <a href="https://tcg-calendar.co.kr" class="site-nav-link">📅 대회 일정 수집기</a>
+      <a href="https://tcg-calendar.co.kr/result.html" class="site-nav-link">📋 대회 결과 수집기</a>
+      <a href="https://tcg-calendar.co.kr/tcg-swisssystem.html" class="site-nav-link">🏆 스위스라운드 시스템</a>
+      <a href="https://tcg-calendar.co.kr/tcgtimer.html" class="site-nav-link active">⏱ TCG 타이머</a>
+      <a href="https://tcg-calendar.co.kr/tcg_map.html" class="site-nav-link">🗺 TCG 매장 지도</a>
+    </div>
+    <span class="site-nav-title">🃏 TCG 시스템</span>
+    <button class="site-nav-hamburger" onclick="this.nextElementSibling.classList.toggle('open')" aria-label="메뉴">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="site-nav-dropdown">
+      <a href="https://tcg-calendar.co.kr" class="site-nav-link">📅 대회 일정 수집기</a>
+      <a href="https://tcg-calendar.co.kr/result.html" class="site-nav-link">📋 대회 결과 수집기</a>
+      <a href="https://tcg-calendar.co.kr/tcg-swisssystem.html" class="site-nav-link">🏆 스위스라운드 시스템</a>
+      <a href="https://tcg-calendar.co.kr/tcgtimer.html" class="site-nav-link active">⏱ TCG 타이머</a>
+      <a href="https://tcg-calendar.co.kr/tcg_map.html" class="site-nav-link">🗺 TCG 매장 지도</a>
+    </div>
+  </div>
+</nav>
+<script>
+document.addEventListener('click', e => {
+  const nav = document.querySelector('.site-nav-dropdown');
+  if (nav && !nav.parentElement.contains(e.target)) nav.classList.remove('open');
+});
+</script>
 
 <!-- ── 체스 시계 ── -->
 <div id="chess-app" class="hidden">

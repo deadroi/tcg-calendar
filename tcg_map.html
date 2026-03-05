@@ -10,15 +10,38 @@ html, body { height: 100%; font-family: 'Malgun Gothic', system-ui, sans-serif; 
 
 #map { width: 100%; height: 100vh; }
 
+/* ── 사이트 네비게이션 ── */
+.site-nav { background: #0d0d1a; position: fixed; top: 0; left: 0; right: 0; z-index: 1001; border-bottom: 1px solid #2a2a44; }
+.site-nav-inner { max-width: 960px; margin: 0 auto; padding: 0 8px; display: flex; align-items: center; justify-content: space-between; }
+.site-nav-links { display: flex; flex-wrap: wrap; justify-content: center; flex: 1; }
+.site-nav-link { display: inline-block; padding: 9px 12px; color: #adb5bd; text-decoration: none; font-size: 12px; font-weight: 600; border-bottom: 3px solid transparent; transition: color .15s; white-space: nowrap; }
+.site-nav-link:hover { color: #fff; }
+.site-nav-link.active { color: #fff; border-bottom-color: #4ccfac; }
+.site-nav-title { color: #4ccfac; font-size: 14px; font-weight: 700; letter-spacing: -.3px; display: none; }
+.site-nav-hamburger { display: none; background: none; border: none; cursor: pointer; padding: 6px; flex-direction: column; gap: 5px; }
+.site-nav-hamburger span { display: block; width: 22px; height: 2px; background: #adb5bd; border-radius: 2px; }
+.site-nav-hamburger:hover span { background: #fff; }
+.site-nav-dropdown { display: none; position: absolute; top: 100%; right: 0; min-width: 220px; background: #13131f; border: 1px solid #2a2a44; border-radius: 0 0 10px 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); overflow: hidden; }
+.site-nav-dropdown.open { display: block; }
+.site-nav-dropdown .site-nav-link { display: flex; align-items: center; gap: 10px; padding: 12px 18px; border-bottom: none; border-left: 3px solid transparent; }
+.site-nav-dropdown .site-nav-link:hover { background: #1e1e35; }
+.site-nav-dropdown .site-nav-link.active { color: #4ccfac; border-left-color: #4ccfac; background: #161628; }
+@media (max-width: 600px) {
+  .site-nav-links { display: none; }
+  .site-nav-title { display: block; }
+  .site-nav-hamburger { display: flex; }
+}
+
 /* ── 상단바 ── */
 #topbar {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  position: fixed; top: 39px; left: 0; right: 0; z-index: 1000;
   background: rgba(13,13,26,0.96);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid #2a2a44;
   padding: 7px 12px;
   display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
 }
+@media (max-width: 600px) { #topbar { top: 44px; } }
 #topbar-title { font-size: 15px; color: #4ccfac; font-weight: 700; white-space: nowrap; }
 #region-filter { display: flex; gap: 4px; flex-wrap: wrap; flex: 1; }
 .rfbtn {
@@ -41,7 +64,7 @@ html, body { height: 100%; font-family: 'Malgun Gothic', system-ui, sans-serif; 
   padding: 14px 36px 14px 14px;
   min-width: 200px; max-width: 280px;
   position: relative;
-  transform: translateY(calc(-100% - 12px));
+  margin-bottom: 10px;
 }
 .custom-overlay::after {
   content: '';
@@ -92,6 +115,35 @@ html, body { height: 100%; font-family: 'Malgun Gothic', system-ui, sans-serif; 
     → 내 애플리케이션 → 앱 키 → JavaScript 키
   </p>
 </div>
+
+<nav class="site-nav">
+  <div class="site-nav-inner">
+    <div class="site-nav-links">
+      <a href="https://tcg-calendar.co.kr" class="site-nav-link">📅 대회 일정 수집기</a>
+      <a href="https://tcg-calendar.co.kr/result.html" class="site-nav-link">📋 대회 결과 수집기</a>
+      <a href="https://tcg-calendar.co.kr/tcg-swisssystem.html" class="site-nav-link">🏆 스위스라운드 시스템</a>
+      <a href="https://tcg-calendar.co.kr/tcgtimer.html" class="site-nav-link">⏱ TCG 타이머</a>
+      <a href="https://tcg-calendar.co.kr/tcg_map.html" class="site-nav-link active">🗺 TCG 매장 지도</a>
+    </div>
+    <span class="site-nav-title">🃏 TCG 시스템</span>
+    <button class="site-nav-hamburger" onclick="this.nextElementSibling.classList.toggle('open')" aria-label="메뉴">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="site-nav-dropdown">
+      <a href="https://tcg-calendar.co.kr" class="site-nav-link">📅 대회 일정 수집기</a>
+      <a href="https://tcg-calendar.co.kr/result.html" class="site-nav-link">📋 대회 결과 수집기</a>
+      <a href="https://tcg-calendar.co.kr/tcg-swisssystem.html" class="site-nav-link">🏆 스위스라운드 시스템</a>
+      <a href="https://tcg-calendar.co.kr/tcgtimer.html" class="site-nav-link">⏱ TCG 타이머</a>
+      <a href="https://tcg-calendar.co.kr/tcg_map.html" class="site-nav-link active">🗺 TCG 매장 지도</a>
+    </div>
+  </div>
+</nav>
+<script>
+document.addEventListener('click', e => {
+  const nav = document.querySelector('.site-nav-dropdown');
+  if (nav && !nav.parentElement.contains(e.target)) nav.classList.remove('open');
+});
+</script>
 
 <div id="topbar">
   <span id="topbar-title">🃏 TCG 매장 지도</span>
@@ -192,63 +244,87 @@ const RC = {
 const rc = r => RC[r] || "#4ccfac";
 const REGIONS = [...new Set(STORES.map(s => s.region))];
 
-let activeFilter = 'all';
+let activeFilters = new Set(['all']);
 let allMarkers = [];
 let openOverlay = null;
 let map = null;
 
+function addMarker(s, pos) {
+  const xHtml = s.x
+    ? `<a class="popup-xlink" href="${s.x}" target="_blank">🐦 X(트위터)</a>`
+    : '';
+  const popupContent = `
+    <div class="custom-overlay">
+      <button class="overlay-close" onclick="closeOverlay()">✕</button>
+      <span class="popup-region" style="background:${rc(s.region)}">${s.region}</span>
+      <div class="popup-name">${s.name}</div>
+      <div class="popup-addr">${s.addr}</div>
+      ${xHtml}
+    </div>`;
+
+  const popup = new kakao.maps.CustomOverlay({
+    position: pos,
+    content: `<div style="padding-bottom:36px">${popupContent}</div>`,
+    zIndex: 10,
+    yAnchor: 1,
+  });
+
+  const idx = allMarkers.length;
+  const color = rc(s.region);
+  const dot = new kakao.maps.CustomOverlay({
+    position: pos,
+    content: `<div onclick="markerClick(${idx})" style="
+      width:22px;height:28px;cursor:pointer;position:relative;
+      filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+    ">
+      <svg width="22" height="28" viewBox="0 0 22 28" xmlns="http://www.w3.org/2000/svg">
+        <path d="M11 0C4.9 0 0 4.9 0 11c0 7.7 11 17 11 17s11-9.3 11-17C22 4.9 17.1 0 11 0z" fill="${color}"/>
+        <circle cx="11" cy="11" r="5" fill="white" opacity="0.85"/>
+      </svg>
+    </div>`,
+    zIndex: 3,
+    yAnchor: 1,
+  });
+
+  allMarkers.push({ store: s, marker: dot, popup, pos });
+  if (activeFilters.has('all') || activeFilters.has(s.region)) {
+    dot.setMap(map);
+  }
+  document.getElementById('count-label').textContent =
+    allMarkers.filter(d => activeFilters.has('all') || activeFilters.has(d.store.region)).length + '개 매장';
+}
+
 function initMap() {
-  const center = new kakao.maps.LatLng(36.5, 127.8);
-  map = new kakao.maps.Map(document.getElementById('map'), {
-    center,
-    level: 8,
-  });
-
-  // 줌 컨트롤
-  const zoomCtrl = new kakao.maps.ZoomControl();
-  map.addControl(zoomCtrl, kakao.maps.ControlPosition.BOTTOMRIGHT);
-
-  STORES.forEach(s => {
-    const pos = new kakao.maps.LatLng(s.lat, s.lon);
-
-    // 팝업 오버레이
-    const xHtml = s.x
-      ? `<a class="popup-xlink" href="${s.x}" target="_blank">🐦 X(트위터)</a>`
-      : '';
-    const popupContent = `
-      <div class="custom-overlay">
-        <button class="overlay-close" onclick="closeOverlay()">✕</button>
-        <span class="popup-region" style="background:${rc(s.region)}">${s.region}</span>
-        <div class="popup-name">${s.name}</div>
-        <div class="popup-addr">${s.addr}</div>
-        ${xHtml}
-      </div>`;
-
-    const popup = new kakao.maps.CustomOverlay({
-      position: pos,
-      content: popupContent,
-      zIndex: 10,
-      yAnchor: 1,
-    });
-
-    const idx = allMarkers.length;
-    const dot = new kakao.maps.CustomOverlay({
-      position: pos,
-      content: `<div onclick="markerClick(${idx})" style="
-        width:14px;height:14px;border-radius:50%;
-        background:${rc(s.region)};
-        border:2.5px solid rgba(255,255,255,0.7);
-        box-shadow:0 2px 6px rgba(0,0,0,0.5);
-        cursor:pointer;
-      "></div>`,
-      zIndex: 3,
-    });
-
-    allMarkers.push({ store: s, marker: dot, popup });
-  });
+  const center = new kakao.maps.LatLng(37.5663, 126.9779);
+  map = new kakao.maps.Map(document.getElementById('map'), { center, level: 8 });
+  map.addControl(new kakao.maps.ZoomControl(), kakao.maps.ControlPosition.BOTTOMRIGHT);
 
   buildFilter();
-  applyFilter();
+
+  const geocoder = new kakao.maps.services.Geocoder();
+  let done = 0;
+
+  STORES.forEach(s => {
+    // 층/호 정보 제거 후 도로명 주소만 사용
+    const query = s.addr.replace(/\s+\d+층.*$/, '').replace(/\s+[A-Za-z]?\s*\d+호.*$/, '').trim();
+    geocoder.addressSearch(query, (result, status) => {
+      if (status === kakao.maps.services.Status.OK) {
+        addMarker(s, new kakao.maps.LatLng(result[0].y, result[0].x));
+      } else {
+        // 실패 시 원본 주소로 재시도
+        geocoder.addressSearch(s.addr, (r2, s2) => {
+          if (s2 === kakao.maps.services.Status.OK) {
+            addMarker(s, new kakao.maps.LatLng(r2[0].y, r2[0].x));
+          } else {
+            console.warn('지오코딩 실패:', s.name);
+          }
+          if (++done === STORES.length) applyFilter();
+        });
+        return;
+      }
+      if (++done === STORES.length) applyFilter();
+    });
+  });
 }
 
 window.closeOverlay = function() {
@@ -273,15 +349,29 @@ function makeBtn(label, value, on) {
   const b = document.createElement('button');
   b.className = 'rfbtn' + (on ? ' on' : '');
   b.textContent = label;
+  b.dataset.value = value;
   if (on) { b.style.background = '#4ccfac'; b.style.color = '#111'; }
   b.onclick = () => {
+    if (value === 'all') {
+      // 전체 버튼: 모두 초기화
+      activeFilters = new Set(['all']);
+    } else {
+      activeFilters.delete('all');
+      if (activeFilters.has(value)) {
+        activeFilters.delete(value);
+        if (activeFilters.size === 0) activeFilters.add('all');
+      } else {
+        activeFilters.add(value);
+      }
+    }
+    // 버튼 UI 갱신
     document.querySelectorAll('.rfbtn').forEach(x => {
-      x.classList.remove('on'); x.style.background = ''; x.style.color = '';
+      const v = x.dataset.value;
+      const isOn = activeFilters.has(v);
+      x.classList.toggle('on', isOn);
+      x.style.background = isOn ? (v === 'all' ? '#4ccfac' : rc(v)) : '';
+      x.style.color = isOn ? '#111' : '';
     });
-    b.classList.add('on');
-    b.style.background = value === 'all' ? '#4ccfac' : rc(value);
-    b.style.color = '#111';
-    activeFilter = value;
     applyFilter();
   };
   return b;
@@ -289,18 +379,21 @@ function makeBtn(label, value, on) {
 
 function applyFilter() {
   if (openOverlay) { openOverlay.setMap(null); openOverlay = null; }
-  const visible = allMarkers.filter(d => activeFilter === 'all' || d.store.region === activeFilter);
+  const visible = allMarkers.filter(d => activeFilters.has('all') || activeFilters.has(d.store.region));
   allMarkers.forEach(d => d.marker.setMap(null));
   visible.forEach(d => d.marker.setMap(map));
   document.getElementById('count-label').textContent = `${visible.length}개 매장`;
 
-  if (activeFilter !== 'all' && visible.length > 0) {
+  if (!activeFilters.has('all') && visible.length > 0) {
     const bounds = new kakao.maps.LatLngBounds();
-    visible.forEach(d => bounds.extend(new kakao.maps.LatLng(d.store.lat, d.store.lon)));
-    map.setBounds(bounds);
+    visible.forEach(d => { if (d.pos) bounds.extend(d.pos); });
+    if (!bounds.isEmpty()) map.setBounds(bounds);
   }
 }
 </script>
-<script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=3a2908c8b5a068955ea02e8eb171813b&onload=initMap" onerror="document.getElementById('apikey-notice').style.display='flex'"></script>
+<script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=3a2908c8b5a068955ea02e8eb171813b&autoload=false&libraries=services" onerror="document.getElementById('apikey-notice').style.display='flex'"></script>
+<script>
+kakao.maps.load(initMap);
+</script>
 </body>
 </html>
