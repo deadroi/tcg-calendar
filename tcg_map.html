@@ -168,8 +168,8 @@ const STORES = [
   {region:"서울", name:"이수 듀얼파크",           addr:"서울 동작구 동작대로33가길 5 지하 1층",             x:"https://x.com/qJejhlkPBpPolwf",  lat:37.4894405,  lon:126.9817215},
   {region:"서울", name:"은평 TCG LABO",           addr:"서울 은평구 가좌로 251 3층",                       x:"https://x.com/TCGLABOs",          lat:37.6000674,  lon:126.9047491},
   {region:"서울", name:"신당 카드스퀘어",          addr:"서울 중구 다산로40길 51 지하1층",                  x:"https://x.com/Card_Square_TCG",   lat:37.5637009,  lon:127.0176527},
-  {region:"서울", name:"역삼 카드냥",             addr:"서울 강남구 논현로77길 9 태원빌딩 4층",             x:"https://x.com/cardnyang_tcg",     lat:37.4970141,  lon:127.0380477},
-  {region:"서울", name:"역삼 토너먼트센터",        addr:"서울 강남구 논현로77길 9 태원빌딩 2층",             x:"https://x.com/tc_nyang",          lat:37.4972,     lon:127.0382},
+  {region:"서울", name:"역삼 카드냥",             addr:"서울 강남구 논현로77길 9 태원빌딩 4층",             x:"https://x.com/cardnyang_tcg",     lat:37.4970141,  lon:127.0380477, keyword:"카드냥 역삼"},
+  {region:"서울", name:"역삼 토너먼트센터",        addr:"서울 강남구 논현로77길 9 태원빌딩 2층",             x:"https://x.com/tc_nyang",          lat:37.4972,     lon:127.0382,    keyword:"역삼 토너먼트센터"},
   {region:"서울", name:"등촌 기어타운",           addr:"서울 양천구 공항대로 570 3층 301호",               x:"https://x.com/GearTownTCG",       lat:37.5487662,  lon:126.8684124},
   {region:"서울", name:"송파 카드피아",           addr:"서울 송파구 송파대로30길 41-25 지하1층",            x:"https://x.com/Card_Pia",          lat:37.4969716,  lon:127.1208953},
   {region:"서울", name:"서대문 밀짚모자해적단TCG", addr:"서울 중랑구 중랑역로 276 헤르만스테이트 302호",     x:"https://x.com/StrawHatTCG",       lat:37.6161192,  lon:127.0779451},
@@ -224,7 +224,7 @@ const STORES = [
   {region:"부산",   name:"동래 티씨지샵 셔플",      addr:"부산 동래구 충렬대로 134-1 1층",                   x:"https://x.com/Busan_Shuffle",     lat:35.2045175,  lon:129.0777572},
   {region:"부산",   name:"양정 J클로버",            addr:"부산 부산진구 중앙대로 905 2층",                   x:"https://x.com/busanjoker",        lat:35.1488489,  lon:129.058603},
   {region:"부산",   name:"서면 듀얼존",             addr:"부산 부산진구 서전로37번길 14-1 B 가동302~303호",  x:"https://x.com/Seomyeon_Duel",     lat:35.1590294,  lon:129.0638791},
-  {region:"부산",   name:"서면 보드게임카페 미니빌", addr:"부산 부산진구 중앙대로692번길 33 4층",             x:"https://x.com/miniville_tcg",     lat:35.1546541,  lon:129.0610886},
+  {region:"부산",   name:"서면 보드게임카페 미니빌", addr:"부산 부산진구 중앙대로692번길 33 4층",             x:"https://x.com/miniville_tcg",     lat:35.1546541,  lon:129.0610886, keyword:"보드게임카페 미니빌 서면"},
   {region:"부산",   name:"서면 카드팜",             addr:"부산 부산진구 중앙대로692번길 33 7층",             x:"https://x.com/CARDPOM2",          lat:35.1548,     lon:129.0613},
   {region:"부산",   name:"경성대 TCG 드로우",       addr:"부산 남구 수영로298번길 37 용수빌딩 6층",           x:"https://x.com/TCG_DRAW",          lat:35.1353095,  lon:129.0999136},
   {region:"경남",   name:"울산 듀얼팩토리",         addr:"울산 중구 번영로 454-1 2층",                       x:"https://x.com/TCG_FACTORY",       lat:35.5664357,  lon:129.3396376},
@@ -319,27 +319,43 @@ function initMap() {
   buildFilter();
 
   const geocoder = new kakao.maps.services.Geocoder();
+  const places = new kakao.maps.services.Places();
   let done = 0;
 
   STORES.forEach(s => {
-    // 층/호 정보 제거 후 도로명 주소만 사용
+    const finish = pos => {
+      addMarker(s, pos);
+      if (++done === STORES.length) applyFilter();
+    };
+
+    // keyword 필드가 있으면 키워드 검색 우선
+    if (s.keyword) {
+      places.keywordSearch(s.keyword, (result, status) => {
+        if (status === kakao.maps.services.Status.OK) {
+          finish(new kakao.maps.LatLng(result[0].y, result[0].x));
+        } else {
+          console.warn('키워드 검색 실패:', s.name);
+          finish(new kakao.maps.LatLng(s.lat, s.lon));
+        }
+      });
+      return;
+    }
+
+    // 층/호 정보 제거 후 도로명 주소로 검색
     const query = s.addr.replace(/\s+\d+층.*$/, '').replace(/\s+[A-Za-z]?\s*\d+호.*$/, '').trim();
     geocoder.addressSearch(query, (result, status) => {
       if (status === kakao.maps.services.Status.OK) {
-        addMarker(s, new kakao.maps.LatLng(result[0].y, result[0].x));
+        finish(new kakao.maps.LatLng(result[0].y, result[0].x));
       } else {
-        // 실패 시 원본 주소로 재시도
         geocoder.addressSearch(s.addr, (r2, s2) => {
           if (s2 === kakao.maps.services.Status.OK) {
-            addMarker(s, new kakao.maps.LatLng(r2[0].y, r2[0].x));
+            finish(new kakao.maps.LatLng(r2[0].y, r2[0].x));
           } else {
             console.warn('지오코딩 실패:', s.name);
+            if (++done === STORES.length) applyFilter();
           }
-          if (++done === STORES.length) applyFilter();
         });
-        return;
       }
-      if (++done === STORES.length) applyFilter();
     });
   });
 }
