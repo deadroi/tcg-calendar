@@ -286,6 +286,23 @@ function addMarker(s, pos) {
     yAnchor: 1,
   });
 
+  // 동일 좌표 마커 겹침 방지: 같은 위치면 살짝 오프셋
+  const OFFSET = 0.00005;
+  const dupCount = allMarkers.filter(d =>
+    Math.abs(d.pos.getLat() - pos.getLat()) < OFFSET &&
+    Math.abs(d.pos.getLng() - pos.getLng()) < OFFSET
+  ).length;
+  if (dupCount > 0) {
+    const angle = (dupCount * 137.5) * Math.PI / 180;
+    const r = OFFSET * dupCount;
+    pos = new kakao.maps.LatLng(
+      pos.getLat() + r * Math.cos(angle),
+      pos.getLng() + r * Math.sin(angle)
+    );
+    dot.setPosition(pos);
+    popup.setPosition(pos);
+  }
+
   allMarkers.push({ store: s, marker: dot, popup, pos });
   if (activeFilters.has('all') || activeFilters.has(s.region)) {
     dot.setMap(map);
