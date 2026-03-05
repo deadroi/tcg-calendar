@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>TCG 매장 지도</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; font-family: 'Malgun Gothic', system-ui, sans-serif; }
+
+#map { width: 100%; height: 100vh; }
+
+/* ── 상단바 ── */
+#topbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  background: rgba(13,13,26,0.96);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid #2a2a44;
+  padding: 7px 12px;
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+}
+#topbar-title { font-size: 15px; color: #4ccfac; font-weight: 700; white-space: nowrap; }
+#region-filter { display: flex; gap: 4px; flex-wrap: wrap; flex: 1; }
+.rfbtn {
+  padding: 4px 10px; border-radius: 20px;
+  border: 1.5px solid #2a2a44; background: #111128;
+  color: #666; font-size: 11px; font-weight: 700;
+  cursor: pointer; white-space: nowrap; transition: all .15s;
+  line-height: 1.4;
+}
+.rfbtn:hover { color: #aaa; border-color: #444; }
+.rfbtn.on { color: #111 !important; border-color: transparent !important; }
+#count-label { font-size: 11px; color: rgba(255,255,255,0.35); white-space: nowrap; }
+
+/* ── 커스텀 오버레이 팝업 ── */
+.custom-overlay {
+  background: #1a1a2e;
+  border: 1px solid #2a2a44;
+  border-radius: 12px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.6);
+  padding: 14px 36px 14px 14px;
+  min-width: 200px; max-width: 280px;
+  position: relative;
+  transform: translateY(calc(-100% - 12px));
+}
+.custom-overlay::after {
+  content: '';
+  position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%);
+  width: 0; height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid #2a2a44;
+}
+.overlay-close {
+  position: absolute; top: 6px; right: 8px;
+  color: rgba(255,255,255,0.4); font-size: 18px;
+  cursor: pointer; line-height: 1; background: none; border: none;
+}
+.overlay-close:hover { color: #fff; }
+.popup-region {
+  display: inline-block; font-size: 10px; font-weight: 700;
+  padding: 2px 7px; border-radius: 4px; margin-bottom: 5px; color: #fff;
+}
+.popup-name { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 5px; line-height: 1.3; }
+.popup-addr { font-size: 11px; color: rgba(255,255,255,0.45); line-height: 1.6; margin-bottom: 7px; }
+.popup-xlink { font-size: 12px; color: #4ccfac; text-decoration: none; display: inline-block; }
+.popup-xlink:hover { text-decoration: underline; }
+
+/* ── API 키 안내 ── */
+#apikey-notice {
+  display: none;
+  position: fixed; inset: 0; z-index: 9999;
+  background: rgba(13,13,26,0.97);
+  align-items: center; justify-content: center;
+  flex-direction: column; gap: 16px; padding: 32px;
+  text-align: center;
+}
+#apikey-notice h2 { color: #4ccfac; font-size: 20px; }
+#apikey-notice p { color: rgba(255,255,255,0.6); font-size: 13px; line-height: 1.8; }
+#apikey-notice code { background: #22223a; color: #f07b2a; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+</style>
+</head>
+<body>
+
+<div id="apikey-notice">
+  <h2>🗝️ Kakao Maps API 키 필요</h2>
+  <p>
+    이 페이지는 카카오 지도 API를 사용합니다.<br>
+    HTML 파일 내 <code>YOUR_KAKAO_APP_KEY</code>를<br>
+    실제 JavaScript 앱 키로 교체해 주세요.<br><br>
+    발급: <a href="https://developers.kakao.com" target="_blank" style="color:#4ccfac">developers.kakao.com</a>
+    → 내 애플리케이션 → 앱 키 → JavaScript 키
+  </p>
+</div>
+
+<div id="topbar">
+  <span id="topbar-title">🃏 TCG 매장 지도</span>
+  <div id="region-filter"></div>
+  <span id="count-label"></span>
+</div>
+<div id="map"></div>
+
+<script>
+// ── 매장 데이터 (좌표 임베드) ──
+const STORES = [
+  {region:"서울", name:"홍대 롤링 다이스",       addr:"서울 마포구 동교로 193 동진빌딩 3층",                x:"https://x.com/Rollingdice_hd",    lat:37.5576845,  lon:126.9225497},
+  {region:"서울", name:"홍대 듀얼 베이스",        addr:"서울 마포구 와우산로35길 9-7",                     x:"https://x.com/DuelBase0523",      lat:37.5562165,  lon:126.9290247},
+  {region:"서울", name:"강변 미카엘",             addr:"서울 광진구 구의강변로 52 영풍빌딩 2층 201호",       x:"",                                lat:37.533649,   lon:127.0909059},
+  {region:"서울", name:"당산 카드냥",             addr:"서울 영등포구 당산로38길 4 401호",                  x:"https://x.com/ds_nyang",          lat:37.5288439,  lon:126.8993096},
+  {region:"서울", name:"ABOUT TCG",              addr:"서울 관악구 조원로 16 로얄빌딩 2층",                x:"https://x.com/AbouttcgA96662",    lat:37.4839817,  lon:126.9034224},
+  {region:"서울", name:"도곡 듀얼샵",             addr:"서울 강남구 논현로36길 27 지하1층",                 x:"https://x.com/DG_duel_shop",      lat:37.4850074,  lon:127.0434559},
+  {region:"서울", name:"목동 듀얼파크",           addr:"서울 양천구 신정중앙로 94",                        x:"",                                lat:37.5262129,  lon:126.8637265},
+  {region:"서울", name:"건대 킨들샵",             addr:"서울 광진구 아차산로 197 동흥빌딩 4층",             x:"https://x.com/mtgkindleshop",     lat:37.5366578,  lon:127.0843581},
+  {region:"서울", name:"아현 카드킹덤",           addr:"서울 마포구 신촌로 254 lk빌딩 4층",                x:"https://x.com/ahyeonck6279",      lat:37.5572695,  lon:126.9576913},
+  {region:"서울", name:"장한평 마린포드",          addr:"서울 동대문구 장한로 37 3층",                      x:"https://x.com/Marineford_TCG",    lat:37.5646122,  lon:127.066318},
+  {region:"서울", name:"이수 듀얼파크",           addr:"서울 동작구 동작대로33가길 5 지하 1층",             x:"https://x.com/qJejhlkPBpPolwf",  lat:37.4894405,  lon:126.9817215},
+  {region:"서울", name:"은평 TCG LABO",           addr:"서울 은평구 가좌로 251 3층",                       x:"https://x.com/TCGLABOs",          lat:37.6000674,  lon:126.9047491},
+  {region:"서울", name:"신당 카드스퀘어",          addr:"서울 중구 다산로40길 51 지하1층",                  x:"https://x.com/Card_Square_TCG",   lat:37.5637009,  lon:127.0176527},
+  {region:"서울", name:"역삼 카드냥",             addr:"서울 강남구 논현로77길 9 태원빌딩 4층",             x:"https://x.com/cardnyang_tcg",     lat:37.4970141,  lon:127.0380477},
+  {region:"서울", name:"역삼 토너먼트센터",        addr:"서울 강남구 논현로77길 9 태원빌딩 2층",             x:"https://x.com/tc_nyang",          lat:37.4972,     lon:127.0382},
+  {region:"서울", name:"등촌 기어타운",           addr:"서울 양천구 공항대로 570 3층 301호",               x:"https://x.com/GearTownTCG",       lat:37.5487662,  lon:126.8684124},
+  {region:"서울", name:"송파 카드피아",           addr:"서울 송파구 송파대로30길 41-25 지하1층",            x:"https://x.com/Card_Pia",          lat:37.4969716,  lon:127.1208953},
+  {region:"서울", name:"서대문 밀짚모자해적단TCG", addr:"서울 중랑구 중랑역로 276 헤르만스테이트 302호",     x:"https://x.com/StrawHatTCG",       lat:37.6161192,  lon:127.0779451},
+  {region:"서울", name:"서대문 콜렉토티시지",      addr:"서울 서대문구 세무서길 84 3층",                    x:"",                                lat:37.5910451,  lon:126.9467102},
+  {region:"서울", name:"구로 카드숲",             addr:"서울 관악구 조원중앙로 13 3층",                    x:"https://x.com/cardforesttcg",     lat:37.4818114,  lon:126.9057947},
+  {region:"서울", name:"사당 카드랩",             addr:"서울 동작구 동작대로1길 27",                       x:"https://x.com/CardLabKR",         lat:37.4772563,  lon:126.9799615},
+  {region:"서울", name:"강동 카드타운",           addr:"서울 강동구 천호대로168길 35 2층",                  x:"https://x.com/cardtown20004",     lat:37.5348359,  lon:127.1327242},
+  {region:"서울", name:"봉천 데쿠데쿠",           addr:"서울 관악구 봉천로31길 9 지하 1층",                x:"https://x.com/deckdecktcg",       lat:37.4845664,  lon:126.9406332},
+  {region:"경기", name:"서현역 라이프링크",        addr:"경기 성남시 분당구 분당로53번길 19 피아자코코빌딩 3층", x:"https://x.com/TCGLifelink",    lat:37.3843229,  lon:127.122196},
+  {region:"경기", name:"구리 듀얼파크",           addr:"경기 구리시 경춘로227번길 6-9 2층",                x:"",                                lat:37.6031169,  lon:127.1461794},
+  {region:"경기", name:"평택 카드빌리지",          addr:"경기 평택시 통복시장1로 29 지하1층",               x:"https://x.com/card_village",      lat:37.0005685,  lon:127.0883775},
+  {region:"경기", name:"신중동역 하비게임몰",      addr:"경기 부천시 원미구 중동로254번길 104 호정프라자 6층 604호", x:"https://x.com/hobby0070", lat:37.4843538,  lon:126.7639187},
+  {region:"경기", name:"역곡 스카이스크레이퍼",    addr:"경기 부천시 원미구 부일로 705 우승메디컬센터 5층 501호", x:"https://x.com/KR_Skyscraper", lat:37.4849997, lon:126.808245},
+  {region:"경기", name:"송내 리프레시",           addr:"경기 부천시 원미구 상일로94번길 35",               x:"https://x.com/refresh_250609",    lat:37.4900498,  lon:126.7528416},
+  {region:"경기", name:"금정 배틀시티",           addr:"경기 군포시 산본천로199번길 5 3층",                x:"https://x.com/cardmoa",           lat:37.3599329,  lon:126.9281831},
+  {region:"경기", name:"일산 듀얼팩토리",          addr:"경기 고양시 일산동구 백석로71번길 14-3 지하1층",    x:"https://x.com/Ilsanduel",         lat:37.6478224,  lon:126.7849005},
+  {region:"경기", name:"야탑 배틀시티",           addr:"경기 성남시 분당구 야탑로111번길 5-3 지하1층",      x:"",                                lat:37.4089929,  lon:127.1405379},
+  {region:"경기", name:"대화 듀얼위너",           addr:"경기 고양시 일산서구 대산로 219 한라프라자 1동 2층 201호", x:"https://x.com/phantom7813", lat:37.6784206, lon:126.7542287},
+  {region:"경기", name:"수원 카드 플래닛",         addr:"경기 수원시 영통구 청명로 73-1 3층",               x:"https://x.com/cardplanet_kr",     lat:37.2535552,  lon:127.0790286},
+  {region:"경기", name:"수원 TCG TracerZ",        addr:"경기 수원시 장안구 파장로 1 윤중빌딩 4층",          x:"https://x.com/TcgTracerZ",        lat:37.2979237,  lon:126.9965261},
+  {region:"경기", name:"평택 카드홀릭",           addr:"경기 평택시 평택2로 16 3층",                       x:"https://x.com/CardHolic_Pt",      lat:36.9956622,  lon:127.0908245},
+  {region:"경기", name:"안양 트레이너스",          addr:"경기 안양시 동안구 평촌대로217번길 15 파크애비뉴엘 3층 302호", x:"https://x.com/trainers_card", lat:37.3906634, lon:126.9550326},
+  {region:"경기", name:"김포 카드베이스",          addr:"경기 김포시 김포한강1로 254 그랜드타워 2층",         x:"https://x.com/cardbase_gimpo",    lat:37.6531394,  lon:126.6856323},
+  {region:"경기", name:"안산 LAS TCG",            addr:"경기 안산시 단원구 중앙대로 907 안산종합상가 2동 3층 302호", x:"https://x.com/LASTCG_77", lat:37.3343593, lon:126.763683},
+  {region:"경기", name:"수내 카드빈",             addr:"경기 성남시 분당구 황새울로214번길 8 MS프라자 802호", x:"https://x.com/cardbean1",        lat:37.3825999,  lon:127.1188},
+  {region:"경기", name:"안성 하얀숲 카드하우스",   addr:"경기 안성시 아양1로 77-31 해송프라자 3층 303호",    x:"https://x.com/AnseongWFTCG",      lat:37.0072604,  lon:127.2577669},
+  {region:"인천", name:"인천 타이쿤",             addr:"인천 미추홀구 경인남길30번길 49 2층",              x:"",                                lat:37.4515492,  lon:126.6579167},
+  {region:"인천", name:"만수 듀얼존",             addr:"인천 남동구 백범로 173 스토리빌딩 5층",             x:"https://x.com/jurassic_tcg",      lat:37.460387,   lon:126.7237838},
+  {region:"인천", name:"계산동 위치스 브루",       addr:"인천 계양구 계양대로 166 정우빌딩 2층",             x:"",                                lat:37.5291918,  lon:126.7225202},
+  {region:"인천", name:"인천 카드팝",             addr:"인천 부평구 부평문화로66번길 21 4층",               x:"https://x.com/Card_Pop_TCG",      lat:37.4933336,  lon:126.7237309},
+  {region:"인천", name:"주안 티씨지아레나",        addr:"인천 미추홀구 염창로 77",                         x:"https://x.com/Juan_TcgArena",     lat:37.4649124,  lon:126.6835534},
+  {region:"인천", name:"부평 히어로즈",           addr:"인천 부평구 대정로 22 부경빌딩 202호",              x:"https://x.com/BupyeongHeroes",    lat:37.4929076,  lon:126.7279258},
+  {region:"대전", name:"대전 듀얼몰",             addr:"대전 서구 문정로170번길 193 2층",                  x:"https://x.com/duelmall",          lat:36.3497165,  lon:127.4012727},
+  {region:"대전", name:"대전 TCG스타디움",         addr:"대전 유성구 유성대로668번길 107 2층",               x:"https://x.com/Tcg_Stadium0",      lat:36.3522494,  lon:127.3338594},
+  {region:"대전", name:"스카이스크레이퍼 대전점",  addr:"대전 중구 목척8길 31 3층",                         x:"https://x.com/Skyscrapershop2",   lat:36.3296195,  lon:127.4263449},
+  {region:"충남충북", name:"충주 듀얼존",          addr:"충북 충주시 계명대로 27",                          x:"",                                lat:36.9824965,  lon:127.9404714},
+  {region:"충남충북", name:"청주 TCG카드프리덤",   addr:"충북 청주시 서원구 수곡로 98 한마음2차아파트 10동상가 201호", x:"https://x.com/TCGcardfreedom", lat:36.6152712, lon:127.4757499},
+  {region:"충남충북", name:"청주 카드슬래쉬",      addr:"충북 청주시 서원구 1순환로672번길 64 3층",          x:"",                                lat:36.6331852,  lon:127.458194},
+  {region:"충남충북", name:"천안 카드빌리지",      addr:"충남 천안시 서북구 불당1길 49",                    x:"https://x.com/cvca2024",          lat:36.8041416,  lon:127.1079915},
+  {region:"강원",   name:"원주 카드스페이스",      addr:"강원특별자치도 원주시 능라동길 42 6층 602호",        x:"https://x.com/wonjucardspace",    lat:37.3322168,  lon:127.9272246},
+  {region:"대구경북", name:"대구 듀얼챔프",        addr:"대구 동구 송라로 66 3층",                          x:"https://x.com/dccom160",          lat:35.8719563,  lon:128.6190661},
+  {region:"대구경북", name:"대구 ss듀얼샵",        addr:"대구 달서구 월배로 132 대금로얄아파트 상가 2층",     x:"",                                lat:35.8290506,  lon:128.5493222},
+  {region:"대구경북", name:"대구 트레이너 스쿨 1호점", addr:"대구 달서구 야외음악당로 50 2층",              x:"https://x.com/TrainerSchool_",    lat:35.8528754,  lon:128.5563404},
+  {region:"대구경북", name:"대구 듀얼스파크",      addr:"대구 중구 동성로2길 50-13 3층",                    x:"https://x.com/Duels_park",        lat:35.8697065,  lon:128.5971628},
+  {region:"대구경북", name:"형곡 터틀라이트",      addr:"경북 구미시 형곡로12길 13",                        x:"https://x.com/TURTLELLITE_TCG",   lat:36.1151608,  lon:128.3304954},
+  {region:"전라제주", name:"광주 Win&Hunt",        addr:"광주 동구 제봉로 70 2층",                          x:"https://x.com/winhunt2",          lat:35.1543873,  lon:126.9131118},
+  {region:"전라제주", name:"광주 화성스토어TCG",   addr:"광주 동구 중앙로160번길 22 2층",                   x:"https://x.com/janghos50634978",   lat:35.147131,   lon:126.9152016},
+  {region:"전라제주", name:"광주 티씨지 플레이어", addr:"광주 서구 화운로 106 2층",                          x:"",                                lat:35.1675993,  lon:126.8773509},
+  {region:"전라제주", name:"목포 TCG팩토리",       addr:"전남 목포시 비파로51번길 20 2층",                  x:"https://x.com/FactoryTCG",        lat:34.80418,    lon:126.4259882},
+  {region:"전라제주", name:"전주 디마켓",          addr:"전북특별자치도 전주시 완산구 솟대2길 2 2층",         x:"",                                lat:35.7954434,  lon:127.1258411},
+  {region:"부산",   name:"장전 울트라 레어",        addr:"부산 금정구 금정로 138",                           x:"https://x.com/_synnd",            lat:35.2454392,  lon:129.0920065},
+  {region:"부산",   name:"동래 티씨지샵 셔플",      addr:"부산 동래구 충렬대로 134-1 1층",                   x:"https://x.com/Busan_Shuffle",     lat:35.2045175,  lon:129.0777572},
+  {region:"부산",   name:"양정 J클로버",            addr:"부산 부산진구 중앙대로 905 2층",                   x:"https://x.com/busanjoker",        lat:35.1488489,  lon:129.058603},
+  {region:"부산",   name:"서면 듀얼존",             addr:"부산 부산진구 서전로37번길 14-1 B 가동302~303호",  x:"https://x.com/Seomyeon_Duel",     lat:35.1590294,  lon:129.0638791},
+  {region:"부산",   name:"서면 보드게임카페 미니빌", addr:"부산 부산진구 중앙대로692번길 33 4층",             x:"https://x.com/miniville_tcg",     lat:35.1546541,  lon:129.0610886},
+  {region:"부산",   name:"서면 카드팜",             addr:"부산 부산진구 중앙대로692번길 33 7층",             x:"https://x.com/CARDPOM2",          lat:35.1548,     lon:129.0613},
+  {region:"부산",   name:"경성대 TCG 드로우",       addr:"부산 남구 수영로298번길 37 용수빌딩 6층",           x:"https://x.com/TCG_DRAW",          lat:35.1353095,  lon:129.0999136},
+  {region:"경남",   name:"울산 듀얼팩토리",         addr:"울산 중구 번영로 454-1 2층",                       x:"https://x.com/TCG_FACTORY",       lat:35.5664357,  lon:129.3396376},
+  {region:"경남",   name:"울산 던전다이스",         addr:"울산 남구 중앙로151번길 2 2층",                    x:"https://x.com/Dungeon__dice",     lat:35.5341489,  lon:129.3125091},
+  {region:"경남",   name:"김해 TCG 플레이존",       addr:"경남 김해시 능동로155번길 10-5 골든프라자 5층 504호", x:"https://x.com/tcgplayzone",     lat:35.2034416,  lon:128.8081951},
+  {region:"경남",   name:"창원 클럽앨리스",         addr:"경남 창원시 성산구 원이대로 495",                  x:"https://x.com/cw_alice_ocg",      lat:35.2414987,  lon:128.6522398},
+  {region:"경남",   name:"진주 TCG팩토리",          addr:"경남 진주시 진양호로547번길 5 2층",                x:"https://x.com/JinjuTCGFactory",   lat:35.1937393,  lon:128.0850103},
+  {region:"경남",   name:"양산 카드캐처",           addr:"경남 양산시 양산역로 69 4층 402호",                x:"https://x.com/yangsan_tcg",       lat:35.3342257,  lon:129.0289197},
+];
+
+// ── 지역 색상 ──
+const RC = {
+  "서울":"#e74c6f","경기":"#f07b2a","인천":"#c8a020",
+  "대전":"#27ae60","충남충북":"#16a085","강원":"#2980b9",
+  "대구경북":"#8e44ad","전라제주":"#d81b8c","부산":"#00acc1","경남":"#e53935",
+};
+const rc = r => RC[r] || "#4ccfac";
+const REGIONS = [...new Set(STORES.map(s => s.region))];
+
+let activeFilter = 'all';
+let allMarkers = [];
+let openOverlay = null;
+let map = null;
+
+function initMap() {
+  const center = new kakao.maps.LatLng(36.5, 127.8);
+  map = new kakao.maps.Map(document.getElementById('map'), {
+    center,
+    level: 8,
+  });
+
+  // 줌 컨트롤
+  const zoomCtrl = new kakao.maps.ZoomControl();
+  map.addControl(zoomCtrl, kakao.maps.ControlPosition.BOTTOMRIGHT);
+
+  STORES.forEach(s => {
+    const pos = new kakao.maps.LatLng(s.lat, s.lon);
+
+    // 커스텀 마커 (색상 dot)
+    const markerContent = `<div style="
+      width:14px;height:14px;border-radius:50%;
+      background:${rc(s.region)};
+      border:2.5px solid rgba(255,255,255,0.7);
+      box-shadow:0 2px 6px rgba(0,0,0,0.5);
+      cursor:pointer;
+    "></div>`;
+
+    const markerOverlay = new kakao.maps.CustomOverlay({
+      position: pos,
+      content: markerContent,
+      zIndex: 3,
+    });
+
+    // 팝업 오버레이
+    const xHtml = s.x
+      ? `<a class="popup-xlink" href="${s.x}" target="_blank">🐦 X(트위터)</a>`
+      : '';
+    const popupContent = `
+      <div class="custom-overlay">
+        <button class="overlay-close" onclick="closeOverlay()">✕</button>
+        <span class="popup-region" style="background:${rc(s.region)}">${s.region}</span>
+        <div class="popup-name">${s.name}</div>
+        <div class="popup-addr">${s.addr}</div>
+        ${xHtml}
+      </div>`;
+
+    const popup = new kakao.maps.CustomOverlay({
+      position: pos,
+      content: popupContent,
+      zIndex: 10,
+      yAnchor: 1,
+    });
+
+    // 마커 클릭 이벤트
+    const markerEl = document.createElement('div');
+    markerEl.innerHTML = markerContent;
+    markerEl.style.cssText = 'cursor:pointer;';
+    markerEl.addEventListener('click', () => {
+      if (openOverlay) openOverlay.setMap(null);
+      if (openOverlay === popup) { openOverlay = null; return; }
+      popup.setMap(map);
+      openOverlay = popup;
+    });
+
+    const clickableMarker = new kakao.maps.CustomOverlay({
+      position: pos,
+      content: markerEl,
+      zIndex: 3,
+    });
+
+    allMarkers.push({ store: s, marker: clickableMarker, popup });
+  });
+
+  buildFilter();
+  applyFilter();
+}
+
+window.closeOverlay = function() {
+  if (openOverlay) { openOverlay.setMap(null); openOverlay = null; }
+};
+
+function buildFilter() {
+  const wrap = document.getElementById('region-filter');
+  wrap.appendChild(makeBtn('전체', 'all', true));
+  REGIONS.forEach(r => wrap.appendChild(makeBtn(r, r, false)));
+}
+
+function makeBtn(label, value, on) {
+  const b = document.createElement('button');
+  b.className = 'rfbtn' + (on ? ' on' : '');
+  b.textContent = label;
+  if (on) { b.style.background = '#4ccfac'; b.style.color = '#111'; }
+  b.onclick = () => {
+    document.querySelectorAll('.rfbtn').forEach(x => {
+      x.classList.remove('on'); x.style.background = ''; x.style.color = '';
+    });
+    b.classList.add('on');
+    b.style.background = value === 'all' ? '#4ccfac' : rc(value);
+    b.style.color = '#111';
+    activeFilter = value;
+    applyFilter();
+  };
+  return b;
+}
+
+function applyFilter() {
+  if (openOverlay) { openOverlay.setMap(null); openOverlay = null; }
+  const visible = allMarkers.filter(d => activeFilter === 'all' || d.store.region === activeFilter);
+  allMarkers.forEach(d => d.marker.setMap(null));
+  visible.forEach(d => d.marker.setMap(map));
+  document.getElementById('count-label').textContent = `${visible.length}개 매장`;
+
+  if (activeFilter !== 'all' && visible.length > 0) {
+    const bounds = new kakao.maps.LatLngBounds();
+    visible.forEach(d => bounds.extend(new kakao.maps.LatLng(d.store.lat, d.store.lon)));
+    map.setBounds(bounds);
+  }
+}
+</script>
+<script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=3a2908c8b5a068955ea02e8eb171813b&onload=initMap" onerror="document.getElementById('apikey-notice').style.display='flex'"></script>
+</body>
+</html>
