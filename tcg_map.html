@@ -211,21 +211,6 @@ function initMap() {
   STORES.forEach(s => {
     const pos = new kakao.maps.LatLng(s.lat, s.lon);
 
-    // 커스텀 마커 (색상 dot)
-    const markerContent = `<div style="
-      width:14px;height:14px;border-radius:50%;
-      background:${rc(s.region)};
-      border:2.5px solid rgba(255,255,255,0.7);
-      box-shadow:0 2px 6px rgba(0,0,0,0.5);
-      cursor:pointer;
-    "></div>`;
-
-    const markerOverlay = new kakao.maps.CustomOverlay({
-      position: pos,
-      content: markerContent,
-      zIndex: 3,
-    });
-
     // 팝업 오버레이
     const xHtml = s.x
       ? `<a class="popup-xlink" href="${s.x}" target="_blank">🐦 X(트위터)</a>`
@@ -246,24 +231,20 @@ function initMap() {
       yAnchor: 1,
     });
 
-    // 마커 클릭 이벤트
-    const markerEl = document.createElement('div');
-    markerEl.innerHTML = markerContent;
-    markerEl.style.cssText = 'cursor:pointer;';
-    markerEl.addEventListener('click', () => {
-      if (openOverlay) openOverlay.setMap(null);
-      if (openOverlay === popup) { openOverlay = null; return; }
-      popup.setMap(map);
-      openOverlay = popup;
-    });
-
-    const clickableMarker = new kakao.maps.CustomOverlay({
+    const idx = allMarkers.length;
+    const dot = new kakao.maps.CustomOverlay({
       position: pos,
-      content: markerEl,
+      content: `<div onclick="markerClick(${idx})" style="
+        width:14px;height:14px;border-radius:50%;
+        background:${rc(s.region)};
+        border:2.5px solid rgba(255,255,255,0.7);
+        box-shadow:0 2px 6px rgba(0,0,0,0.5);
+        cursor:pointer;
+      "></div>`,
       zIndex: 3,
     });
 
-    allMarkers.push({ store: s, marker: clickableMarker, popup });
+    allMarkers.push({ store: s, marker: dot, popup });
   });
 
   buildFilter();
@@ -272,6 +253,14 @@ function initMap() {
 
 window.closeOverlay = function() {
   if (openOverlay) { openOverlay.setMap(null); openOverlay = null; }
+};
+
+window.markerClick = function(i) {
+  const d = allMarkers[i];
+  if (openOverlay) { openOverlay.setMap(null); openOverlay = null; }
+  if (openOverlay === d.popup) return;
+  d.popup.setMap(map);
+  openOverlay = d.popup;
 };
 
 function buildFilter() {
