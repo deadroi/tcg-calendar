@@ -113,7 +113,7 @@ body { display: flex; flex-direction: column; overflow: hidden; }
 /* ══════════════════════════════════════════
    체스 시계 모드
 ══════════════════════════════════════════ */
-#chess-app { display: flex; flex-direction: column; height: 100vh; width: 100vw; }
+#chess-app { display: flex; flex-direction: column; flex: 1; min-height: 0; width: 100%; }
 #chess-app.hidden { display: none; }
 
 #chess-top {
@@ -180,7 +180,7 @@ body { display: flex; flex-direction: column; overflow: hidden; }
 /* ══════════════════════════════════════════
    자기관리 타이머 모드
 ══════════════════════════════════════════ */
-#self-app { display: flex; flex-direction: column; height: 100vh; }
+#self-app { display: flex; flex-direction: column; flex: 1; min-height: 0; }
 #self-app.hidden { display: none; }
 
 #self-header {
@@ -252,6 +252,17 @@ body { display: flex; flex-direction: column; overflow: hidden; }
 .lap-tag.longest { background: #2a1e0a; color: #f0a030; }
 .lap-tag.fastest { background: #1a1e2e; color: #6090ff; }
 #self-no-laps { text-align: center; padding: 30px 0; font-size: 13px; color: rgba(255,255,255,0.2); }
+
+@media (orientation: landscape) and (max-height: 500px) {
+  #self-main { gap: 4px; padding: 6px 12px 8px; }
+  #self-total-label { font-size: 10px; }
+  #self-total-time { font-size: clamp(28px, 8vh, 50px); }
+  #self-lap-time { font-size: clamp(22px, 7vh, 40px); }
+  #self-lap-row { font-size: 11px; }
+  #self-action-btn { height: clamp(40px, 9vh, 56px); font-size: clamp(13px, 3.5vh, 18px); }
+  #self-header { padding: 4px 12px; }
+  .chess-consumed-time, .consumed-time { font-size: clamp(28px, 10vh, 56px); }
+}
 </style>
 </head>
 <body>
