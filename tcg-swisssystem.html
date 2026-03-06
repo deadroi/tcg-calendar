@@ -231,7 +231,7 @@ document.addEventListener('click', e => {
 
 <!-- ─── 대회 상세 뷰 ─── -->
 <div id="view-tournament" style="display:none">
-<nav>
+<nav class="tab-nav">
   <button class="active" onclick="showTab('setup')">⚙️ 설정/참가자</button>
   <button onclick="showTab('rounds')">🎮 라운드</button>
   <button onclick="showTab('standings')">📊 라운드순위표</button>
@@ -985,10 +985,10 @@ function render() {
 // ═══════════════════════════════════════════════════
 function showTab(name) {
   document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('nav button').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-nav button').forEach(el => el.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active');
   const idx = ['setup', 'rounds', 'standings', 'bracket', 'final'].indexOf(name);
-  document.querySelectorAll('nav button')[idx].classList.add('active');
+  document.querySelectorAll('.tab-nav button')[idx].classList.add('active');
   if (name === 'rounds')    { renderRoundInfo(); renderRoundTabs(); renderRound(viewRound); }
   if (name === 'standings') { renderStandings(); }
   if (name === 'bracket')   { renderBracket(); }
