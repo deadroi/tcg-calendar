@@ -63,6 +63,44 @@ html, body { height: 100%; font-family: 'Malgun Gothic', system-ui, sans-serif; 
 .rfbtn.on { color: #111 !important; border-color: transparent !important; }
 #count-label { font-size: 11px; color: rgba(255,255,255,0.35); white-space: nowrap; }
 
+/* ── 검색창 ── */
+#search-wrap {
+  position: relative; flex-shrink: 0;
+}
+#search-input {
+  background: #fff; border: 1.5px solid #ddd;
+  border-radius: 20px; color: #222; font-size: 12px;
+  padding: 5px 12px 5px 28px; outline: none; width: 160px;
+  transition: border-color .15s, width .2s;
+}
+#search-input:focus { border-color: #4ccfac; width: 200px; }
+#search-input::placeholder { color: #aaa; }
+#search-icon {
+  position: absolute; left: 9px; top: 50%; transform: translateY(-50%);
+  font-size: 13px; pointer-events: none; color: #aaa;
+}
+#search-results {
+  display: none; position: absolute; top: calc(100% + 6px); right: 0;
+  background: #1a1a2e; border: 1px solid #2a2a44;
+  border-radius: 10px; min-width: 220px; max-width: 300px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6); overflow: hidden; z-index: 2000;
+  max-height: 260px; overflow-y: auto;
+}
+#search-results.open { display: block; }
+.sr-item {
+  padding: 9px 12px; cursor: pointer; display: flex; align-items: center; gap: 8px;
+  border-bottom: 1px solid #2a2a44; transition: background .1s;
+}
+.sr-item:last-child { border-bottom: none; }
+.sr-item:hover { background: #22223a; }
+.sr-badge {
+  font-size: 10px; font-weight: 700; padding: 2px 6px;
+  border-radius: 4px; color: #fff; flex-shrink: 0;
+}
+.sr-name { font-size: 13px; color: #eee; }
+.sr-addr { font-size: 10px; color: rgba(255,255,255,0.35); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#search-empty { padding: 14px 12px; font-size: 12px; color: rgba(255,255,255,0.3); text-align: center; }
+
 /* ── 커스텀 오버레이 팝업 ── */
 .custom-overlay {
   background: #1a1a2e;
@@ -157,6 +195,11 @@ document.addEventListener('click', e => {
   <span id="topbar-title">🃏 TCG 매장 지도</span>
   <div id="region-filter"></div>
   <span id="count-label"></span>
+  <div id="search-wrap">
+    <span id="search-icon">🔍</span>
+    <input id="search-input" type="text" placeholder="매장 검색..." autocomplete="off">
+    <div id="search-results"></div>
+  </div>
 </div>
 <div id="map"></div>
 
@@ -311,7 +354,7 @@ function addMarker(s, pos) {
     popup.setPosition(pos);
   }
 
-  allMarkers.push({ store: s, marker: dot, popup, pos });
+  allMarkers.push({ store: s, marker: dot, popup, pos, idx });
   if (activeFilters.has('all') || activeFilters.has(s.region)) {
     dot.setMap(map);
   }
@@ -430,6 +473,62 @@ function applyFilter() {
     visible.forEach(d => { if (d.pos) bounds.extend(d.pos); });
     if (!bounds.isEmpty()) map.setBounds(bounds);
   }
+}
+
+// ── 매장 검색 ──
+(function() {
+  const input = document.getElementById('search-input');
+  const results = document.getElementById('search-results');
+
+  function closeSearch() { results.classList.remove('open'); }
+
+  input.addEventListener('input', () => {
+    const q = input.value.trim();
+    if (!q) { closeSearch(); return; }
+    const lq = q.toLowerCase();
+    const matched = allMarkers.filter(d =>
+      d.store.name.toLowerCase().includes(lq) ||
+      d.store.region.toLowerCase().includes(lq) ||
+      d.store.addr.toLowerCase().includes(lq)
+    );
+    if (matched.length === 0) {
+      results.innerHTML = '<div id="search-empty">검색 결과가 없습니다</div>';
+    } else {
+      results.innerHTML = matched.map(d => `
+        <div class="sr-item" onclick="searchSelect(${d.idx})">
+          <span class="sr-badge" style="background:${rc(d.store.region)}">${d.store.region}</span>
+          <div style="overflow:hidden">
+            <div class="sr-name">${highlight(d.store.name, q)}</div>
+            <div class="sr-addr">${d.store.addr}</div>
+          </div>
+        </div>`).join('');
+    }
+    results.classList.add('open');
+  });
+
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { closeSearch(); input.blur(); }
+  });
+
+  document.addEventListener('click', e => {
+    if (!document.getElementById('search-wrap').contains(e.target)) closeSearch();
+  });
+})();
+
+function highlight(text, q) {
+  const i = text.toLowerCase().indexOf(q.toLowerCase());
+  if (i < 0) return text;
+  return text.slice(0, i) + `<mark style="background:#4ccfac33;color:#4ccfac;border-radius:2px">${text.slice(i, i + q.length)}</mark>` + text.slice(i + q.length);
+}
+
+function searchSelect(idx) {
+  const d = allMarkers[idx];
+  if (!d || !d.pos) return;
+  document.getElementById('search-input').value = '';
+  document.getElementById('search-results').classList.remove('open');
+  map.setCenter(d.pos);
+  map.setLevel(3);
+  markerClick(idx);
 }
 </script>
 <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=3a2908c8b5a068955ea02e8eb171813b&autoload=false&libraries=services" onerror="document.getElementById('apikey-notice').style.display='flex'"></script>
