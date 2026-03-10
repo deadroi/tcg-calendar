@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="description" content="니벨아레나 리더 레벨 계산기">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>NIVELARENA - LVChecker</title>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-9N9WTDYW2G"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-9N9WTDYW2G');
+</script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+    html, body { width: 100%; height: 100%; background: #0a0a12; color: #eee; font-family: 'Segoe UI', Arial, sans-serif; overflow: hidden; }
+
+    /* ===== SELECT SCREEN ===== */
+    #select-screen {
+      display: flex; flex-direction: column;
+      width: 100vw; height: 100dvh;
+      background: #0d0d1a;
+    }
+
+    .top-header {
+      flex-shrink: 0;
+      padding: 10px 14px 6px;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      border-bottom: 1px solid #2a2a4a;
+    }
+    .top-header {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .top-header-text h1 {
+      font-size: 16px; font-weight: 700; letter-spacing: 2px;
+      color: #c0a060; text-transform: uppercase;
+    }
+    .top-header-text p { font-size: 11px; color: #666; margin-top: 2px; }
+    #btn-fullscreen {
+      background: rgba(255,255,255,0.07); border: 1.5px solid rgba(255,255,255,0.18);
+      color: rgba(255,255,255,0.7); border-radius: 8px;
+      width: 36px; height: 36px; font-size: 16px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: background 0.15s;
+    }
+    #btn-fullscreen:active { background: rgba(255,255,255,0.18); }
+
+    /* Attribute tabs */
+    .attr-tabs {
+      display: flex; flex-shrink: 0;
+      background: #111120; border-bottom: 1px solid #222240;
+      overflow-x: auto;
+    }
+    .attr-tabs::-webkit-scrollbar { display: none; }
+    .attr-tab {
+      flex: 1; min-width: 56px; padding: 9px 4px;
+      text-align: center; font-size: 12px; font-weight: 600;
+      cursor: pointer; border-bottom: 3px solid transparent;
+      transition: all 0.2s; white-space: nowrap; color: #666;
+      user-select: none;
+    }
+    .attr-tab .tab-icon { font-size: 15px; display: block; line-height: 1; }
+    .attr-tab .tab-name { font-size: 10px; margin-top: 2px; }
+    .attr-tab.active { border-bottom-color: var(--c); color: var(--c); background: rgba(255,255,255,0.04); }
+
+    /* Card grid */
+    .card-grid {
+      flex: 1; overflow-y: auto; overflow-x: hidden;
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      grid-auto-rows: calc((100vw - 36px) / 3 * 63 / 88);
+      gap: 8px; padding: 10px;
+    }
+    .card-grid::-webkit-scrollbar { width: 4px; }
+    .card-grid::-webkit-scrollbar-track { background: transparent; }
+    .card-grid::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+
+    .card-item {
+      aspect-ratio: 88 / 63; border-radius: 6px;
+      overflow: hidden; cursor: pointer;
+      background: #1a1a2e; border: 2px solid #2a2a4a;
+      transition: transform 0.12s, border-color 0.2s;
+      position: relative;
+    }
+    .card-item:active { transform: scale(0.93); }
+    .card-item.has-img { border-color: var(--c); }
+    .card-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .card-placeholder {
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      background: linear-gradient(135deg, #1a1a2e, #111120);
+      padding: 4px;
+    }
+    .card-placeholder .ph-icon { font-size: 18px; opacity: 0.35; }
+    .card-placeholder .ph-no { font-size: 7px; color: #333; margin-top: 3px; }
+    .card-name-bar {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: linear-gradient(transparent, rgba(0,0,0,0.88));
+      font-size: 8.5px; text-align: center; padding: 10px 3px 3px;
+      color: #ccc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .card-item.has-img .card-name-bar { color: #fff; }
+
+    /* ===== DISPLAY SCREEN ===== */
+    #display-screen {
+      display: none; position: fixed; inset: 0;
+      background: #000; align-items: center; justify-content: center;
+      flex-direction: column;
+    }
+    #display-screen.active { display: flex; }
+
+    #card-wrap {
+      position: relative;
+      width: min(100vw, calc(100dvh * 88 / 63));
+      height: min(calc(100vw * 63 / 88), 100dvh);
+      max-width: 100vw; max-height: 100dvh;
+    }
+
+    #card-canvas-el {
+      width: 100%; height: 100%;
+      display: block; border-radius: 4px;
+    }
+    #card-placeholder-el {
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      background: linear-gradient(135deg, #1a1a2e, #111120);
+      border-radius: 4px;
+    }
+    #card-placeholder-el .ph-name {
+      font-size: clamp(16px, 4vw, 26px); font-weight: 700;
+      color: #555; text-align: center; padding: 0 20px;
+    }
+    #card-placeholder-el .ph-sub {
+      font-size: clamp(10px, 2.5vw, 14px); color: #333; margin-top: 6px;
+    }
+
+    /* Level UI overlay */
+    #level-ui {
+      position: absolute; top: 6px; right: 6px;
+      display: flex; flex-direction: column; align-items: flex-end;
+      z-index: 10; pointer-events: none;
+    }
+    #level-label {
+      font-size: 10px; font-weight: 800; letter-spacing: 2px;
+      color: rgba(255,220,80,0.9);
+      text-shadow: 0 1px 4px rgba(0,0,0,0.9);
+      line-height: 1;
+    }
+    #level-num {
+      font-size: clamp(44px, 14vw, 80px); font-weight: 900;
+      color: #FFD700; line-height: 1; margin-top: 1px;
+      text-shadow: 0 0 12px rgba(255,180,0,0.6), 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+    }
+    #level-btns {
+      display: flex; flex-direction: column; gap: 5px; margin-top: 5px; pointer-events: all;
+    }
+    .lv-btn {
+      width: clamp(45px, 13.5vw, 61px); height: clamp(45px, 13.5vw, 61px);
+      background: rgba(0,0,0,0.3); border: 1.5px solid rgba(255,215,0,0.4);
+      border-radius: 50%; color: rgba(255,215,0,0.9);
+      font-size: clamp(25px, 8.1vw, 36px); font-weight: 700;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: background 0.12s, transform 0.1s;
+      user-select: none;
+    }
+    .lv-btn:active { background: rgba(255,215,0,0.25); transform: scale(0.9); }
+
+    /* 각성 표시 */
+    #awaken-indicator {
+      position: absolute; top: 6px; left: 6px;
+      z-index: 10; pointer-events: none;
+    }
+    #awaken-badge {
+      font-size: 20px; font-weight: 900; letter-spacing: 1px;
+      padding: 6px 16px; border-radius: 14px;
+      background: rgba(180,100,255,0.88); color: #fff;
+      text-shadow: 0 1px 6px rgba(0,0,0,0.8);
+      box-shadow: 0 2px 10px rgba(150,80,255,0.5);
+      display: none;
+    }
+    #awaken-badge.active { display: block; }
+
+    /* 효과 오버레이 (하단) */
+    #effect-overlay {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: rgba(0,0,0,0.82);
+      max-height: 55%; overflow-y: auto;
+      padding: 6px 10px 8px;
+    }
+    #effect-overlay::-webkit-scrollbar { width: 3px; }
+    #effect-overlay::-webkit-scrollbar-thumb { background: #555; border-radius: 2px; }
+    #effect-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 5px;
+    }
+    #effect-label {
+      font-size: 9px; font-weight: 800; letter-spacing: 2px;
+      padding: 2px 7px; border-radius: 8px; color: #fff;
+    }
+    #effect-label.basic  { background: rgba(100,160,255,0.7); }
+    #effect-label.awaken { background: rgba(180,100,255,0.8); }
+    #disp-attr-badge {
+      font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 8px;
+      color: #fff; opacity: 0.85; white-space: nowrap; flex-shrink: 0;
+    }
+    #effect-text {
+      font-size: clamp(13px, 3.6vw, 17px); line-height: 1.6;
+      color: #ddd; white-space: pre-wrap; word-break: keep-all;
+    }
+
+    /* Back button */
+    #btn-back {
+      position: fixed; top: 10px; left: 10px;
+      background: rgba(0,0,0,0.55); color: rgba(255,255,255,0.85);
+      border: 1.5px solid rgba(255,255,255,0.2);
+      border-radius: 20px; padding: 7px 14px;
+      font-size: 13px; cursor: pointer; z-index: 200;
+      transition: background 0.15s;
+    }
+    #btn-back:active { background: rgba(255,255,255,0.15); }
+
+    .site-footer {
+      flex-shrink: 0;
+      padding: 6px 10px;
+      text-align: center;
+      font-size: 9px; color: #888; line-height: 1.5;
+      border-top: 1px solid #1a1a2e;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== SELECT SCREEN ===== -->
+<div id="select-screen">
+  <div class="top-header">
+    <div class="top-header-text">
+      <h1>⚔ NIVEL ARENA</h1>
+      <p>리더카드를 선택하세요</p>
+    </div>
+    <button id="btn-fullscreen" onclick="toggleFullscreen()" title="전체화면">⛶</button>
+  </div>
+  <div class="attr-tabs" id="attr-tabs"></div>
+  <div class="card-grid" id="card-grid"></div>
+  <div class="site-footer">
+    본 사이트는 니벨아레나 비공식 팬사이트입니다.<br>
+    니벨아레나 및 관련 상표의 권리는 젬블로컴퍼니에 있으며,<br>
+    사이트에 사용된 기타 상표 및 이미지의 권리는 각 권리자에게 있습니다.
+  </div>
+</div>
+
+<!-- ===== DISPLAY SCREEN ===== -->
+<div id="display-screen">
+  <button id="btn-back" onclick="goBack()">← 목록</button>
+  <div id="card-wrap">
+    <canvas id="card-canvas-el" style="display:none;"></canvas>
+    <div id="card-placeholder-el" style="display:none;">
+      <div class="ph-name" id="ph-name-text"></div>
+      <div class="ph-sub" id="ph-sub-text"></div>
+    </div>
+    <div id="level-ui">
+      <div id="level-label">LEVEL</div>
+      <div id="level-num">1</div>
+      <div id="level-btns">
+        <button class="lv-btn" id="btn-plus"  onclick="changeLevel(+1)">+</button>
+        <button class="lv-btn" id="btn-minus" onclick="changeLevel(-1)">−</button>
+      </div>
+    </div>
+    <div id="awaken-indicator">
+      <div id="awaken-badge">✦ 각성</div>
+    </div>
+    <div id="effect-overlay">
+      <div id="effect-header">
+        <span id="disp-attr-badge"></span>
+      </div>
+      <div id="effect-text"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== 속성 데이터 =====
+const ATTRS = [
+  { name: "화염", icon: "🔥", color: "#e05530" },
+  { name: "대지", icon: "🌿", color: "#55aa44" },
+  { name: "폭풍", icon: "🌀", color: "#9955cc" },
+  { name: "파도", icon: "💧", color: "#2299dd" },
+  { name: "번개", icon: "⚡", color: "#ccaa00" },
+];
+
+// ===== 리더카드 30종 =====
+// attr: 0=화염, 1=대지, 2=폭풍, 3=파도, 4=번개
+// awLv: 각성 레벨
+const CARDS = [
+  // ── 화염 (9종) ──────────────────────────────────────
+  { no:"BT01-001", name:"레드 후드", attr:0, awLv:6, img:null,
+    basic:"[서약] 자신의 덱에 [화염]카드만 넣을 수 있다.\n[각성] 자신의 리더 레벨이 6 이상이라면 이 카드를 뒤집는다.",
+    awaken:"[패시브] 자신의 턴 동안 필드에 있는 [어태커]를 가진 모든 자신 유닛의 파워+2000." },
+  { no:"BT03-001", name:"라피 : 레드 후드", attr:0, awLv:5, img:"leadercard/라피레후.png",
+    basic:"[서약] 자신의 덱에 [화염]카드만 넣을 수 있다.\n[각성] 자신의 리더 레벨이 5 이상이라면 이 카드를 뒤집는다.",
+    awaken:"[액티브: 메인] 자신의 스킬 존에 있는 스킬이 1장 이상이라면 필드에 있는 상대 유닛을 1장 골라, 이 턴이 끝날 때까지 파워-2000." },
+  { no:"BT04-001", name:"레테", attr:0, awLv:5, img:null,
+    basic:"[서약] 자신의 덱에 [화염]카드만 넣을 수 있다.\n[각성] 자신의 리더 레벨이 5 이상이라면 이 카드를 뒤집는다.",
+    awaken:"[패시브] 자신의 효과로 대미지 존에 있는 카드의 수를 참조할 때 자신의 대미지 존에 카드가 4장 더 있는 것으로 취급한다." },
+  { no:"BT04-002", name:"조장 아룬카", attr:0, awLv:5, img:"leadercard/아룬카.png",
+    basic:"[서약] 자신의 덱에 [화염]카드만 넣을 수 있다.\n[각성] 자신의 리더 레벨이 5 이상이라면 이 카드를 뒤집는다.",
+    awaken:"[액티브: 메인] 이 턴 동안 자신이 다음에 패에서 배치하는 유닛 1장은 이 턴이 끝날 때까지 파워+3000." },
+  { no:"BT05-001", name:"훈련소장 카티야", attr:0, awLv:5, img:"leadercard/카티야.png",
+    basic:"[서약] 자신의 덱에 [화염] 카드를 넣어야 한다. [화염] 이외의 카드는 모두 같은 속성이어야 한다.\n[각성] 자신의 리더 레벨이 5 이상이라면 이 카드를 뒤집는다. 자신의 필드에 [화염] 이외의 카드가 있다면 상대는 카드를 1장 드로우할 수 있다.",
+    awaken:"[액티브: 메인] 자신의 패를 1장 골라 트래시한다. 그러면 자신의 트래시 존에서 [트리거]를 가지지 않고 2코스트 이하인 스킬 카드를 1장 골라 패에 넣는다." },
+  { no:"BT06-001", name:"와일드독 루벤시아", attr:0, awLv:6, img:"leadercard/루벤시아.jpg",
+    basic:"[서약] 자신의 덱에 [화염] 카드만 넣을 수 있다.\n[각성] 자신의 리더 레벨이 6 이상이라면 이 카드를 뒤집는다.",
+    awaken:"[액티브: 어택] 필드에 있는 [액티브: 어택]을 가진 자신 유닛을 1장 골라, 그 유닛이 가진 [액티브: 어택] 효과를 하나 골라 발동한다." },
+  { no:"ST01-001", name:"라피", attr:0, awLv:5, img:"leadercard/라피.png",
+    basic:"[서약] 자신의 덱에 [화염]카드만 넣을 수 있다.\n[각성] 자신의 리더 레벨이 5 이상이라면 이 카드를 뒤집는다.",
+    awaken:"[패시브] 자신의 턴 동안 필드에 있는 모든 자신 유닛의 파워+1000." },
+  { no:"ST06-001", name:"리나크", attr:0, awLv:5, img:"leadercard/리나크.png",
+    basic:"[서약] 자신의 덱에 [화염]카드만 넣을 수 있다.\n[각성] 자신의 리더 레벨이 5 이상이라면 이 카드를 뒤집는다.",
+    awaken:"[액티브: 메인] 필드에 있는 0코스트인 자신 유닛을 1장 골라, 이 턴이 끝날 때까지 파워+2000, 히트+1." },
+  { no:"ST10-001", name:"강철의 군주 빌헬미나", attr:0, awLv:5, img:"leadercard/빌헬미나.jpg",
+    basic:"[서약] 자신의 덱에 [화염] 카드만 넣을 수 있다.\n[각성] 자신의 리더 레벨이 5 이상이라면 이 카드를 뒤집는다.",
+    awaken:"[액티브: 어택] 자신의 패를 1장 골라 트래시한다. 그러면 필드에 있는 3코스트 이하인 자신 유닛을 1장 고른다. 그 유닛은 이 턴의 어택 페이즈 중 1번 더 공격할 수 있다." },
+  // ── 대지 (4종) ──────────────────────────────────────
+  { no:"BT01-028", name:"홍련", attr:1, awLv:5, img:null,
+    basic:"[서약] 자신의 덱에 [대지]카드만 넣을 수 있다.\n[각성] 자신의 리더 레벨이 5 이상이라면 이 카드를 뒤집는다.",
+    awaken:"[패시브] 필드에 있는 《베이스》를 가진 모든 자신 유닛의 파워+1000." },
+  { no:"BT03-018", name:"나가-라스트 걸후드", attr:1, awLv:5, img:"leadercard/나가.png",
+    basic:"[서약] 자신의 덱에 [대지]카드만 넣을 수 있다.\n[각성] 자신의 리더 레벨이 5 이상이라면 이 카드를 뒤집는다.",
+    awaken:"[전선구축] 자신의 모든 유닛 존에 유닛이 존재한다면 모든 자신 유닛의 파워+1000." },
+  { no:"ST02-001", name:"길티", attr:1, awLv:6, img:"leadercard/길티.png",
+    basic:"[서약] 자신의 덱에 [대지]카드만 넣을 수 있다.\n[각성] 자신의 리더 레벨이 6 이상이라면 이 카드를 뒤집는다.",
+    awaken:"[패시브] 자신의 사이즈+1." },
+  { no:"ST08-001", name:"1st Anniversary 수아", attr:1, awLv:7, img:null,
+    basic:"[서약] 자신의 덱에 [대지] 카드를 넣어야 한다. [대지] 이외의 카드는 모두 같은 속성이어야 한다.\n[각성] 자신의 리더 레벨이 7 이상이라면 이 카드를 뒤집는다. 자신의 필드에 [대지] 이외의 카드가 있다면 상대는 카드를 1장 드로우할 수 있다.",
+    awaken:"[액티브: 메인] 자신의 패를 1장 골라 트래시한다. 그러면 자신의 덱 맨 위에서 카드를 1장 공개하고, 그중 유닛 카드를 1장 골라 비어 있는 자신의 유닛 존에 사이즈를 무시하고 배치할 수 있다. 나머지는 모두 트래시한다." },
+  // ── 폭풍 (7종) ──────────────────────────────────────
+  { no:"BT01-055", name:"신데렐라", attr:2, awLv:5, img:null,
+    basic:"[서약] 자신의 덱에 [폭풍]카드만 넣을 수 있다.\n[각성] 자신의 리더 레벨이 5 이상이라면 이 카드를 뒤집는다.",
+    awaken:"[패시브] 자신과 상대의 턴마다 한 번씩, 필드에서 5코스트 이상인 자신 유닛이 트래시되면 카드를 1장 드로우한다." },
+  { no:"BT03-035", name:"리틀 머메이드-어비스 플라워", attr:2, awLv:5, img:"leadercard/머메이드.png",
+    basic:"[서약] 자신의 덱에 [폭풍]카드만 넣을 수 있다.\n[각성] 자신의 리더 레벨이 5 이상이라면 이 카드를 뒤집는다.",
+    awaken:"[액티브: 메인] 상대의 패가 3장 이상이라면 자신의 패를 1장 골라 트래시할 수 있다. 그러면 상대는 패를 1장 골라 트래시한다." },
+  { no:"BT04-041", name:"신월의 루나", attr:2, awLv:6, img:null,
+    basic:"[서약] 자신의 덱에 [폭풍]카드만 넣을 수 있다.\n[각성] 자신의 리더 레벨이 6 이상이라면 이 카드를 뒤집는다.",
+    awaken:"[액티브: 메인] 자신의 패에서 《용의 계곡》이나 《혹한의 날들》을 가진 카드를 1장 골라 대미지 존에 놓는다. 그러면 자신의 트래시 존에서 그 카드의 코스트 이하인 카드를 1장 골라 패에 넣는다." },
+  { no:"BT04-042", name:"용의 반려 셰나", attr:2, awLv:5, img:"leadercard/셰나.jpg",
+    basic:"[서약] 자신의 덱에 [폭풍]카드만 넣을 수 있다.\n[각성] 자신의 리더 레벨이 5 이상이라면 이 카드를 뒤집는다.",
+    awaken:"[액티브: 메인] 필드에 있는 자신 유닛을 1장 골라 트래시한다. 그러면 필드에 있는 자신 유닛을 1장 골라, 이 턴이 끝날 때까지 파워+2000." },
+  { no:"BT05-032", name:"언럭키 바니 니키", attr:2, awLv:5, img:"leadercard/니키.png",
+    basic:"[서약] 자신의 덱에 [폭풍]카드를 넣어야 한다. [폭풍] 이외의 카드는 모두 같은 속성이어야 한다.\n[각성] 자신의 리더 레벨이 5 이상이라면 이 카드를 뒤집는다. 자신의 필드에 [폭풍] 이외의 카드가 있다면 상대는 카드를 1장 드로우할 수 있다.",
+    awaken:"[액티브: 메인] 아래 효과 중 하나를 고른다.\n・필드에 있는 자신 유닛을 1장 고른다. 그 유닛은 상대의 턴이 끝날 때까지 [엑시트] 귀환을 얻는다.\n・필드에 있는 자신 유닛을 1장 골라 트래시한다." },
+  { no:"ST03-001", name:"모더니아", attr:2, awLv:4, img:"leadercard/모더니아.png",
+    basic:"[서약] 자신의 덱에 [폭풍]카드만 넣을 수 있다.\n[각성] 자신의 리더 레벨이 4 이상이라면 이 카드를 뒤집는다.",
+    awaken:"[패시브] 필드에 있는 [엑시트]를 가진 모든 자신 유닛의 파워+1000." },
+  { no:"ST07-001", name:"페네", attr:2, awLv:4, img:"leadercard/페네.png",
+    basic:"[서약] 자신의 덱에 [폭풍]카드만 넣을 수 있다.\n[각성] 자신의 리더 레벨이 4 이상이라면 이 카드를 뒤집는다.",
+    awaken:"[액티브: 메인] 자신의 패를 1장 골라 트래시한다. 그러면 그 카드의 코스트 이하이고 《호문클루스》를 가진 필드에 있는 모든 자신 유닛은 이 턴이 끝날 때까지 히트+1." },
+  // ── 파도 (6종) ──────────────────────────────────────
+  { no:"BT02-028", name:"헬름 : 아쿠아마린", attr:3, awLv:5, img:null,
+    basic:"[서약] 자신의 덱에 [파도]카드만 넣을 수 있다.\n[각성] 자신의 리더 레벨이 5 이상이라면 이 카드를 뒤집는다.",
+    awaken:"[패시브] 필드에 있는 [가디언]을 가진 모든 자신 유닛의 파워+1000." },
+  { no:"BT03-052", name:"마스트 : 로망틱 메이드", attr:3, awLv:6, img:"leadercard/마스트.png",
+    basic:"[서약] 자신의 덱에 [파도]카드만 넣을 수 있다.\n[각성] 자신의 리더 레벨이 6 이상이라면 이 카드를 뒤집는다.",
+    awaken:"[액티브: 메인] 자신의 스킬 존에서 3코스트인 스킬을 1장 골라 트래시한다. 그러면 필드에 있는 [엔트리]를 가진 자신 유닛을 1장 고른다. 그 유닛이 가진 [엔트리]효과를 하나 골라 발동한다." },
+  { no:"BT06-043", name:"꿈속의 신부 이클립스", attr:3, awLv:5, img:"leadercard/이클립스.jpg",
+    basic:"[서약] 자신의 덱에 [파도] 카드만 넣을 수 있다.\n[각성] 자신의 리더 레벨이 5 이상이라면 이 카드를 뒤집는다.",
+    awaken:"[액티브: 메인] 자신의 덱 맨 위에서 카드를 1장 트래시한다. 이 효과로 트래시한 카드 중 스킬 카드를 1장 골라 효과를 발동할 수 있다." },
+  { no:"ST04-001", name:"도로시", attr:3, awLv:4, img:"leadercard/도로시.png",
+    basic:"[서약] 자신의 덱에 [파도]카드만 넣을 수 있다.\n[각성] 자신의 리더 레벨이 4 이상이라면 이 카드를 뒤집는다.",
+    awaken:"[패시브] 필드에 있는 모든 자신 유닛은 상대의 턴 동안 파워+1000." },
+  { no:"ST09-001", name:"트로피컬 디멘션 아비게일", attr:3, awLv:5, img:null,
+    basic:"[서약] 자신의 덱에 [파도] 카드를 넣어야 한다. [파도] 이외의 카드는 모두 같은 속성이어야 한다.\n[각성] 자신의 리더 레벨이 5 이상이라면 이 카드를 뒤집는다. 자신의 필드에 [파도] 이외의 카드가 있다면 상대는 카드를 1장 드로우할 수 있다.",
+    awaken:"[액티브: 메인] 필드에 있는 자신 유닛을 1장 고른다. 그 유닛은 다음 자신의 턴이 끝날 때까지 「[이스케이프] 자신의 메인 페이즈가 시작할 때 이 유닛을 주인의 덱 맨 아래에 놓는다. 상대에게 1대미지를 준다」를 얻는다." },
+  { no:"ST11-001", name:"사도 모르페아", attr:3, awLv:5, img:"leadercard/모르페아.jpg",
+    basic:"[서약] 자신의 덱에 [파도] 카드만 넣을 수 있다.\n[각성] 자신의 리더 레벨이 5 이상이라면 이 카드를 뒤집는다.",
+    awaken:"[액티브: 메인] 자신의 스킬 존에 있는 스킬이 1장 이상이라면 자신의 트래시 존에서 자신의 스킬 존에 있는 스킬의 수보다 코스트가 낮은 스킬 카드를 1장 골라 패에 넣는다." },
+  // ── 번개 (4종) ──────────────────────────────────────
+  { no:"BT02-055", name:"크라운-네이키드 킹", attr:4, awLv:6, img:null,
+    basic:"[서약] 자신의 덱에 [번개]카드만 넣을 수 있다.\n[각성] 자신의 리더 레벨이 6 이상이라면 이 카드를 뒤집는다.",
+    awaken:"[패시브] 필드에 있는 아이템을 장착한 모든 자신 유닛의 파워+1500." },
+  { no:"BT03-069", name:"레비아탄", attr:4, awLv:6, img:"leadercard/레비아탄.png",
+    basic:"[서약] 자신의 덱에 [번개]카드만 넣을 수 있다.\n[각성] 자신의 리더 레벨이 6 이상이라면 이 카드를 뒤집는다.",
+    awaken:"[액티브: 메인] 자신의 덱 맨 위에서 카드를 3장 트래시한다. 이 효과로 트래시된 아이템 카드가 1장 이상이라면 카드를 1장 드로우한다." },
+  { no:"BT05-063", name:"사관후보생 아야", attr:4, awLv:5, img:"leadercard/아야.png",
+    basic:"[서약] 자신의 덱에 [번개] 카드를 넣어야 한다. [번개] 이외의 카드는 모두 같은 속성이어야 한다.\n[각성] 자신의 리더 레벨이 5 이상이라면 이 카드를 뒤집는다. 자신의 필드에 [번개] 이외의 카드가 있다면 상대는 카드를 1장 드로우할 수 있다.",
+    awaken:"[액티브: 메인] 자신의 패를 1장 골라 트래시한다. 그러면 자신의 트래시 존에서 이 효과로 트래시한 카드와 카드명이 다른 아이템 카드를 1장 골라 필드에 있는 자신 유닛에 사이즈를 무시하고 장착할 수 있다." },
+  { no:"ST05-001", name:"프리바티 : 언카인드 메이드", attr:4, awLv:5, img:"leadercard/프리바티.png",
+    basic:"[서약] 자신의 덱에 [번개]카드만 넣을 수 있다.\n[각성] 자신의 리더 레벨이 5 이상이라면 이 카드를 뒤집는다.",
+    awaken:"[패시브] 필드에 있는 [암드]를 가진 모든 자신 유닛의 파워+1000." },
+];
+
+const MAX_LEVEL = 10;
+const MIN_LEVEL = 1;
+let currentAttr = 0;
+let currentLevel = 1;
+let currentAwLv = 5;
+
+
+// ===== Blob URL 캐시 =====
+const _blobCache = {};
+async function getBlobUrl(src) {
+  if (_blobCache[src]) return _blobCache[src];
+  try {
+    const resp = await fetch(src);
+    const blob = await resp.blob();
+    _blobCache[src] = URL.createObjectURL(blob);
+  } catch(e) {
+    _blobCache[src] = src; // fallback (file:// 등)
+  }
+  return _blobCache[src];
+}
+
+// ===== Canvas 렌더링 =====
+async function drawImageOnCanvas(canvas, src) {
+  const url = await getBlobUrl(src);
+  return new Promise(resolve => {
+    const tmpImg = new Image();
+    tmpImg.onload = () => {
+      const w = canvas.offsetWidth  || canvas.width;
+      const h = canvas.offsetHeight || canvas.height;
+      canvas.width  = w * devicePixelRatio;
+      canvas.height = h * devicePixelRatio;
+      const ctx = canvas.getContext('2d');
+      ctx.scale(devicePixelRatio, devicePixelRatio);
+      // object-fit: cover 재현
+      const iw = tmpImg.naturalWidth, ih = tmpImg.naturalHeight;
+      const scale = Math.max(w / iw, h / ih);
+      const sw = iw * scale, sh = ih * scale;
+      ctx.drawImage(tmpImg, (w - sw) / 2, (h - sh) / 2, sw, sh);
+      resolve();
+    };
+    tmpImg.onerror = resolve;
+    tmpImg.src = url;
+  });
+}
+
+// ===== 선택 화면 =====
+function buildAttrTabs() {
+  const container = document.getElementById('attr-tabs');
+  ATTRS.forEach((a, i) => {
+    const tab = document.createElement('div');
+    tab.className = 'attr-tab' + (i === currentAttr ? ' active' : '');
+    tab.style.setProperty('--c', a.color);
+    const cnt = CARDS.filter(c => c.attr === i).length;
+    tab.innerHTML = `<span class="tab-icon">${a.icon}</span><span class="tab-name">${a.name} (${cnt})</span>`;
+    tab.onclick = () => selectAttr(i);
+    container.appendChild(tab);
+  });
+}
+
+function buildCardGrid() {
+  const container = document.getElementById('card-grid');
+  container.innerHTML = '';
+  CARDS.forEach((card, idx) => {
+    if (card.attr !== currentAttr) return;
+    const item = document.createElement('div');
+    item.className = 'card-item' + (card.img ? ' has-img' : '');
+    item.style.setProperty('--c', ATTRS[card.attr].color);
+    if (card.img) {
+      const cvs = document.createElement('canvas');
+      cvs.style.cssText = 'width:100%;height:100%;display:block;border-radius:4px;';
+      item.appendChild(cvs);
+      // IntersectionObserver로 뷰포트 진입 시 렌더
+      new IntersectionObserver((entries, obs) => {
+        if (entries[0].isIntersecting) {
+          obs.disconnect();
+          drawImageOnCanvas(cvs, card.img);
+        }
+      }, { threshold: 0.1 }).observe(cvs);
+    } else {
+      const ph = document.createElement('div');
+      ph.className = 'card-placeholder';
+      ph.innerHTML = `<div class="ph-icon">${ATTRS[card.attr].icon}</div><div class="ph-no">${card.no}</div>`;
+      item.appendChild(ph);
+    }
+    const nameBar = document.createElement('div');
+    nameBar.className = 'card-name-bar';
+    nameBar.textContent = card.name;
+    item.appendChild(nameBar);
+    item.onclick = () => openCard(idx);
+    container.appendChild(item);
+  });
+}
+
+function selectAttr(idx) {
+  currentAttr = idx;
+  document.querySelectorAll('.attr-tab').forEach((t, i) => t.classList.toggle('active', i === idx));
+  buildCardGrid();
+}
+
+// ===== 카드 표시 =====
+let currentCard = null;
+
+function openCard(cardIdx) {
+  currentCard = CARDS[cardIdx];
+  const attr = ATTRS[currentCard.attr];
+  currentLevel = 1;
+  currentAwLv = currentCard.awLv;
+
+  const cvsEl = document.getElementById('card-canvas-el');
+  const phEl  = document.getElementById('card-placeholder-el');
+  if (currentCard.img) {
+    cvsEl.style.display = 'block'; phEl.style.display = 'none';
+    // 모바일에서 레이아웃이 확정된 후 드로우 (rAF 두 번으로 보장)
+    requestAnimationFrame(() => requestAnimationFrame(() => drawImageOnCanvas(cvsEl, currentCard.img)));
+  } else {
+    cvsEl.style.display = 'none'; phEl.style.display = 'flex';
+    document.getElementById('ph-name-text').textContent = currentCard.name;
+    document.getElementById('ph-sub-text').textContent = attr.icon + ' ' + attr.name + '  |  각성 Lv.' + currentCard.awLv;
+  }
+
+  const badge = document.getElementById('disp-attr-badge');
+  badge.textContent = attr.icon + ' ' + attr.name;
+  badge.style.background = attr.color;
+
+  document.getElementById('display-screen').classList.add('active');
+  document.getElementById('select-screen').style.display = 'none';
+  updateLevelDisplay();
+}
+
+function goBack() {
+  document.getElementById('display-screen').classList.remove('active');
+  document.getElementById('select-screen').style.display = '';
+}
+
+// ===== 레벨 조절 =====
+function changeLevel(delta) {
+  currentLevel = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, currentLevel + delta));
+  updateLevelDisplay();
+}
+
+function updateLevelDisplay() {
+  document.getElementById('level-num').textContent = currentLevel;
+  document.getElementById('btn-minus').style.opacity = currentLevel <= MIN_LEVEL ? '0.3' : '1';
+  document.getElementById('btn-plus').style.opacity  = currentLevel >= MAX_LEVEL ? '0.3' : '1';
+
+  const awakened = currentLevel >= currentAwLv;
+
+  // 각성 배지
+  document.getElementById('awaken-badge').classList.toggle('active', awakened);
+
+  // 효과 텍스트 전환
+  if (currentCard) {
+    const text  = document.getElementById('effect-text');
+    const overlay = document.getElementById('effect-overlay');
+    if (awakened) {
+      text.textContent = currentCard.awaken || '';
+    } else {
+      text.textContent = currentCard.basic || '';
+    }
+    overlay.scrollTop = 0;
+  }
+}
+
+// ===== 초기화 =====
+buildAttrTabs();
+buildCardGrid();
+updateLevelDisplay();
+
+window.addEventListener('popstate', () => {
+  if (document.getElementById('display-screen').classList.contains('active')) goBack();
+});
+
+document.addEventListener('contextmenu', e => e.preventDefault());
+
+// ===== 전체화면 =====
+function toggleFullscreen() {
+  const btn = document.getElementById('btn-fullscreen');
+  if (!document.fullscreenElement) {
+    (document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen || document.documentElement.mozRequestFullScreen).call(document.documentElement);
+  } else {
+    (document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen).call(document);
+  }
+}
+document.addEventListener('fullscreenchange', updateFullscreenIcon);
+document.addEventListener('webkitfullscreenchange', updateFullscreenIcon);
+function updateFullscreenIcon() {
+  document.getElementById('btn-fullscreen').textContent = document.fullscreenElement ? '✕' : '⛶';
+}
+
+</script>
+</body>
+</html>
