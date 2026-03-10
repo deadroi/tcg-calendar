@@ -392,25 +392,6 @@ let currentLevel = 1;
 let currentAwLv = 5;
 
 
-// ===== Blob URL 캐시 =====
-const _blobCache = {};
-async function getBlobUrl(src) {
-  if (_blobCache[src]) return _blobCache[src];
-  try {
-    const resp = await fetch(src);
-    const blob = await resp.blob();
-    _blobCache[src] = URL.createObjectURL(blob);
-  } catch(e) {
-    _blobCache[src] = src; // fallback (file:// 등)
-  }
-  return _blobCache[src];
-}
-
-// ===== Img 렌더링 =====
-async function setImgSrc(imgEl, src) {
-  const url = await getBlobUrl(src);
-  imgEl.src = url;
-}
 
 // ===== 선택 화면 =====
 function buildAttrTabs() {
@@ -442,7 +423,7 @@ function buildCardGrid() {
       new IntersectionObserver((entries, obs) => {
         if (entries[0].isIntersecting) {
           obs.disconnect();
-          setImgSrc(img, card.img);
+          img.src = card.img;
         }
       }, { threshold: 0.1 }).observe(img);
     } else {
@@ -479,7 +460,7 @@ function openCard(cardIdx) {
   const phEl  = document.getElementById('card-placeholder-el');
   if (currentCard.img) {
     imgEl.style.display = 'block'; phEl.style.display = 'none';
-    setImgSrc(imgEl, currentCard.img);
+    imgEl.src = currentCard.img;
   } else {
     imgEl.style.display = 'none'; phEl.style.display = 'flex';
     document.getElementById('ph-name-text').textContent = currentCard.name;
