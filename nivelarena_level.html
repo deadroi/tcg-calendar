@@ -2,9 +2,9 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="description" content="니벨아레나 리더카드 레벨 계산기">
+  <meta name="description" content="니벨아레나 리더 레벨 계산기">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>NIVEL ARENA - 리더카드 레벨</title>
+  <title>NIVELARENA - LVChecker</title>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-9N9WTDYW2G"></script>
 <script>
@@ -397,6 +397,7 @@ let currentAttr = 0;
 let currentLevel = 1;
 let currentAwLv = 5;
 
+
 // ===== Blob URL 캐시 =====
 const _blobCache = {};
 async function getBlobUrl(src) {
@@ -502,8 +503,8 @@ function openCard(cardIdx) {
   const phEl  = document.getElementById('card-placeholder-el');
   if (currentCard.img) {
     cvsEl.style.display = 'block'; phEl.style.display = 'none';
-    // 화면이 active된 후 offsetWidth가 잡히도록 다음 프레임에 드로우
-    requestAnimationFrame(() => drawImageOnCanvas(cvsEl, currentCard.img));
+    // 모바일에서 레이아웃이 확정된 후 드로우 (rAF 두 번으로 보장)
+    requestAnimationFrame(() => requestAnimationFrame(() => drawImageOnCanvas(cvsEl, currentCard.img)));
   } else {
     cvsEl.style.display = 'none'; phEl.style.display = 'flex';
     document.getElementById('ph-name-text').textContent = currentCard.name;
