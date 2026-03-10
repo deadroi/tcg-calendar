@@ -21,11 +21,22 @@
       background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
       border-bottom: 1px solid #2a2a4a;
     }
-    .top-header h1 {
+    .top-header {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .top-header-text h1 {
       font-size: 16px; font-weight: 700; letter-spacing: 2px;
       color: #c0a060; text-transform: uppercase;
     }
-    .top-header p { font-size: 11px; color: #666; margin-top: 2px; }
+    .top-header-text p { font-size: 11px; color: #666; margin-top: 2px; }
+    #btn-fullscreen {
+      background: rgba(255,255,255,0.07); border: 1.5px solid rgba(255,255,255,0.18);
+      color: rgba(255,255,255,0.7); border-radius: 8px;
+      width: 36px; height: 36px; font-size: 16px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: background 0.15s;
+    }
+    #btn-fullscreen:active { background: rgba(255,255,255,0.18); }
 
     /* Attribute tabs */
     .attr-tabs {
@@ -217,8 +228,11 @@
 <!-- ===== SELECT SCREEN ===== -->
 <div id="select-screen">
   <div class="top-header">
-    <h1>⚔ NIVEL ARENA</h1>
-    <p>리더카드를 선택하세요</p>
+    <div class="top-header-text">
+      <h1>⚔ NIVEL ARENA</h1>
+      <p>리더카드를 선택하세요</p>
+    </div>
+    <button id="btn-fullscreen" onclick="toggleFullscreen()" title="전체화면">⛶</button>
   </div>
   <div class="attr-tabs" id="attr-tabs"></div>
   <div class="card-grid" id="card-grid"></div>
@@ -492,6 +506,22 @@ updateLevelDisplay();
 window.addEventListener('popstate', () => {
   if (document.getElementById('display-screen').classList.contains('active')) goBack();
 });
+
+// ===== 전체화면 =====
+function toggleFullscreen() {
+  const btn = document.getElementById('btn-fullscreen');
+  if (!document.fullscreenElement) {
+    (document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen || document.documentElement.mozRequestFullScreen).call(document.documentElement);
+  } else {
+    (document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen).call(document);
+  }
+}
+document.addEventListener('fullscreenchange', updateFullscreenIcon);
+document.addEventListener('webkitfullscreenchange', updateFullscreenIcon);
+function updateFullscreenIcon() {
+  document.getElementById('btn-fullscreen').textContent = document.fullscreenElement ? '✕' : '⛶';
+}
+
 </script>
 </body>
 </html>
