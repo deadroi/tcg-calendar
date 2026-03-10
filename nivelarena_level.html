@@ -4,6 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>NIVEL ARENA - 리더카드 레벨</title>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-9N9WTDYW2G"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-9N9WTDYW2G');
+</script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
     html, body { width: 100%; height: 100%; background: #0a0a12; color: #eee; font-family: 'Segoe UI', Arial, sans-serif; overflow: hidden; }
@@ -109,10 +117,9 @@
       max-width: 100vw; max-height: 100dvh;
     }
 
-    #card-img-el {
+    #card-canvas-el {
       width: 100%; height: 100%;
-      object-fit: cover; display: block;
-      border-radius: 4px;
+      display: block; border-radius: 4px;
     }
     #card-placeholder-el {
       width: 100%; height: 100%;
@@ -247,7 +254,7 @@
 <div id="display-screen">
   <button id="btn-back" onclick="goBack()">← 목록</button>
   <div id="card-wrap">
-    <img id="card-img-el" src="" alt="" style="display:none;">
+    <canvas id="card-canvas-el" style="display:none;"></canvas>
     <div id="card-placeholder-el" style="display:none;">
       <div class="ph-name" id="ph-name-text"></div>
       <div class="ph-sub" id="ph-sub-text"></div>
@@ -389,6 +396,44 @@ let currentAttr = 0;
 let currentLevel = 1;
 let currentAwLv = 5;
 
+// ===== Blob URL 캐시 =====
+const _blobCache = {};
+async function getBlobUrl(src) {
+  if (_blobCache[src]) return _blobCache[src];
+  try {
+    const resp = await fetch(src);
+    const blob = await resp.blob();
+    _blobCache[src] = URL.createObjectURL(blob);
+  } catch(e) {
+    _blobCache[src] = src; // fallback (file:// 등)
+  }
+  return _blobCache[src];
+}
+
+// ===== Canvas 렌더링 =====
+async function drawImageOnCanvas(canvas, src) {
+  const url = await getBlobUrl(src);
+  return new Promise(resolve => {
+    const tmpImg = new Image();
+    tmpImg.onload = () => {
+      const w = canvas.offsetWidth  || canvas.width;
+      const h = canvas.offsetHeight || canvas.height;
+      canvas.width  = w * devicePixelRatio;
+      canvas.height = h * devicePixelRatio;
+      const ctx = canvas.getContext('2d');
+      ctx.scale(devicePixelRatio, devicePixelRatio);
+      // object-fit: cover 재현
+      const iw = tmpImg.naturalWidth, ih = tmpImg.naturalHeight;
+      const scale = Math.max(w / iw, h / ih);
+      const sw = iw * scale, sh = ih * scale;
+      ctx.drawImage(tmpImg, (w - sw) / 2, (h - sh) / 2, sw, sh);
+      resolve();
+    };
+    tmpImg.onerror = resolve;
+    tmpImg.src = url;
+  });
+}
+
 // ===== 선택 화면 =====
 function buildAttrTabs() {
   const container = document.getElementById('attr-tabs');
@@ -412,9 +457,16 @@ function buildCardGrid() {
     item.className = 'card-item' + (card.img ? ' has-img' : '');
     item.style.setProperty('--c', ATTRS[card.attr].color);
     if (card.img) {
-      const img = document.createElement('img');
-      img.src = card.img; img.alt = card.name; img.loading = 'lazy';
-      item.appendChild(img);
+      const cvs = document.createElement('canvas');
+      cvs.style.cssText = 'width:100%;height:100%;display:block;border-radius:4px;';
+      item.appendChild(cvs);
+      // IntersectionObserver로 뷰포트 진입 시 렌더
+      new IntersectionObserver((entries, obs) => {
+        if (entries[0].isIntersecting) {
+          obs.disconnect();
+          drawImageOnCanvas(cvs, card.img);
+        }
+      }, { threshold: 0.1 }).observe(cvs);
     } else {
       const ph = document.createElement('div');
       ph.className = 'card-placeholder';
@@ -445,12 +497,14 @@ function openCard(cardIdx) {
   currentLevel = 1;
   currentAwLv = currentCard.awLv;
 
-  const imgEl = document.getElementById('card-img-el');
+  const cvsEl = document.getElementById('card-canvas-el');
   const phEl  = document.getElementById('card-placeholder-el');
   if (currentCard.img) {
-    imgEl.src = currentCard.img; imgEl.style.display = 'block'; phEl.style.display = 'none';
+    cvsEl.style.display = 'block'; phEl.style.display = 'none';
+    // 화면이 active된 후 offsetWidth가 잡히도록 다음 프레임에 드로우
+    requestAnimationFrame(() => drawImageOnCanvas(cvsEl, currentCard.img));
   } else {
-    imgEl.style.display = 'none'; phEl.style.display = 'flex';
+    cvsEl.style.display = 'none'; phEl.style.display = 'flex';
     document.getElementById('ph-name-text').textContent = currentCard.name;
     document.getElementById('ph-sub-text').textContent = attr.icon + ' ' + attr.name + '  |  각성 Lv.' + currentCard.awLv;
   }
@@ -506,6 +560,8 @@ updateLevelDisplay();
 window.addEventListener('popstate', () => {
   if (document.getElementById('display-screen').classList.contains('active')) goBack();
 });
+
+document.addEventListener('contextmenu', e => e.preventDefault());
 
 // ===== 전체화면 =====
 function toggleFullscreen() {
