@@ -118,9 +118,10 @@
       max-width: 100vw; max-height: 100dvh;
     }
 
-    #card-canvas-el {
+    #card-img-el {
       width: 100%; height: 100%;
       display: block; border-radius: 4px;
+      object-fit: cover;
     }
     #card-placeholder-el {
       width: 100%; height: 100%;
@@ -250,7 +251,7 @@
 <div id="display-screen">
   <button id="btn-back" onclick="goBack()">← 목록</button>
   <div id="card-wrap">
-    <canvas id="card-canvas-el" style="display:none;"></canvas>
+    <img id="card-img-el" style="display:none;" alt="">
     <div id="card-placeholder-el" style="display:none;">
       <div class="ph-name" id="ph-name-text"></div>
       <div class="ph-sub" id="ph-sub-text"></div>
@@ -392,43 +393,6 @@ let currentAwLv = 5;
 
 
 
-// ===== Blob URL 캐시 =====
-const _blobCache = {};
-async function getBlobUrl(src) {
-  if (_blobCache[src]) return _blobCache[src];
-  try {
-    const resp = await fetch(src);
-    const blob = await resp.blob();
-    _blobCache[src] = URL.createObjectURL(blob);
-  } catch(e) {
-    _blobCache[src] = src;
-  }
-  return _blobCache[src];
-}
-
-// ===== Canvas 렌더링 =====
-async function drawImageOnCanvas(canvas, src) {
-  const url = await getBlobUrl(src);
-  return new Promise(resolve => {
-    const tmpImg = new Image();
-    tmpImg.onload = () => {
-      const w = canvas.offsetWidth  || canvas.width;
-      const h = canvas.offsetHeight || canvas.height;
-      canvas.width  = w * devicePixelRatio;
-      canvas.height = h * devicePixelRatio;
-      const ctx = canvas.getContext('2d');
-      ctx.scale(devicePixelRatio, devicePixelRatio);
-      const iw = tmpImg.naturalWidth, ih = tmpImg.naturalHeight;
-      const scale = Math.max(w / iw, h / ih);
-      const sw = iw * scale, sh = ih * scale;
-      ctx.drawImage(tmpImg, (w - sw) / 2, (h - sh) / 2, sw, sh);
-      resolve();
-    };
-    tmpImg.onerror = resolve;
-    tmpImg.src = url;
-  });
-}
-
 // ===== 선택 화면 =====
 function buildAttrTabs() {
   const container = document.getElementById('attr-tabs');
@@ -452,14 +416,12 @@ function buildCardGrid() {
     item.className = 'card-item' + (card.img ? ' has-img' : '');
     item.style.setProperty('--c', ATTRS[card.attr].color);
     if (card.img) {
-      const cvs = document.createElement('canvas');
-      cvs.style.cssText = 'width:100%;height:100%;display:block;border-radius:4px;';
-      item.appendChild(cvs);
-      getBlobUrl(card.img).then(url => {
-        const tmpImg = new Image();
-        tmpImg.onload = () => drawImageOnCanvas(cvs, card.img);
-        tmpImg.src = url;
-      });
+      const img = document.createElement('img');
+      img.style.cssText = 'width:100%;height:100%;display:block;border-radius:4px;object-fit:cover;';
+      img.alt = card.name;
+      img.loading = 'lazy';
+      img.src = card.img;
+      item.appendChild(img);
     } else {
       const ph = document.createElement('div');
       ph.className = 'card-placeholder';
@@ -490,13 +452,13 @@ function openCard(cardIdx) {
   currentLevel = 1;
   currentAwLv = currentCard.awLv;
 
-  const cvsEl = document.getElementById('card-canvas-el');
+  const imgEl = document.getElementById('card-img-el');
   const phEl  = document.getElementById('card-placeholder-el');
   if (currentCard.img) {
-    cvsEl.style.display = 'block'; phEl.style.display = 'none';
-    requestAnimationFrame(() => requestAnimationFrame(() => drawImageOnCanvas(cvsEl, currentCard.img)));
+    imgEl.style.display = 'block'; phEl.style.display = 'none';
+    imgEl.src = currentCard.img;
   } else {
-    cvsEl.style.display = 'none'; phEl.style.display = 'flex';
+    imgEl.style.display = 'none'; phEl.style.display = 'flex';
     document.getElementById('ph-name-text').textContent = currentCard.name;
     document.getElementById('ph-sub-text').textContent = attr.icon + ' ' + attr.name + '  |  각성 Lv.' + currentCard.awLv;
   }
