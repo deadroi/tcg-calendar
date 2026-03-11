@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="description" content="TCG 입상덱 메타"/>
+<title>TCG 입상덱 메타</title>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-9N9WTDYW2G"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-9N9WTDYW2G');
+</script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :root {
+    --sidebar-w: 220px;
+    --bg: #f4f5f7;
+    --card-bg: #fff;
+    --border: #e4e6ea;
+    --text: #111;
+    --text-sub: #555;
+    --accent: #4ccfac;
+    --nav-bg: #0d0d1a;
+  }
+  body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans KR', sans-serif; margin:0; background:var(--bg); color:var(--text); }
+
+  /* Nav */
+  .site-nav { background: var(--nav-bg); position: relative; z-index: 500; }
+  .site-nav-inner { max-width: 1600px; margin: 0 auto; padding: 0 8px; display: flex; align-items: center; justify-content: space-between; }
+  .site-nav-links { display: flex; flex-wrap: wrap; justify-content: center; flex: 1; }
+  .site-nav-link { display: inline-block; padding: 10px 13px; color: #adb5bd; text-decoration: none; font-size: 13px; font-weight: 600; border-bottom: 3px solid transparent; transition: color .15s; white-space: nowrap; }
+  .site-nav-link:hover { color: #fff; }
+  .site-nav-link.active { color: #fff; border-bottom-color: var(--accent); }
+  .site-nav-title { color: var(--accent); font-size: 14px; font-weight: 700; display: none; }
+  .site-nav-hamburger { display: none; background: none; border: none; cursor: pointer; padding: 6px; flex-direction: column; gap: 5px; }
+  .site-nav-hamburger span { display: block; width: 22px; height: 2px; background: #adb5bd; border-radius: 2px; }
+  .site-nav-hamburger:hover span { background: #fff; }
+  .site-nav-dropdown { display: none; position: absolute; top: 100%; right: 0; min-width: 220px; background: #13131f; border: 1px solid #2a2a44; border-radius: 0 0 10px 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); overflow: hidden; }
+  .site-nav-dropdown.open { display: block; }
+  .site-nav-dropdown .site-nav-link { display: flex; align-items: center; gap: 10px; padding: 12px 18px; border-bottom: none; border-left: 3px solid transparent; }
+  .site-nav-dropdown .site-nav-link:hover { background: #1e1e35; }
+  .site-nav-dropdown .site-nav-link.active { color: var(--accent); border-left-color: var(--accent); background: #161628; }
+  @media (max-width: 600px) {
+    .site-nav-links { display: none; }
+    .site-nav-title { display: block; }
+    .site-nav-hamburger { display: flex; }
+  }
+
+  /* Page header */
+  .page-header { text-align: center; padding: 18px 14px 12px; background: var(--card-bg); border-bottom: 1px solid var(--border); }
+  .page-header h1 { margin: 0 0 4px; font-size: 22px; font-weight: 800; }
+  .page-header .sub { font-size: 12px; color: var(--text-sub); margin-bottom: 10px; }
+  .period-toggle { display: inline-flex; gap: 0; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-top: 8px; }
+  .period-btn {
+    padding: 6px 20px; font-size: 13px; font-weight: 700;
+    border: none; background: var(--card-bg); color: var(--text-sub); cursor: pointer;
+    transition: background .12s, color .12s;
+  }
+  .period-btn + .period-btn { border-left: 1px solid var(--border); }
+  .period-btn.active { background: var(--accent); color: #fff; }
+
+  /* Layout */
+  .app { display: flex; gap: 16px; padding: 20px 14px; max-width: 1400px; margin: 0 auto; align-items: flex-start; }
+
+  /* Sidebar */
+  .sidebar {
+    width: var(--sidebar-w); flex: 0 0 var(--sidebar-w);
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
+    padding: 14px 12px; position: sticky; top: 16px;
+    overflow: auto; max-height: calc(100vh - 32px);
+  }
+  .sidebar h2 { margin: 2px 4px 10px; font-size: 13px; color: #888; text-transform: uppercase; letter-spacing: .5px; }
+  .filter-btn {
+    display: flex; align-items: center; gap: 8px; width: 100%;
+    padding: 8px 10px; border-radius: 8px; border: none; background: none;
+    cursor: pointer; font-size: 13px; font-weight: 600; color: var(--text);
+    text-align: left; transition: background .12s;
+  }
+  .filter-btn:hover { background: #f0f2f5; }
+  .filter-btn.active { background: #eef9f6; color: #1a9a7a; }
+  .filter-btn .chip {
+    width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+    border: 1px solid rgba(0,0,0,0.1);
+  }
+  .filter-btn .badge {
+    margin-left: auto; font-size: 11px; color: var(--text-sub);
+    background: #f1f3f5; padding: 1px 7px; border-radius: 999px;
+  }
+  .filter-btn.active .badge { background: #d1f5eb; color: #1a9a7a; }
+  .sidebar-divider { height: 1px; background: var(--border); margin: 8px 0; }
+
+  /* Main */
+  .main { flex: 1 1 auto; min-width: 0; }
+
+  /* Week section */
+  .week-section { margin-bottom: 24px; }
+  .week-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 12px;
+  }
+  .week-title {
+    font-size: 16px; font-weight: 800; color: var(--text);
+  }
+
+  /* Game cards grid */
+  .game-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 12px;
+  }
+  .game-card {
+    background: var(--card-bg); border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .game-card-header {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 14px; border-bottom: 1px solid var(--border);
+  }
+  .game-color-bar {
+    width: 4px; height: 20px; border-radius: 3px; flex-shrink: 0;
+  }
+  .game-card-title {
+    font-size: 13px; font-weight: 700; flex: 1;
+  }
+  .game-card-total {
+    font-size: 11px; color: var(--text-sub);
+    background: #f1f3f5; padding: 1px 7px; border-radius: 999px;
+  }
+  .deck-list { padding: 8px 0; }
+  .deck-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 5px 14px; transition: background .1s;
+  }
+  .deck-row:hover { background: #f8f9fa; }
+  .deck-rank {
+    font-size: 11px; font-weight: 700; color: var(--text-sub);
+    width: 18px; text-align: center; flex-shrink: 0;
+  }
+  .deck-rank.top1 { color: #f59f00; }
+  .deck-rank.top2 { color: #868e96; }
+  .deck-rank.top3 { color: #c05c2a; }
+  .deck-name { flex: 1; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .deck-bar-wrap { width: 60px; flex-shrink: 0; }
+  .deck-bar {
+    height: 6px; border-radius: 3px; background: #e9ecef;
+    overflow: hidden;
+  }
+  .deck-bar-fill { height: 100%; border-radius: 3px; transition: width .3s; }
+  .deck-count {
+    font-size: 12px; font-weight: 700; color: var(--text-sub);
+    min-width: 20px; text-align: right; flex-shrink: 0;
+  }
+
+  /* Empty state */
+  .empty-state {
+    text-align: center; padding: 60px 20px;
+    color: var(--text-sub); font-size: 14px;
+  }
+
+  /* Notice */
+  .notice {
+    margin-top: 24px; padding: 14px 18px;
+    background: #fff9db; border: 1px solid #ffe066; border-radius: 10px;
+    font-size: 13px; color: #555; line-height: 1.6;
+  }
+  .notice h3 { margin: 0 0 6px; font-size: 14px; color: #e67700; }
+  .notice ul { margin: 4px 0 8px; padding-left: 18px; }
+  .notice li { margin: 3px 0; }
+  .notice a { color: #1a73e8; text-decoration: none; }
+  .notice a:hover { text-decoration: underline; }
+
+  /* Responsive */
+  @media (max-width: 960px) {
+    .app { flex-direction: column; }
+    .sidebar { width: 100%; position: static; max-height: none; }
+    .filter-list { display: flex; flex-wrap: wrap; gap: 6px; }
+    .filter-btn { width: auto; }
+  }
+  @media (max-width: 480px) {
+    .game-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="site-nav-inner">
+    <div class="site-nav-links">
+      <a href="https://tcg-calendar.co.kr" class="site-nav-link">📅 대회 일정 수집기</a>
+      <a href="https://tcg-calendar.co.kr/result.html" class="site-nav-link">📋 대회 결과 수집기</a>
+      <a href="https://tcg-calendar.co.kr/deck_meta.html" class="site-nav-link active">🃏 입상덱 메타</a>
+      <a href="https://tcg-calendar.co.kr/tcg-swisssystem.html" class="site-nav-link">🏆 스위스라운드 시스템</a>
+      <a href="https://tcg-calendar.co.kr/tcgtimer.html" class="site-nav-link">⏱ TCG 타이머</a>
+      <a href="https://tcg-calendar.co.kr/tcg_map.html" class="site-nav-link">🗺 TCG 매장 지도</a>
+    </div>
+    <span class="site-nav-title">🃏 TCG 시스템</span>
+    <button class="site-nav-hamburger" onclick="this.nextElementSibling.classList.toggle('open')" aria-label="메뉴">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="site-nav-dropdown">
+      <a href="https://tcg-calendar.co.kr" class="site-nav-link">📅 대회 일정 수집기</a>
+      <a href="https://tcg-calendar.co.kr/result.html" class="site-nav-link">📋 대회 결과 수집기</a>
+      <a href="https://tcg-calendar.co.kr/deck_meta.html" class="site-nav-link active">🃏 입상덱 메타</a>
+      <a href="https://tcg-calendar.co.kr/tcg-swisssystem.html" class="site-nav-link">🏆 스위스라운드 시스템</a>
+      <a href="https://tcg-calendar.co.kr/tcgtimer.html" class="site-nav-link">⏱ TCG 타이머</a>
+      <a href="https://tcg-calendar.co.kr/tcg_map.html" class="site-nav-link">🗺 TCG 매장 지도</a>
+    </div>
+  </div>
+</nav>
+<script>
+document.addEventListener('click', e => {
+  const nav = document.querySelector('.site-nav-dropdown');
+  if (nav && !nav.parentElement.contains(e.target)) nav.classList.remove('open');
+});
+</script>
+
+<div class="page-header">
+  <h1>🃏 TCG 입상덱 메타</h1>
+  <div class="sub">X 수집 대회 결과 기준</div>
+  <div class="period-toggle">
+    <button class="period-btn active" data-period="week">주간</button>
+    <button class="period-btn" data-period="month">월간</button>
+  </div>
+</div>
+
+<div class="app">
+  <aside class="sidebar">
+    <h2>게임 필터</h2>
+    <div class="filter-list" id="gameFilters"></div>
+  </aside>
+
+  <main class="main">
+    <div id="mainContent"></div>
+    <div class="notice">
+      <h3>주의사항</h3>
+      <ul>
+        <li>해당 TCG샵 X에서 검색을 허용해야 수집이 됩니다. (검색 허용 OFF, 외부 노출 제한, 로그인 안 하면 못 보는 글, Follow해야만 보이는 글은 수집 불가)</li>
+        <li>X에서 TCG샵 대회 결과를 수집합니다. (내용에 '우승' 또는 '결과' 또는 '대회' 라는 단어가 있으면 수집이 잘 됩니다)</li>
+        <li>또한 게임종목, 날짜 정보가 명확하게 있어야 수집합니다.</li>
+        <li>1주에 1~2회 수집됩니다.(월요일은 확정)</li>
+      </ul>
+      <h3>오류발생시</h3>
+      <ul>
+        <li>텍스트는 문제가 없지만 이미지일정의 경우 AI가 잘못 인식할 수 있습니다</li>
+        <li>이용시 오류가 발생하거나, 덱 명칭이 틀렸을시 알려주시면 감사합니다. (제작자가 모든 TCG를 하는게 아니라 모르는게 많습니다.) <a href="https://naver.me/GZDzA3Ue" target="_blank">오류 신고</a></li>
+      </ul>
+    </div>
+  </main>
+</div>
+
+<script>
+const WEEKS_DATA = [{"week_key": "2026-W11", "period_label": "2026년 3월 2주 (03/09~03/15)", "monday": "2026-03-09", "games": {"DIGIMON": [{"deck": "수서", "count": 1}], "ONE PIECE": [{"deck": "적 샹크스", "count": 1}], "NIVEL ARENA": [{"deck": "녹 길티", "count": 1}], "YUGIOH": [{"deck": "낙인", "count": 1}, {"deck": "데먼 엘펜", "count": 1}, {"deck": "섬도희", "count": 1}], "YUGIOH RUSH DUEL": [{"deck": "라브", "count": 1}, {"deck": "제왕", "count": 1}], "Starlight TCG": [{"deck": "피아 (청적 번)", "count": 1}]}}, {"week_key": "2026-W10", "period_label": "2026년 3월 1주 (03/02~03/08)", "monday": "2026-03-02", "games": {"VANGUARD": [{"deck": "졸가", "count": 2}, {"deck": "괴수", "count": 1}, {"deck": "리엘 드라코니스", "count": 1}, {"deck": "미네르바", "count": 1}, {"deck": "바브사가라", "count": 1}, {"deck": "브래그드마이어 팬텀", "count": 1}, {"deck": "수각수", "count": 1}, {"deck": "오버로드", "count": 1}], "DIGIMON": [{"deck": "듀크몬", "count": 6}, {"deck": "샤크라몬", "count": 4}, {"deck": "자색 하이브리드", "count": 3}, {"deck": "레나몬", "count": 2}, {"deck": "리바이어몬", "count": 2}, {"deck": "적 조류", "count": 2}, {"deck": "로얄나이츠", "count": 1}, {"deck": "엑자몬", "count": 1}, {"deck": "자색 리바이어몬", "count": 1}, {"deck": "청녹 매그너몬", "count": 1}, {"deck": "칠대마왕", "count": 1}, {"deck": "후디에몬", "count": 1}, {"deck": "흑 리버", "count": 1}], "ONE PIECE": [{"deck": "녹자 루피", "count": 2}, {"deck": "녹자 리무", "count": 1}, {"deck": "자 카이도", "count": 1}, {"deck": "적자 우타", "count": 1}, {"deck": "적황 벨로베티", "count": 1}, {"deck": "청자 레이주", "count": 1}, {"deck": "청흑 레베카", "count": 1}, {"deck": "흑 크로커다일", "count": 1}], "NIVEL ARENA": [{"deck": "녹적 수아", "count": 2}, {"deck": "자 셰나", "count": 1}, {"deck": "자황 니키", "count": 1}, {"deck": "적 라피", "count": 1}, {"deck": "적 레드후드", "count": 1}, {"deck": "청 마스트", "count": 1}, {"deck": "청황 아야", "count": 1}, {"deck": "황 메프바", "count": 1}], "HOLOLIVE": [{"deck": "코로네", "count": 2}, {"deck": "네리사", "count": 1}, {"deck": "이로하", "count": 1}, {"deck": "칼리 코로네", "count": 1}], "WEISS SCHWARZ": [{"deck": "걸밴크", "count": 1}, {"deck": "레스티아 엘 바이스릴리", "count": 1}], "YUGIOH": [{"deck": "미츠루기", "count": 5}, {"deck": "낙인", "count": 3}, {"deck": "K9VS", "count": 2}, {"deck": "드래곤테일", "count": 2}, {"deck": "룡화", "count": 2}, {"deck": "테라나이트", "count": 2}, {"deck": "퓨어히어로", "count": 2}, {"deck": "K9 VS", "count": 1}, {"deck": "K9 크리스트론", "count": 1}, {"deck": "M∀LICE", "count": 1}, {"deck": "TG 가제트", "count": 1}, {"deck": "낙인 드래곤테일", "count": 1}, {"deck": "둠즈", "count": 1}, {"deck": "땅기계", "count": 1}, {"deck": "맬리스", "count": 1}, {"deck": "메멘토", "count": 1}, {"deck": "미츠루기 라이제올", "count": 1}, {"deck": "불꽃성기사", "count": 1}, {"deck": "블랙 가든 제거 가제트", "count": 1}, {"deck": "샌드백 토치맨", "count": 1}, {"deck": "섬도", "count": 1}, {"deck": "염왕", "count": 1}, {"deck": "원석백룡", "count": 1}, {"deck": "유벨", "count": 1}, {"deck": "킬러튠", "count": 1}, {"deck": "텔라나이트", "count": 1}, {"deck": "토치맨 하얀숲", "count": 1}, {"deck": "트라이브리게이드", "count": 1}, {"deck": "하얀숲 엘펜노츠", "count": 1}], "YUGIOH RUSH DUEL": [{"deck": "볼카라이즈", "count": 1}, {"deck": "제왕", "count": 1}], "POKEMON": [{"deck": "가디안 ex", "count": 1}, {"deck": "드래펄트 ex", "count": 1}, {"deck": "드펄", "count": 1}, {"deck": "메가루카리오", "count": 1}, {"deck": "악 리자몽 ex", "count": 1}, {"deck": "이브이 바렛", "count": 1}]}}, {"week_key": "2026-W09", "period_label": "2026년 2월 4주 (02/23~03/01)", "monday": "2026-02-23", "games": {"VANGUARD": [{"deck": "레글레그너스", "count": 1}, {"deck": "리엘 아니무스", "count": 1}, {"deck": "리엘=드라코니스", "count": 1}, {"deck": "매그놀리아팬텀", "count": 1}, {"deck": "버질루아", "count": 1}], "DIGIMON": [{"deck": "듀크몬", "count": 5}, {"deck": "리바이어몬", "count": 3}, {"deck": "자하브", "count": 3}, {"deck": "청녹 조그레스", "count": 3}, {"deck": "로얄나이츠", "count": 2}, {"deck": "샤크라몬", "count": 2}, {"deck": "자색 하이브리드", "count": 2}, {"deck": "그라우몬 어그로", "count": 1}, {"deck": "녹 리버", "count": 1}, {"deck": "녹 리버레이터", "count": 1}, {"deck": "녹색 GS", "count": 1}, {"deck": "딥 세이버즈", "count": 1}, {"deck": "사쿠야몬", "count": 1}, {"deck": "샤크라", "count": 1}, {"deck": "식물요정", "count": 1}, {"deck": "오메가몬", "count": 1}, {"deck": "워매웃코", "count": 1}, {"deck": "적타마청하브", "count": 1}, {"deck": "청 아머", "count": 1}, {"deck": "체스몬", "count": 1}, {"deck": "황색 샤크라몬", "count": 1}], "ONE PIECE": [{"deck": "녹자 루피", "count": 4}, {"deck": "적황 보니", "count": 2}, {"deck": "네리사", "count": 1}, {"deck": "녹 쥬얼리 보니", "count": 1}, {"deck": "녹자 리무", "count": 1}, {"deck": "녹청 로시난테", "count": 1}, {"deck": "자황 로시난테", "count": 1}, {"deck": "적 드래곤", "count": 1}, {"deck": "적 조로", "count": 1}, {"deck": "적청 루시", "count": 1}, {"deck": "적흑 사보", "count": 1}, {"deck": "청황 행콕", "count": 1}, {"deck": "황 에넬", "count": 1}, {"deck": "흑 티치", "count": 1}, {"deck": "흑황 루피", "count": 1}], "NIVEL ARENA": [{"deck": "적 빌헬미나", "count": 4}, {"deck": "녹적 수아", "count": 3}, {"deck": "적 라레후", "count": 2}, {"deck": "적 라피 레드후드", "count": 1}, {"deck": "적청 카티야", "count": 1}, {"deck": "청황 아비게일", "count": 1}, {"deck": "폭풍번개 언럭키 바니 니키", "count": 1}, {"deck": "황 메프바", "count": 1}, {"deck": "황 크라운", "count": 1}], "HOLOLIVE": [{"deck": "비쥬", "count": 2}, {"deck": "네리사", "count": 1}, {"deck": "로보코", "count": 1}, {"deck": "로보코상", "count": 1}, {"deck": "코로네", "count": 1}, {"deck": "코세키 비쥬", "count": 1}, {"deck": "코요리", "count": 1}], "SHADOWVERSE EVOLVE": [{"deck": "무투용인드래곤", "count": 1}], "GUNDAM": [{"deck": "녹백 윙", "count": 1}], "ULTRAMAN": [{"deck": "긴가/빅토리 & 다이나/아크", "count": 1}], "WEISS SCHWARZ": [{"deck": "벽람향로", "count": 1}, {"deck": "우마무스메", "count": 1}, {"deck": "유루캠", "count": 1}, {"deck": "패배 히로인이 너무 많아!", "count": 1}], "YUGIOH": [{"deck": "낙인", "count": 6}, {"deck": "K9VS", "count": 2}, {"deck": "맬리스", "count": 2}, {"deck": "미츠루기", "count": 2}, {"deck": "킬러튠", "count": 2}, {"deck": "DD", "count": 1}, {"deck": "낙인리시드", "count": 1}, {"deck": "드래곤테일", "count": 1}, {"deck": "라이트로드", "count": 1}, {"deck": "래빗 라기어", "count": 1}, {"deck": "룡화 / 엘펜노츠", "count": 1}, {"deck": "미츠루기야미", "count": 1}, {"deck": "바렛/바렐", "count": 1}, {"deck": "섬도", "count": 1}, {"deck": "섬도희", "count": 1}, {"deck": "엑소 문라", "count": 1}, {"deck": "엘펜노츠", "count": 1}, {"deck": "오르페골", "count": 1}, {"deck": "킬러툰", "count": 1}, {"deck": "타락천사", "count": 1}, {"deck": "퓨어히어로", "count": 1}, {"deck": "히어로 비트", "count": 1}], "YUGIOH RUSH DUEL": [{"deck": "OTS", "count": 1}, {"deck": "리추얼 카오스", "count": 1}, {"deck": "볼카라이즈", "count": 1}, {"deck": "블랙 매지션", "count": 1}, {"deck": "사이버", "count": 1}], "POKEMON": [{"deck": "N 의조로아크 ex", "count": 1}, {"deck": "개굴닌자 ex", "count": 1}, {"deck": "드래펄트 ex", "count": 1}, {"deck": "메가루카리오 ex", "count": 1}, {"deck": "우레", "count": 1}, {"deck": "타부자고", "count": 1}]}}, {"week_key": "2026-W08", "period_label": "2026년 2월 3주 (02/16~02/22)", "monday": "2026-02-16", "games": {"VANGUARD": [{"deck": "레자엘", "count": 1}, {"deck": "리엘=아니무스", "count": 1}, {"deck": "바브사가라", "count": 1}, {"deck": "버질루아", "count": 1}, {"deck": "유스", "count": 1}, {"deck": "인발디오", "count": 1}], "DIGIMON": [{"deck": "자 하이브리드", "count": 3}, {"deck": "듀크몬", "count": 2}, {"deck": "디아블로몬", "count": 2}, {"deck": "사쿠야몬", "count": 2}, {"deck": "오메가몬", "count": 2}, {"deck": "은하", "count": 2}, {"deck": "청녹 조그레스", "count": 2}, {"deck": "청녹 황제드라몬", "count": 2}, {"deck": "황 퍼펫", "count": 2}, {"deck": "디아블로", "count": 1}, {"deck": "레나몬", "count": 1}, {"deck": "로드나이트몬", "count": 1}, {"deck": "로얄나이츠", "count": 1}, {"deck": "마수 로나 타케미", "count": 1}, {"deck": "베르제브몬", "count": 1}, {"deck": "빙설 리버레이터", "count": 1}, {"deck": "어둠의 4 천왕", "count": 1}, {"deck": "유피테르", "count": 1}, {"deck": "적 조류", "count": 1}, {"deck": "청 리버", "count": 1}, {"deck": "청 하이브리드", "count": 1}, {"deck": "청녹 아머", "count": 1}, {"deck": "크로스하트", "count": 1}, {"deck": "펄스몬", "count": 1}, {"deck": "황 아머", "count": 1}, {"deck": "흑 리버레이터", "count": 1}], "ONE PIECE": [{"deck": "녹자 루피", "count": 4}, {"deck": "자 루피", "count": 2}, {"deck": "적녹 쵸파", "count": 2}, {"deck": "적황 보니", "count": 2}, {"deck": "흑 루치", "count": 2}, {"deck": "녹자 리무", "count": 1}, {"deck": "적 샹크스", "count": 1}, {"deck": "적녹 스모커", "count": 1}, {"deck": "적에이스", "count": 1}, {"deck": "적자 루피", "count": 1}, {"deck": "적자 슈거", "count": 1}, {"deck": "청 도플라밍고", "count": 1}, {"deck": "청자 상디", "count": 1}, {"deck": "청흑 우솝", "count": 1}, {"deck": "흑 티치", "count": 1}], "NIVEL ARENA": [{"deck": "녹적 수아", "count": 3}, {"deck": "자황 니키", "count": 3}, {"deck": "자 셰나", "count": 2}, {"deck": "적 레드후드", "count": 2}, {"deck": "녹 길티", "count": 1}, {"deck": "자적 니키", "count": 1}, {"deck": "적 루벤시아", "count": 1}, {"deck": "적 빌헬미나", "count": 1}, {"deck": "황 레비아탄", "count": 1}], "HOLOLIVE": [{"deck": "라플라스", "count": 1}, {"deck": "스이세이", "count": 1}, {"deck": "이로하", "count": 1}, {"deck": "칼리", "count": 1}, {"deck": "코로네", "count": 1}, {"deck": "코로네 덱", "count": 1}, {"deck": "코요리", "count": 1}, {"deck": "후부키", "count": 1}], "SHADOWVERSE EVOLVE": [{"deck": "무투용인드래곤", "count": 1}], "GUNDAM": [{"deck": "청자 발바토스", "count": 1}, {"deck": "청자덱", "count": 1}], "WEISS SCHWARZ": [{"deck": "라플라스", "count": 2}, {"deck": "테일즈", "count": 2}, {"deck": "후부키", "count": 2}, {"deck": "뱅드림", "count": 1}], "UNION ARENA": [{"deck": "샤니 CoMETIK", "count": 1}, {"deck": "완벽초인", "count": 1}, {"deck": "일루미네이션 스타즈", "count": 1}, {"deck": "자 완벽초인", "count": 1}, {"deck": "적 켄신", "count": 1}, {"deck": "켄신", "count": 1}, {"deck": "황 일루미네이션 스타즈", "count": 1}], "YUGIOH": [{"deck": "킬러튠", "count": 13}, {"deck": "둠즈", "count": 6}, {"deck": "엘펜노츠", "count": 6}, {"deck": "낙인", "count": 4}, {"deck": "K9 크리스트론", "count": 2}, {"deck": "VS", "count": 2}, {"deck": "낙인드테", "count": 2}, {"deck": "드래곤테일", "count": 2}, {"deck": "미츠루기", "count": 2}, {"deck": "섬도", "count": 2}, {"deck": "섬도희", "count": 2}, {"deck": "아르토메기아", "count": 2}, {"deck": "하얀숲", "count": 2}, {"deck": "K9 미츠루기", "count": 1}, {"deck": "K9VS", "count": 1}, {"deck": "금궤페골", "count": 1}, {"deck": "낙인 드래곤테일", "count": 1}, {"deck": "드래곤메이드", "count": 1}, {"deck": "마탄", "count": 1}, {"deck": "미츠루기 라이제올", "count": 1}, {"deck": "싱크론", "count": 1}, {"deck": "현람", "count": 1}], "YUGIOH RUSH DUEL": [{"deck": "블랙 카오스", "count": 1}], "POKEMON": [{"deck": "n 의 조로아크 ex", "count": 1}, {"deck": "드래펄트 ex", "count": 1}, {"deck": "마리의 오롱털 ex", "count": 1}, {"deck": "메가루카리오 ex", "count": 1}, {"deck": "타부자고", "count": 1}]}}, {"week_key": "2026-W07", "period_label": "2026년 2월 2주 (02/09~02/15)", "monday": "2026-02-09", "games": {"VANGUARD": [{"deck": "무한의 숙명왕 레비드라스 엠피레오", "count": 1}, {"deck": "수각수 매그놀리아 패트리아크", "count": 1}, {"deck": "영잠자", "count": 1}, {"deck": "은하영용 스테이틀리 클로저드", "count": 1}], "DIGIMON": [{"deck": "7 대마왕", "count": 1}, {"deck": "로드나이트몬", "count": 1}, {"deck": "청녹 조그레스", "count": 1}, {"deck": "후디에몬", "count": 1}], "ONE PIECE": [{"deck": "녹 미호크", "count": 2}, {"deck": "적녹 스모커", "count": 2}, {"deck": "적청 에이스", "count": 2}, {"deck": "적흑 사보", "count": 2}, {"deck": "적황 보니", "count": 1}], "HOLOLIVE": [{"deck": "아야메", "count": 1}], "YUGIOH": [{"deck": "K9VS", "count": 1}]}}, {"week_key": "2026-W05", "period_label": "2026년 1월 4주 (01/26~02/01)", "monday": "2026-01-26", "games": {"YUGIOH": [{"deck": "낙인", "count": 1}, {"deck": "엑소 문라", "count": 1}]}}, {"week_key": "2026-W04", "period_label": "2026년 1월 3주 (01/19~01/25)", "monday": "2026-01-19", "games": {"YUGIOH RUSH DUEL": [{"deck": "제왕", "count": 1}]}}];
+const MONTHS_DATA = [{"month_key": "2026-03", "period_label": "2026년 3월", "games": {"VANGUARD": [{"deck": "졸가", "count": 2}, {"deck": "괴수", "count": 1}, {"deck": "리엘 드라코니스", "count": 1}, {"deck": "리엘 아니무스", "count": 1}, {"deck": "매그놀리아팬텀", "count": 1}, {"deck": "미네르바", "count": 1}, {"deck": "바브사가라", "count": 1}, {"deck": "브래그드마이어 팬텀", "count": 1}, {"deck": "수각수", "count": 1}, {"deck": "오버로드", "count": 1}], "DIGIMON": [{"deck": "듀크몬", "count": 6}, {"deck": "샤크라몬", "count": 5}, {"deck": "리바이어몬", "count": 4}, {"deck": "자색 하이브리드", "count": 4}, {"deck": "레나몬", "count": 2}, {"deck": "로얄나이츠", "count": 2}, {"deck": "적 조류", "count": 2}, {"deck": "청녹 조그레스", "count": 2}, {"deck": "딥 세이버즈", "count": 1}, {"deck": "사쿠야몬", "count": 1}, {"deck": "샤크라", "count": 1}, {"deck": "수서", "count": 1}, {"deck": "엑자몬", "count": 1}, {"deck": "오메가몬", "count": 1}, {"deck": "자색 리바이어몬", "count": 1}, {"deck": "자하브", "count": 1}, {"deck": "청녹 매그너몬", "count": 1}, {"deck": "칠대마왕", "count": 1}, {"deck": "후디에몬", "count": 1}, {"deck": "흑 리버", "count": 1}], "ONE PIECE": [{"deck": "녹자 루피", "count": 3}, {"deck": "녹자 리무", "count": 2}, {"deck": "녹청 로시난테", "count": 1}, {"deck": "자 카이도", "count": 1}, {"deck": "적 샹크스", "count": 1}, {"deck": "적자 우타", "count": 1}, {"deck": "적황 벨로베티", "count": 1}, {"deck": "청자 레이주", "count": 1}, {"deck": "청흑 레베카", "count": 1}, {"deck": "흑 크로커다일", "count": 1}, {"deck": "흑 티치", "count": 1}], "NIVEL ARENA": [{"deck": "녹적 수아", "count": 3}, {"deck": "녹 길티", "count": 1}, {"deck": "자 셰나", "count": 1}, {"deck": "자황 니키", "count": 1}, {"deck": "적 라피", "count": 1}, {"deck": "적 레드후드", "count": 1}, {"deck": "적 빌헬미나", "count": 1}, {"deck": "청 마스트", "count": 1}, {"deck": "청황 아야", "count": 1}, {"deck": "황 메프바", "count": 1}, {"deck": "황 크라운", "count": 1}], "HOLOLIVE": [{"deck": "코로네", "count": 2}, {"deck": "네리사", "count": 1}, {"deck": "이로하", "count": 1}, {"deck": "칼리 코로네", "count": 1}, {"deck": "코세키 비쥬", "count": 1}], "WEISS SCHWARZ": [{"deck": "걸밴크", "count": 1}, {"deck": "레스티아 엘 바이스릴리", "count": 1}, {"deck": "우마무스메", "count": 1}, {"deck": "패배 히로인이 너무 많아!", "count": 1}], "YUGIOH": [{"deck": "낙인", "count": 5}, {"deck": "미츠루기", "count": 5}, {"deck": "K9VS", "count": 2}, {"deck": "드래곤테일", "count": 2}, {"deck": "룡화", "count": 2}, {"deck": "킬러튠", "count": 2}, {"deck": "테라나이트", "count": 2}, {"deck": "퓨어히어로", "count": 2}, {"deck": "K9 VS", "count": 1}, {"deck": "K9 크리스트론", "count": 1}, {"deck": "M∀LICE", "count": 1}, {"deck": "TG 가제트", "count": 1}, {"deck": "낙인 드래곤테일", "count": 1}, {"deck": "데먼 엘펜", "count": 1}, {"deck": "둠즈", "count": 1}, {"deck": "땅기계", "count": 1}, {"deck": "룡화 / 엘펜노츠", "count": 1}, {"deck": "맬리스", "count": 1}, {"deck": "메멘토", "count": 1}, {"deck": "미츠루기 라이제올", "count": 1}, {"deck": "미츠루기야미", "count": 1}, {"deck": "불꽃성기사", "count": 1}, {"deck": "블랙 가든 제거 가제트", "count": 1}, {"deck": "샌드백 토치맨", "count": 1}, {"deck": "섬도", "count": 1}, {"deck": "섬도희", "count": 1}, {"deck": "염왕", "count": 1}, {"deck": "원석백룡", "count": 1}, {"deck": "유벨", "count": 1}, {"deck": "텔라나이트", "count": 1}, {"deck": "토치맨 하얀숲", "count": 1}, {"deck": "트라이브리게이드", "count": 1}, {"deck": "하얀숲 엘펜노츠", "count": 1}], "YUGIOH RUSH DUEL": [{"deck": "제왕", "count": 2}, {"deck": "라브", "count": 1}, {"deck": "볼카라이즈", "count": 1}], "POKEMON": [{"deck": "가디안 ex", "count": 1}, {"deck": "드래펄트 ex", "count": 1}, {"deck": "드펄", "count": 1}, {"deck": "메가루카리오", "count": 1}, {"deck": "악 리자몽 ex", "count": 1}, {"deck": "이브이 바렛", "count": 1}], "Starlight TCG": [{"deck": "피아 (청적 번)", "count": 1}]}}, {"month_key": "2026-02", "period_label": "2026년 2월", "games": {"VANGUARD": [{"deck": "버질루아", "count": 2}, {"deck": "레글레그너스", "count": 1}, {"deck": "레자엘", "count": 1}, {"deck": "리엘=드라코니스", "count": 1}, {"deck": "리엘=아니무스", "count": 1}, {"deck": "무한의 숙명왕 레비드라스 엠피레오", "count": 1}, {"deck": "바브사가라", "count": 1}, {"deck": "수각수 매그놀리아 패트리아크", "count": 1}, {"deck": "영잠자", "count": 1}, {"deck": "유스", "count": 1}, {"deck": "은하영용 스테이틀리 클로저드", "count": 1}, {"deck": "인발디오", "count": 1}], "DIGIMON": [{"deck": "듀크몬", "count": 7}, {"deck": "청녹 조그레스", "count": 4}, {"deck": "자 하이브리드", "count": 3}, {"deck": "디아블로몬", "count": 2}, {"deck": "로드나이트몬", "count": 2}, {"deck": "로얄나이츠", "count": 2}, {"deck": "사쿠야몬", "count": 2}, {"deck": "오메가몬", "count": 2}, {"deck": "은하", "count": 2}, {"deck": "자하브", "count": 2}, {"deck": "청녹 황제드라몬", "count": 2}, {"deck": "황 퍼펫", "count": 2}, {"deck": "7 대마왕", "count": 1}, {"deck": "그라우몬 어그로", "count": 1}, {"deck": "녹 리버", "count": 1}, {"deck": "녹 리버레이터", "count": 1}, {"deck": "녹색 GS", "count": 1}, {"deck": "디아블로", "count": 1}, {"deck": "레나몬", "count": 1}, {"deck": "리바이어몬", "count": 1}, {"deck": "마수 로나 타케미", "count": 1}, {"deck": "베르제브몬", "count": 1}, {"deck": "빙설 리버레이터", "count": 1}, {"deck": "샤크라몬", "count": 1}, {"deck": "식물요정", "count": 1}, {"deck": "어둠의 4 천왕", "count": 1}, {"deck": "워매웃코", "count": 1}, {"deck": "유피테르", "count": 1}, {"deck": "자색 하이브리드", "count": 1}, {"deck": "적 조류", "count": 1}, {"deck": "적타마청하브", "count": 1}, {"deck": "청 리버", "count": 1}, {"deck": "청 아머", "count": 1}, {"deck": "청 하이브리드", "count": 1}, {"deck": "청녹 아머", "count": 1}, {"deck": "체스몬", "count": 1}, {"deck": "크로스하트", "count": 1}, {"deck": "펄스몬", "count": 1}, {"deck": "황 아머", "count": 1}, {"deck": "황색 샤크라몬", "count": 1}, {"deck": "후디에몬", "count": 1}, {"deck": "흑 리버레이터", "count": 1}], "ONE PIECE": [{"deck": "녹자 루피", "count": 7}, {"deck": "적황 보니", "count": 5}, {"deck": "적녹 스모커", "count": 3}, {"deck": "적흑 사보", "count": 3}, {"deck": "녹 미호크", "count": 2}, {"deck": "자 루피", "count": 2}, {"deck": "적녹 쵸파", "count": 2}, {"deck": "적청 에이스", "count": 2}, {"deck": "흑 루치", "count": 2}, {"deck": "네리사", "count": 1}, {"deck": "녹 쥬얼리 보니", "count": 1}, {"deck": "녹자 리무", "count": 1}, {"deck": "자황 로시난테", "count": 1}, {"deck": "적 드래곤", "count": 1}, {"deck": "적 샹크스", "count": 1}, {"deck": "적 조로", "count": 1}, {"deck": "적에이스", "count": 1}, {"deck": "적자 루피", "count": 1}, {"deck": "적자 슈거", "count": 1}, {"deck": "적청 루시", "count": 1}, {"deck": "청 도플라밍고", "count": 1}, {"deck": "청자 상디", "count": 1}, {"deck": "청황 행콕", "count": 1}, {"deck": "청흑 우솝", "count": 1}, {"deck": "황 에넬", "count": 1}, {"deck": "흑 티치", "count": 1}, {"deck": "흑황 루피", "count": 1}], "NIVEL ARENA": [{"deck": "녹적 수아", "count": 5}, {"deck": "적 빌헬미나", "count": 4}, {"deck": "자황 니키", "count": 3}, {"deck": "자 셰나", "count": 2}, {"deck": "적 라레후", "count": 2}, {"deck": "적 레드후드", "count": 2}, {"deck": "녹 길티", "count": 1}, {"deck": "자적 니키", "count": 1}, {"deck": "적 라피 레드후드", "count": 1}, {"deck": "적 루벤시아", "count": 1}, {"deck": "적청 카티야", "count": 1}, {"deck": "청황 아비게일", "count": 1}, {"deck": "폭풍번개 언럭키 바니 니키", "count": 1}, {"deck": "황 레비아탄", "count": 1}, {"deck": "황 메프바", "count": 1}], "HOLOLIVE": [{"deck": "비쥬", "count": 2}, {"deck": "코로네", "count": 2}, {"deck": "코요리", "count": 2}, {"deck": "네리사", "count": 1}, {"deck": "라플라스", "count": 1}, {"deck": "로보코", "count": 1}, {"deck": "로보코상", "count": 1}, {"deck": "스이세이", "count": 1}, {"deck": "아야메", "count": 1}, {"deck": "이로하", "count": 1}, {"deck": "칼리", "count": 1}, {"deck": "코로네 덱", "count": 1}, {"deck": "후부키", "count": 1}], "SHADOWVERSE EVOLVE": [{"deck": "무투용인드래곤", "count": 2}], "GUNDAM": [{"deck": "녹백 윙", "count": 1}, {"deck": "청자 발바토스", "count": 1}, {"deck": "청자덱", "count": 1}], "ULTRAMAN": [{"deck": "긴가/빅토리 & 다이나/아크", "count": 1}], "WEISS SCHWARZ": [{"deck": "라플라스", "count": 2}, {"deck": "테일즈", "count": 2}, {"deck": "후부키", "count": 2}, {"deck": "뱅드림", "count": 1}, {"deck": "벽람향로", "count": 1}, {"deck": "유루캠", "count": 1}], "UNION ARENA": [{"deck": "샤니 CoMETIK", "count": 1}, {"deck": "완벽초인", "count": 1}, {"deck": "일루미네이션 스타즈", "count": 1}, {"deck": "자 완벽초인", "count": 1}, {"deck": "적 켄신", "count": 1}, {"deck": "켄신", "count": 1}, {"deck": "황 일루미네이션 스타즈", "count": 1}], "YUGIOH": [{"deck": "킬러튠", "count": 14}, {"deck": "낙인", "count": 10}, {"deck": "엘펜노츠", "count": 7}, {"deck": "둠즈", "count": 6}, {"deck": "K9VS", "count": 4}, {"deck": "미츠루기", "count": 4}, {"deck": "드래곤테일", "count": 3}, {"deck": "섬도", "count": 3}, {"deck": "섬도희", "count": 3}, {"deck": "K9 크리스트론", "count": 2}, {"deck": "VS", "count": 2}, {"deck": "낙인드테", "count": 2}, {"deck": "맬리스", "count": 2}, {"deck": "아르토메기아", "count": 2}, {"deck": "엑소 문라", "count": 2}, {"deck": "하얀숲", "count": 2}, {"deck": "DD", "count": 1}, {"deck": "K9 미츠루기", "count": 1}, {"deck": "금궤페골", "count": 1}, {"deck": "낙인 드래곤테일", "count": 1}, {"deck": "낙인리시드", "count": 1}, {"deck": "드래곤메이드", "count": 1}, {"deck": "라이트로드", "count": 1}, {"deck": "래빗 라기어", "count": 1}, {"deck": "마탄", "count": 1}, {"deck": "미츠루기 라이제올", "count": 1}, {"deck": "바렛/바렐", "count": 1}, {"deck": "싱크론", "count": 1}, {"deck": "오르페골", "count": 1}, {"deck": "킬러툰", "count": 1}, {"deck": "타락천사", "count": 1}, {"deck": "퓨어히어로", "count": 1}, {"deck": "현람", "count": 1}, {"deck": "히어로 비트", "count": 1}], "YUGIOH RUSH DUEL": [{"deck": "OTS", "count": 1}, {"deck": "리추얼 카오스", "count": 1}, {"deck": "볼카라이즈", "count": 1}, {"deck": "블랙 매지션", "count": 1}, {"deck": "블랙 카오스", "count": 1}, {"deck": "사이버", "count": 1}], "POKEMON": [{"deck": "드래펄트 ex", "count": 2}, {"deck": "메가루카리오 ex", "count": 2}, {"deck": "타부자고", "count": 2}, {"deck": "N 의조로아크 ex", "count": 1}, {"deck": "n 의 조로아크 ex", "count": 1}, {"deck": "개굴닌자 ex", "count": 1}, {"deck": "마리의 오롱털 ex", "count": 1}, {"deck": "우레", "count": 1}]}}, {"month_key": "2026-01", "period_label": "2026년 1월", "games": {"YUGIOH RUSH DUEL": [{"deck": "제왕", "count": 1}]}}];
+const GAME_LABEL = {"VANGUARD": "뱅가드", "DIGIMON": "디지몬", "ONE PIECE": "원피스", "NIVEL ARENA": "니벨아레나", "HOLOLIVE": "홀로라이브", "SHADOWVERSE EVOLVE": "섀도우버스 이볼브", "GUNDAM": "건담", "ULTRAMAN": "울트라맨", "WEISS SCHWARZ": "바이스 슈발츠", "UNION ARENA": "유니온 아레나", "YUGIOH": "유희왕", "YUGIOH RUSH DUEL": "유희왕 러쉬듀얼", "POKEMON": "포켓몬", "Starlight TCG": "스타라이트"};
+const GAME_COLORS = {"VANGUARD": "#1f77b4", "DIGIMON": "#2ca02c", "ONE PIECE": "#ff7f0e", "NIVEL ARENA": "#d62728", "HOLOLIVE": "#9467bd", "SHADOWVERSE EVOLVE": "#8c564b", "GUNDAM": "#e377c2", "ULTRAMAN": "#17becf", "WEISS SCHWARZ": "#7f7f7f", "UNION ARENA": "#bcbd22", "YUGIOH": "#d62700", "YUGIOH RUSH DUEL": "#ff6347", "POKEMON": "#f0c040", "Starlight TCG": "#e91e8c"};
+const ALL_GAMES = ["VANGUARD", "DIGIMON", "ONE PIECE", "NIVEL ARENA", "HOLOLIVE", "SHADOWVERSE EVOLVE", "GUNDAM", "ULTRAMAN", "WEISS SCHWARZ", "UNION ARENA", "YUGIOH", "YUGIOH RUSH DUEL", "POKEMON", "Starlight TCG"];
+
+let selectedGame = 'ALL';
+let selectedPeriod = 'week'; // 'week' | 'month'
+
+function currentData() {
+  return selectedPeriod === 'week' ? WEEKS_DATA : MONTHS_DATA;
+}
+
+function escHtml(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ─── 기간 토글 ─── */
+document.querySelectorAll('.period-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    selectedPeriod = btn.dataset.period;
+    document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderFilters();
+    renderContent();
+  });
+});
+
+/* ─── 필터 버튼 렌더 ─── */
+function renderFilters() {
+  const el = document.getElementById('gameFilters');
+  el.innerHTML = '';
+  const data = currentData();
+
+  const allBtn = makeFilterBtn('ALL', '전체', null, data);
+  el.appendChild(allBtn);
+
+  const div = document.createElement('div');
+  div.className = 'sidebar-divider';
+  el.appendChild(div);
+
+  ALL_GAMES.forEach(game => {
+    const btn = makeFilterBtn(game, GAME_LABEL[game] || game, GAME_COLORS[game], data);
+    el.appendChild(btn);
+  });
+
+  updateFilterActive();
+}
+
+function makeFilterBtn(key, label, color, data) {
+  const btn = document.createElement('button');
+  btn.className = 'filter-btn';
+  btn.dataset.key = key;
+  const chip = color ? `<span class="chip" style="background:${color}"></span>` : `<span style="width:10px;display:inline-block"></span>`;
+  let total = 0;
+  if (key === 'ALL') {
+    data.forEach(p => Object.values(p.games).forEach(decks => decks.forEach(d => total += d.count)));
+  } else {
+    data.forEach(p => (p.games[key] || []).forEach(d => total += d.count));
+  }
+  btn.innerHTML = `${chip}<span>${escHtml(label)}</span><span class="badge">${total}</span>`;
+  btn.addEventListener('click', () => {
+    selectedGame = key;
+    updateFilterActive();
+    renderContent();
+  });
+  return btn;
+}
+
+function updateFilterActive() {
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.key === selectedGame);
+  });
+}
+
+/* ─── 메인 콘텐츠 렌더 ─── */
+function renderContent() {
+  const container = document.getElementById('mainContent');
+  container.innerHTML = '';
+  const data = currentData();
+
+  const filtered = data.filter(p => {
+    if (selectedGame === 'ALL') return Object.keys(p.games).length > 0;
+    return p.games[selectedGame] && p.games[selectedGame].length > 0;
+  });
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<div class="empty-state">해당 조건의 입상덱 데이터가 없습니다.</div>';
+    return;
+  }
+
+  filtered.forEach(p => {
+    const section = document.createElement('div');
+    section.className = 'week-section';
+
+    const header = document.createElement('div');
+    header.className = 'week-header';
+    header.innerHTML = `<div class="week-title">${escHtml(p.period_label)}</div>`;
+    section.appendChild(header);
+
+    const grid = document.createElement('div');
+    grid.className = 'game-grid';
+
+    const gamesToShow = selectedGame === 'ALL'
+      ? Object.keys(p.games)
+      : [selectedGame].filter(g => p.games[g]);
+
+    gamesToShow.forEach(game => {
+      const decks = p.games[game] || [];
+      if (decks.length === 0) return;
+      grid.appendChild(buildGameCard(game, decks));
+    });
+
+    section.appendChild(grid);
+    container.appendChild(section);
+  });
+}
+
+function buildGameCard(game, decks) {
+  const color = GAME_COLORS[game] || '#888';
+  const label = GAME_LABEL[game] || game;
+  const total = decks.reduce((s, d) => s + d.count, 0);
+  const maxCount = decks[0]?.count || 1;
+
+  const card = document.createElement('div');
+  card.className = 'game-card';
+  card.innerHTML = `
+    <div class="game-card-header">
+      <div class="game-color-bar" style="background:${color}"></div>
+      <div class="game-card-title">${escHtml(label)}</div>
+      <div class="game-card-total">총 ${total}건</div>
+    </div>
+    <div class="deck-list">
+      ${decks.map((d, i) => buildDeckRow(d, i, maxCount, color)).join('')}
+    </div>
+  `;
+  return card;
+}
+
+function buildDeckRow(d, idx, maxCount, color) {
+  const rankClass = idx === 0 ? 'top1' : idx === 1 ? 'top2' : idx === 2 ? 'top3' : '';
+  const rankLabel = idx === 0 ? '1위' : idx === 1 ? '2위' : idx === 2 ? '3위' : `${idx+1}위`;
+  const pct = Math.round((d.count / maxCount) * 100);
+  return `
+    <div class="deck-row">
+      <div class="deck-rank ${rankClass}">${rankLabel}</div>
+      <div class="deck-name" title="${escHtml(d.deck)}">${escHtml(d.deck)}</div>
+      <div class="deck-bar-wrap">
+        <div class="deck-bar">
+          <div class="deck-bar-fill" style="width:${pct}%;background:${color}88"></div>
+        </div>
+      </div>
+      <div class="deck-count">${d.count}</div>
+    </div>
+  `;
+}
+
+/* ─── 초기화 ─── */
+renderFilters();
+renderContent();
+</script>
+</body>
+</html>
