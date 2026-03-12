@@ -46,7 +46,9 @@
   .fc .fc-daygrid-day-frame { min-height: 110px; }
   .fc .fc-daygrid-day { cursor: pointer; }
   .tcg-region-tag { font-weight: 700; margin-right: 6px; }
-  .tcg-event-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tcg-event-text { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+  .fc .fc-daygrid-event { overflow: hidden; }
+  .fc .fc-event-main { overflow: hidden; min-width: 0; }
   .modal {
     display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45);
     z-index: 9999; justify-content:center; align-items:center; padding: 18px;
