@@ -61,6 +61,42 @@
   }
   .period-btn + .period-btn { border-left: 1px solid var(--border); }
   .period-btn.active { background: var(--accent); color: #fff; }
+  .month-nav {
+    display: flex; align-items: center; justify-content: center; gap: 0;
+    margin-top: 10px;
+  }
+  .month-nav-arrow {
+    width: 32px; height: 32px; border: 1px solid var(--border); background: var(--card-bg);
+    color: var(--text-sub); cursor: pointer; font-size: 16px; line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .12s, color .12s;
+  }
+  .month-nav-arrow:first-child { border-radius: 8px 0 0 8px; }
+  .month-nav-arrow:last-child { border-radius: 0 8px 8px 0; }
+  .month-nav-arrow:hover { background: #f0f2f5; color: var(--text); }
+  .month-nav-arrow:disabled { opacity: 0.3; cursor: default; }
+  .month-nav-label {
+    padding: 0 18px; height: 32px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    background: var(--card-bg); font-size: 14px; font-weight: 700; color: var(--text);
+    cursor: pointer; display: flex; align-items: center; gap: 6px; user-select: none;
+    transition: background .12s;
+    position: relative;
+  }
+  .month-nav-label:hover { background: #f0f2f5; }
+  .month-nav-label .arrow-icon { font-size: 10px; color: var(--text-sub); }
+  .month-dropdown {
+    display: none; position: absolute; top: calc(100% + 4px); left: 50%; transform: translateX(-50%);
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12); z-index: 999;
+    min-width: 150px; overflow: hidden;
+  }
+  .month-dropdown.open { display: block; }
+  .month-dropdown-item {
+    padding: 10px 18px; font-size: 13px; font-weight: 600; cursor: pointer;
+    color: var(--text); transition: background .1s;
+  }
+  .month-dropdown-item:hover { background: #f0f2f5; }
+  .month-dropdown-item.active { color: var(--accent); background: #eef9f6; }
 
   /* Layout */
   .app { display: flex; gap: 16px; padding: 20px 14px; max-width: 1400px; margin: 0 auto; align-items: flex-start; }
@@ -225,6 +261,14 @@ document.addEventListener('click', e => {
     <button class="period-btn active" data-period="week">주간</button>
     <button class="period-btn" data-period="month">월간</button>
   </div>
+  <div class="month-nav" id="monthNav">
+    <button class="month-nav-arrow" id="monthPrev">&#8249;</button>
+    <div class="month-nav-label" id="monthLabel" onclick="toggleMonthDropdown()">
+      <span id="monthLabelText"></span><span class="arrow-icon">▼</span>
+      <div class="month-dropdown" id="monthDropdown"></div>
+    </div>
+    <button class="month-nav-arrow" id="monthNext">&#8250;</button>
+  </div>
 </div>
 
 <div class="app">
@@ -260,14 +304,80 @@ const ALL_GAMES = ["VANGUARD", "DIGIMON", "ONE PIECE", "NIVEL ARENA", "HOLOLIVE"
 
 let selectedGame = 'ALL';
 let selectedPeriod = 'week'; // 'week' | 'month'
+let selectedMonth = MONTHS_DATA.length > 0 ? MONTHS_DATA[0].month_key : null;
 
 function currentData() {
-  return selectedPeriod === 'week' ? WEEKS_DATA : MONTHS_DATA;
+  const data = selectedPeriod === 'week' ? WEEKS_DATA : MONTHS_DATA;
+  if (!selectedMonth) return data;
+  if (selectedPeriod === 'week') {
+    return data.filter(p => p.monday && p.monday.substring(0, 7) === selectedMonth);
+  } else {
+    return data.filter(p => p.month_key === selectedMonth);
+  }
 }
 
 function escHtml(s) {
   return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
+
+/* ─── 월 네비게이션 ─── */
+const MONTH_KEYS = MONTHS_DATA.map(m => m.month_key); // 내림차순 (최신이 앞)
+
+function currentMonthIndex() {
+  return MONTH_KEYS.indexOf(selectedMonth);
+}
+
+function setMonth(key) {
+  selectedMonth = key;
+  renderMonthNav();
+  renderFilters();
+  renderContent();
+}
+
+function renderMonthNav() {
+  const idx = currentMonthIndex();
+  const m = MONTHS_DATA.find(m => m.month_key === selectedMonth);
+  document.getElementById('monthLabelText').textContent = m ? m.period_label : '';
+
+  // 이전(더 오래된) = idx+1, 다음(더 최신) = idx-1
+  document.getElementById('monthPrev').disabled = idx >= MONTH_KEYS.length - 1;
+  document.getElementById('monthNext').disabled = idx <= 0;
+
+  // 드롭다운 항목 업데이트
+  const dd = document.getElementById('monthDropdown');
+  dd.innerHTML = '';
+  MONTHS_DATA.forEach(m => {
+    const item = document.createElement('div');
+    item.className = 'month-dropdown-item' + (m.month_key === selectedMonth ? ' active' : '');
+    item.textContent = m.period_label;
+    item.addEventListener('click', (e) => {
+      e.stopPropagation();
+      dd.classList.remove('open');
+      setMonth(m.month_key);
+    });
+    dd.appendChild(item);
+  });
+}
+
+function toggleMonthDropdown() {
+  document.getElementById('monthDropdown').classList.toggle('open');
+}
+
+document.getElementById('monthPrev').addEventListener('click', () => {
+  const idx = currentMonthIndex();
+  if (idx < MONTH_KEYS.length - 1) setMonth(MONTH_KEYS[idx + 1]);
+});
+document.getElementById('monthNext').addEventListener('click', () => {
+  const idx = currentMonthIndex();
+  if (idx > 0) setMonth(MONTH_KEYS[idx - 1]);
+});
+
+document.addEventListener('click', e => {
+  const label = document.getElementById('monthLabel');
+  if (label && !label.contains(e.target)) {
+    document.getElementById('monthDropdown').classList.remove('open');
+  }
+});
 
 /* ─── 기간 토글 ─── */
 document.querySelectorAll('.period-btn').forEach(btn => {
@@ -410,6 +520,7 @@ function buildDeckRow(d, idx, maxCount, color) {
 }
 
 /* ─── 초기화 ─── */
+renderMonthNav();
 renderFilters();
 renderContent();
 </script>
