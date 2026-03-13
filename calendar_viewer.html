@@ -604,7 +604,8 @@ async function loadMonth(monthKey) {
   }
   document.getElementById('loadingOverlay').style.display = 'flex';
   try {
-    const resp = await fetch(DATA_BASE + 'calendar_' + monthKey + '.json');
+    const v = window._cacheVer || Date.now();
+    const resp = await fetch(DATA_BASE + 'calendar_' + monthKey + '.json?v=' + v);
     if (!resp.ok) throw new Error('Not found');
     const data = await resp.json();
     jsonCache[monthKey] = data;
@@ -625,9 +626,10 @@ function applyMonthData(data) {
 /* ─── 초기화 ─── */
 async function init() {
   try {
-    const resp = await fetch(DATA_BASE + 'calendar_index.json');
+    const resp = await fetch(DATA_BASE + 'calendar_index.json?v=' + Date.now());
     if (!resp.ok) throw new Error('index not found');
     const index = await resp.json();
+    window._cacheVer = (index.updated || '').replace(/\D/g,'');
     allMonths = index.months; // [{key, label}, ...]
     const todayKey = new Date().toISOString().substring(0, 7); // YYYY-MM
     selectedMonthKey = allMonths.find(m => m.key === todayKey)?.key || index.latest;
