@@ -628,12 +628,13 @@ async function init() {
     if (!resp.ok) throw new Error('index not found');
     const index = await resp.json();
     allMonths = index.months; // [{key, label}, ...]
-    selectedMonthKey = index.latest;
+    const todayKey = new Date().toISOString().substring(0, 7); // YYYY-MM
+    selectedMonthKey = allMonths.find(m => m.key === todayKey)?.key || index.latest;
     document.getElementById('monthNav').style.display = 'flex';
     renderMonthNav();
     await loadMonth(selectedMonthKey);
   } catch(e) {
-    document.getElementById('loadingOverlay').textContent = '데이터 파일을 찾을 수 없습니다. generate_calendar.py를 먼저 실행하세요.';
+    document.getElementById('loadingOverlay').textContent = '데이터 파일을 찾을 수 없습니다.';
   }
 }
 
