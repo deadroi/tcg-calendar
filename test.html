@@ -162,21 +162,6 @@
   .schedule-loading { text-align: center; color: #888; font-size: 14px; padding: 30px 0; }
   .schedule-empty { text-align: center; color: #aaa; font-size: 14px; padding: 30px 0; }
 
-  /* ── 사이트 소개 ── */
-  .intro-grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 16px;
-  }
-  .intro-card {
-    background: #fff; border-radius: 12px; padding: 22px 20px;
-    border: 1px solid #eee; text-align: center;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-  }
-  .intro-card .ico { font-size: 32px; margin-bottom: 10px; }
-  .intro-card h3 { margin: 0 0 8px; font-size: 15px; font-weight: 800; color: #111; }
-  .intro-card p { margin: 0; font-size: 13px; color: #666; line-height: 1.65; }
-  .intro-card a { color: #1a9f77; text-decoration: none; font-weight: 600; }
-  .intro-card a:hover { text-decoration: underline; }
 
   /* ── 인사말 ── */
   .greeting {
@@ -200,7 +185,7 @@
   <div class="site-nav-inner">
     <div class="site-nav-links">
       <a href="https://tcg-calendar.co.kr/index.html" class="site-nav-link active">🏠 메인</a>
-      <a href="https://tcg-calendar.co.kr" class="site-nav-link">📅 대회 일정 수집기</a>
+      <a href="https://tcg-calendar.co.kr/calendar_viewer.html" class="site-nav-link">📅 대회 일정 수집기</a>
       <a href="https://tcg-calendar.co.kr/result.html" class="site-nav-link">📋 대회 결과 수집기</a>
       <a href="https://tcg-calendar.co.kr/deck_meta.html" class="site-nav-link">🃏 입상덱 메타</a>
       <a href="https://tcg-calendar.co.kr/tcg-swisssystem.html" class="site-nav-link">🏆 스위스라운드 시스템</a>
@@ -213,7 +198,7 @@
     </button>
     <div class="site-nav-dropdown">
       <a href="https://tcg-calendar.co.kr/index.html" class="site-nav-link active">🏠 메인</a>
-      <a href="https://tcg-calendar.co.kr" class="site-nav-link">📅 대회 일정 수집기</a>
+      <a href="https://tcg-calendar.co.kr/calendar_viewer.html" class="site-nav-link">📅 대회 일정 수집기</a>
       <a href="https://tcg-calendar.co.kr/result.html" class="site-nav-link">📋 대회 결과 수집기</a>
       <a href="https://tcg-calendar.co.kr/deck_meta.html" class="site-nav-link">🃏 입상덱 메타</a>
       <a href="https://tcg-calendar.co.kr/tcg-swisssystem.html" class="site-nav-link">🏆 스위스라운드 시스템</a>
@@ -233,19 +218,19 @@ document.addEventListener('click', e => {
 <div class="hero">
   <h1>TCG 캘린더</h1>
   <p>전국 TCG 매장 대회 일정 · 결과 · 입상덱 정보를 한곳에서</p>
-  <span class="hero-badge">X(트위터) 기반 자동 수집 · 하루 1~2회 업데이트</span>
 </div>
 
-<!-- ── 이미지 배너 ── -->
+<!-- ── 이미지 배너 (비활성화 - 이미지 준비 시 주석 해제) ──
 <div class="banner-wrap">
   <div class="banner-slider" id="bannerSlider">
-    <!-- 이미지 추가 시: <div class="banner-slide"><img src="banner/이미지파일.png" alt="배너설명"></div> -->
+    <!– 이미지 추가 시: <div class="banner-slide"><img src="banner/이미지파일.png" alt="배너설명"></div> –>
     <div class="banner-slide active"><div class="banner-placeholder">📅 배너 이미지를 여기에 추가하세요 (banner/ 폴더)</div></div>
     <div class="banner-slide"><div class="banner-placeholder">🃏 배너 슬롯 2</div></div>
     <div class="banner-slide"><div class="banner-placeholder">🏆 배너 슬롯 3</div></div>
   </div>
   <div class="banner-dots" id="bannerDots"></div>
 </div>
+──>
 
 <!-- ── 이주의 대회일정 ── -->
 <div class="section">
@@ -258,48 +243,6 @@ document.addEventListener('click', e => {
   <div id="scheduleArea" class="schedule-loading">일정을 불러오는 중...</div>
 </div>
 
-<!-- ── 사이트 소개 ── -->
-<div class="section">
-  <div class="section-title">🛠 사이트 소개</div>
-  <div class="intro-grid">
-    <div class="intro-card">
-      <div class="ico">📅</div>
-      <h3>대회 일정 수집기</h3>
-      <p>X(트위터)에서 전국 TCG 매장의 대회 일정을 자동으로 수집합니다. 지역·게임 필터로 원하는 정보만 골라보세요.</p>
-      <p style="margin-top:8px"><a href="https://tcg-calendar.co.kr">바로가기 →</a></p>
-    </div>
-    <div class="intro-card">
-      <div class="ico">📋</div>
-      <h3>대회 결과 수집기</h3>
-      <p>대회 결과 및 입상자 정보를 수집합니다. 어떤 덱이 입상했는지 확인해보세요.</p>
-      <p style="margin-top:8px"><a href="https://tcg-calendar.co.kr/result.html">바로가기 →</a></p>
-    </div>
-    <div class="intro-card">
-      <div class="ico">🃏</div>
-      <h3>입상덱 메타</h3>
-      <p>수집된 대회 결과를 바탕으로 게임별 입상덱 메타를 통계로 확인할 수 있습니다.</p>
-      <p style="margin-top:8px"><a href="https://tcg-calendar.co.kr/deck_meta.html">바로가기 →</a></p>
-    </div>
-    <div class="intro-card">
-      <div class="ico">🏆</div>
-      <h3>스위스라운드 시스템</h3>
-      <p>소규모 대회 운영에 최적화된 스위스 라운드 진행 도구입니다. 간편하게 대회를 진행해보세요.</p>
-      <p style="margin-top:8px"><a href="https://tcg-calendar.co.kr/tcg-swisssystem.html">바로가기 →</a></p>
-    </div>
-    <div class="intro-card">
-      <div class="ico">⏱</div>
-      <h3>TCG 타이머</h3>
-      <p>대회 라운드 시간 관리를 위한 TCG 전용 타이머입니다. 종료 알림까지 깔끔하게 제공합니다.</p>
-      <p style="margin-top:8px"><a href="https://tcg-calendar.co.kr/tcgtimer.html">바로가기 →</a></p>
-    </div>
-    <div class="intro-card">
-      <div class="ico">🗺</div>
-      <h3>TCG 매장 지도</h3>
-      <p>전국 TCG 매장의 위치를 지도에서 확인하세요. 내 주변 매장을 쉽게 찾을 수 있습니다.</p>
-      <p style="margin-top:8px"><a href="https://tcg-calendar.co.kr/tcg_map.html">바로가기 →</a></p>
-    </div>
-  </div>
-</div>
 
 <!-- ── 안내 ── -->
 <div class="section">
@@ -531,7 +474,7 @@ async function loadSchedule() {
 
 loadSchedule();
 
-// ── 배너 슬라이더 ──
+/* ── 배너 슬라이더 (비활성화 - 배너 HTML 활성화 시 함께 주석 해제)
 (function() {
   const slider = document.getElementById('bannerSlider');
   const dotsEl = document.getElementById('bannerDots');
@@ -540,7 +483,6 @@ loadSchedule();
   if (slides.length < 2) return;
   let cur = 0;
 
-  // 도트 생성
   slides.forEach((_, i) => {
     const d = document.createElement('span');
     d.className = 'banner-dot' + (i === 0 ? ' active' : '');
@@ -558,6 +500,7 @@ loadSchedule();
 
   setInterval(() => goTo(cur + 1), 3000);
 })();
+*/
 </script>
 </body>
 </html>
