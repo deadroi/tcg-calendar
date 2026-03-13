@@ -13,6 +13,7 @@
   gtag('js', new Date());
   gtag('config', 'G-9N9WTDYW2G');
 </script>
+<meta name="google-adsense-account" content="ca-pub-4158709673269015">
 <style>
   * { box-sizing: border-box; }
   body { font-family: system-ui, -apple-system, Segoe UI, Roboto, 'Noto Sans KR', sans-serif; margin: 0; background: #f5f6fa; color: #222; }
@@ -102,24 +103,35 @@
     padding: 5px 16px; border-radius: 20px;
   }
 
-  /* ── 이주의 대회일정 ── */
-  .schedule-grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 12px;
+  /* ── 오늘의 대회일정 (지역 열 레이아웃) ── */
+  .schedule-region-grid {
+    display: flex; gap: 12px; overflow-x: auto; align-items: flex-start;
+    padding-bottom: 4px;
   }
-  .schedule-card {
-    background: #fff; border-radius: 10px; padding: 14px 16px;
+  .schedule-region-col {
+    flex: 0 0 220px; min-width: 160px;
+    background: #fff; border-radius: 12px;
     border: 1px solid #eee; box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    overflow: hidden;
+  }
+  .schedule-region-header {
+    background: #f0faf6; padding: 9px 14px;
+    font-size: 13px; font-weight: 800; color: #1a9f77;
+    border-bottom: 1px solid #e0f4ec; text-align: center;
+  }
+  .schedule-region-body { padding: 8px 10px; display: flex; flex-direction: column; gap: 8px; }
+  .schedule-card {
+    background: #f9f9f9; border-radius: 8px; padding: 10px 12px;
+    border: 1px solid #eee;
     transition: box-shadow .15s;
   }
-  .schedule-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.09); }
-  .scard-date { font-size: 12px; color: #888; margin-bottom: 6px; }
-  .scard-store { font-size: 14px; font-weight: 700; color: #111; margin-bottom: 4px; }
+  .schedule-card:hover { box-shadow: 0 3px 10px rgba(0,0,0,0.08); }
+  .scard-date { font-size: 11px; color: #888; margin-bottom: 4px; }
+  .scard-store { font-size: 13px; font-weight: 700; color: #111; margin-bottom: 4px; }
   .scard-game {
-    display: inline-block; font-size: 12px; font-weight: 600;
-    padding: 2px 8px; border-radius: 99px; background: #f0faf6; color: #1a9f77;
+    display: inline-block; font-size: 11px; font-weight: 600;
+    padding: 2px 7px; border-radius: 99px; background: #edf9f4; color: #1a9f77;
   }
-  .scard-region { font-size: 12px; color: #666; margin-top: 6px; }
   .schedule-loading { text-align: center; color: #888; font-size: 14px; padding: 30px 0; }
   .schedule-empty { text-align: center; color: #aaa; font-size: 14px; padding: 30px 0; }
 
@@ -211,7 +223,7 @@ document.addEventListener('click', e => {
 <!-- ── 이주의 대회일정 ── -->
 <div class="section">
   <div class="section-title">
-    📅 이주의 대회일정
+    📅 오늘의 대회일정
     <a class="more-btn" href="https://tcg-calendar.co.kr">더보기</a>
   </div>
   <div id="scheduleArea" class="schedule-loading">일정을 불러오는 중...</div>
@@ -292,13 +304,9 @@ const GAME_LABEL = {
   "Starlight TCG":"스타라이트",
 };
 
-function getThisWeekRange() {
-  const now = new Date();
-  const day = now.getDay(); // 0=일
-  const mon = new Date(now); mon.setDate(now.getDate() - (day === 0 ? 6 : day - 1));
-  const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
-  const fmt = d => d.toISOString().slice(0,10);
-  return { start: fmt(mon), end: fmt(sun) };
+function getTodayRange() {
+  const today = new Date().toISOString().slice(0,10);
+  return { start: today, end: today };
 }
 
 async function loadSchedule() {
@@ -312,7 +320,7 @@ async function loadSchedule() {
     if (!latest) throw new Error('no data');
 
     // 이번 주 범위
-    const { start, end } = getThisWeekRange();
+    const { start, end } = getTodayRange();
     const thisMonth = start.slice(0,7);
     const nextMonth = end.slice(0,7);
 
@@ -339,18 +347,16 @@ async function loadSchedule() {
 
     if (week.length === 0) {
       area.className = 'schedule-empty';
-      area.textContent = '이번 주 등록된 대회 일정이 없습니다.';
+      area.textContent = '오늘 등록된 대회 일정이 없습니다.';
       return;
     }
 
-    // 최대 12개만 표시
-    const show = week.slice(0, 12);
-    area.className = 'schedule-grid';
-    area.innerHTML = '';
-    for (const ev of show) {
+    // 지역별로 그룹핑
+    const regionMap = new Map();
+    for (const ev of week) {
       const title = ev.title || '';
       const regionM = title.match(/^\[([^\]]+)\]/);
-      const region = regionM ? regionM[1] : '';
+      const region = regionM ? regionM[1] : '기타';
       const rest = title.replace(/^\[[^\]]+\]\s*/, '');
       const parts = rest.split(' - ');
       const store = parts[0] || '';
@@ -358,15 +364,33 @@ async function loadSchedule() {
       const gameLabel = GAME_LABEL[gameKey] || gameKey;
       const dateStr = ev.start.slice(0,10);
       const timeStr = ev.start.slice(11,16);
-      const card = document.createElement('div');
-      card.className = 'schedule-card';
-      card.innerHTML = `
-        <div class="scard-date">${dateStr}${timeStr && timeStr !== '00:00' ? ' ' + timeStr : ''}</div>
-        <div class="scard-store">${store}</div>
-        <span class="scard-game">${gameLabel}</span>
-        <div class="scard-region">${region}</div>
-      `;
-      area.appendChild(card);
+      if (!regionMap.has(region)) regionMap.set(region, []);
+      regionMap.get(region).push({ store, gameLabel, dateStr, timeStr });
+    }
+
+    area.className = 'schedule-region-grid';
+    area.innerHTML = '';
+    for (const [region, items] of regionMap) {
+      const col = document.createElement('div');
+      col.className = 'schedule-region-col';
+      const header = document.createElement('div');
+      header.className = 'schedule-region-header';
+      header.textContent = region;
+      const body = document.createElement('div');
+      body.className = 'schedule-region-body';
+      for (const item of items) {
+        const card = document.createElement('div');
+        card.className = 'schedule-card';
+        card.innerHTML = `
+          <div class="scard-date">${item.dateStr}${item.timeStr && item.timeStr !== '00:00' ? ' ' + item.timeStr : ''}</div>
+          <div class="scard-store">${item.store}</div>
+          <span class="scard-game">${item.gameLabel}</span>
+        `;
+        body.appendChild(card);
+      }
+      col.appendChild(header);
+      col.appendChild(body);
+      area.appendChild(col);
     }
   } catch(e) {
     area.className = 'schedule-empty';
