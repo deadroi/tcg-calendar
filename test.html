@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>TCG 캘린더 - TCG 대회 정보 수집 사이트</title>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4158709673269015" crossorigin="anonymous"></script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-9N9WTDYW2G"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-9N9WTDYW2G');
+</script>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: system-ui, -apple-system, Segoe UI, Roboto, 'Noto Sans KR', sans-serif; margin: 0; background: #f5f6fa; color: #222; }
+
+  /* ── 네비게이션 ── */
+  .site-nav { background: #0d0d1a; position: relative; z-index: 500; }
+  .site-nav-inner { max-width: 1400px; margin: 0 auto; padding: 0 8px; display: flex; align-items: center; justify-content: space-between; }
+  .site-nav-links { display: flex; flex-wrap: wrap; justify-content: center; flex: 1; }
+  .site-nav-link { display: inline-block; padding: 10px 13px; color: #adb5bd; text-decoration: none; font-size: 13px; font-weight: 600; border-bottom: 3px solid transparent; transition: color .15s; white-space: nowrap; }
+  .site-nav-link:hover { color: #fff; }
+  .site-nav-link.active { color: #fff; border-bottom-color: #4ccfac; }
+  .site-nav-title { color: #4ccfac; font-size: 14px; font-weight: 700; letter-spacing: -.3px; display: none; }
+  .site-nav-hamburger { display: none; background: none; border: none; cursor: pointer; padding: 6px; flex-direction: column; gap: 5px; }
+  .site-nav-hamburger span { display: block; width: 22px; height: 2px; background: #adb5bd; border-radius: 2px; }
+  .site-nav-hamburger:hover span { background: #fff; }
+  .site-nav-dropdown { display: none; position: absolute; top: 100%; right: 0; min-width: 220px; background: #13131f; border: 1px solid #2a2a44; border-radius: 0 0 10px 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); overflow: hidden; }
+  .site-nav-dropdown.open { display: block; }
+  .site-nav-dropdown .site-nav-link { display: flex; align-items: center; gap: 10px; padding: 12px 18px; border-bottom: none; border-left: 3px solid transparent; }
+  .site-nav-dropdown .site-nav-link:hover { background: #1e1e35; }
+  .site-nav-dropdown .site-nav-link.active { color: #4ccfac; border-left-color: #4ccfac; background: #161628; }
+  @media (max-width: 700px) {
+    .site-nav-links { display: none; }
+    .site-nav-title { display: block; }
+    .site-nav-hamburger { display: flex; }
+  }
+
+  /* ── 공통 섹션 ── */
+  .section { max-width: 1100px; margin: 0 auto 36px; padding: 0 16px; }
+  .section-title {
+    font-size: 18px; font-weight: 800; color: #111;
+    margin: 0 0 14px; padding-bottom: 8px;
+    border-bottom: 2px solid #4ccfac;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .section-title span { font-size: 13px; font-weight: 600; color: #4ccfac; }
+  .more-btn {
+    font-size: 13px; font-weight: 600; color: #4ccfac; text-decoration: none;
+    padding: 4px 12px; border: 1.5px solid #4ccfac; border-radius: 20px;
+    transition: background .15s, color .15s;
+  }
+  .more-btn:hover { background: #4ccfac; color: #fff; }
+
+  /* ── 이미지 배너 ── */
+  .banner-wrap {
+    max-width: 1100px; margin: 0 auto 36px; padding: 0 16px;
+    position: relative;
+  }
+  .banner-slider {
+    position: relative; width: 100%; overflow: hidden;
+    border-radius: 12px; background: #0d0d1a;
+    aspect-ratio: 6 / 1;
+  }
+  @media (max-width: 600px) { .banner-slider { aspect-ratio: 3 / 1; } }
+  .banner-slide {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    opacity: 0; transition: opacity 0.6s ease;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .banner-slide.active { opacity: 1; }
+  .banner-slide img {
+    width: 100%; height: 100%; object-fit: cover; border-radius: 12px; display: block;
+  }
+  .banner-slide .banner-placeholder {
+    width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 700; color: #adb5bd; background: #13131f; border-radius: 12px;
+  }
+  .banner-dots {
+    display: flex; justify-content: center; gap: 6px; margin-top: 10px;
+  }
+  .banner-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #ccc; cursor: pointer; transition: background .2s;
+  }
+  .banner-dot.active { background: #4ccfac; }
+
+  /* ── 히어로 헤더 ── */
+  .hero {
+    background: linear-gradient(135deg, #0d0d1a 0%, #1a1a3a 100%);
+    padding: 48px 16px 40px; text-align: center; margin-bottom: 40px;
+  }
+  .hero h1 { margin: 0 0 10px; font-size: 32px; font-weight: 900; color: #fff; letter-spacing: -.5px; }
+  .hero p { margin: 0; font-size: 15px; color: #8891a4; line-height: 1.7; }
+  .hero .hero-badge {
+    display: inline-block; margin-top: 18px;
+    background: #4ccfac22; border: 1px solid #4ccfac55;
+    color: #4ccfac; font-size: 13px; font-weight: 600;
+    padding: 5px 16px; border-radius: 20px;
+  }
+
+  /* ── 이주의 대회일정 ── */
+  .schedule-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+  }
+  .schedule-card {
+    background: #fff; border-radius: 10px; padding: 14px 16px;
+    border: 1px solid #eee; box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    transition: box-shadow .15s;
+  }
+  .schedule-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.09); }
+  .scard-date { font-size: 12px; color: #888; margin-bottom: 6px; }
+  .scard-store { font-size: 14px; font-weight: 700; color: #111; margin-bottom: 4px; }
+  .scard-game {
+    display: inline-block; font-size: 12px; font-weight: 600;
+    padding: 2px 8px; border-radius: 99px; background: #f0faf6; color: #1a9f77;
+  }
+  .scard-region { font-size: 12px; color: #666; margin-top: 6px; }
+  .schedule-loading { text-align: center; color: #888; font-size: 14px; padding: 30px 0; }
+  .schedule-empty { text-align: center; color: #aaa; font-size: 14px; padding: 30px 0; }
+
+  /* ── 사이트 소개 ── */
+  .intro-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+  }
+  .intro-card {
+    background: #fff; border-radius: 12px; padding: 22px 20px;
+    border: 1px solid #eee; text-align: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+  }
+  .intro-card .ico { font-size: 32px; margin-bottom: 10px; }
+  .intro-card h3 { margin: 0 0 8px; font-size: 15px; font-weight: 800; color: #111; }
+  .intro-card p { margin: 0; font-size: 13px; color: #666; line-height: 1.65; }
+  .intro-card a { color: #1a9f77; text-decoration: none; font-weight: 600; }
+  .intro-card a:hover { text-decoration: underline; }
+
+  /* ── 인사말 ── */
+  .greeting {
+    background: #fff; border-radius: 12px; padding: 28px 28px;
+    border: 1px solid #eee; box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    font-size: 14px; color: #444; line-height: 1.85;
+  }
+  .greeting strong { color: #111; }
+
+  /* ── 하단 여백 ── */
+  .footer { height: 48px; }
+
+  @media (max-width: 600px) {
+    .hero h1 { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="site-nav-inner">
+    <div class="site-nav-links">
+      <a href="https://tcg-calendar.co.kr/index.html" class="site-nav-link active">🏠 메인</a>
+      <a href="https://tcg-calendar.co.kr" class="site-nav-link">📅 대회 일정 수집기</a>
+      <a href="https://tcg-calendar.co.kr/result.html" class="site-nav-link">📋 대회 결과 수집기</a>
+      <a href="https://tcg-calendar.co.kr/deck_meta.html" class="site-nav-link">🃏 입상덱 메타</a>
+      <a href="https://tcg-calendar.co.kr/tcg-swisssystem.html" class="site-nav-link">🏆 스위스라운드 시스템</a>
+      <a href="https://tcg-calendar.co.kr/tcgtimer.html" class="site-nav-link">⏱ TCG 타이머</a>
+      <a href="https://tcg-calendar.co.kr/tcg_map.html" class="site-nav-link">🗺 TCG 매장 지도</a>
+    </div>
+    <span class="site-nav-title">🃏 TCG 캘린더</span>
+    <button class="site-nav-hamburger" onclick="this.nextElementSibling.classList.toggle('open')" aria-label="메뉴">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="site-nav-dropdown">
+      <a href="https://tcg-calendar.co.kr/index.html" class="site-nav-link active">🏠 메인</a>
+      <a href="https://tcg-calendar.co.kr" class="site-nav-link">📅 대회 일정 수집기</a>
+      <a href="https://tcg-calendar.co.kr/result.html" class="site-nav-link">📋 대회 결과 수집기</a>
+      <a href="https://tcg-calendar.co.kr/deck_meta.html" class="site-nav-link">🃏 입상덱 메타</a>
+      <a href="https://tcg-calendar.co.kr/tcg-swisssystem.html" class="site-nav-link">🏆 스위스라운드 시스템</a>
+      <a href="https://tcg-calendar.co.kr/tcgtimer.html" class="site-nav-link">⏱ TCG 타이머</a>
+      <a href="https://tcg-calendar.co.kr/tcg_map.html" class="site-nav-link">🗺 TCG 매장 지도</a>
+    </div>
+  </div>
+</nav>
+<script>
+document.addEventListener('click', e => {
+  const nav = document.querySelector('.site-nav-dropdown');
+  if (nav && !nav.parentElement.contains(e.target)) nav.classList.remove('open');
+});
+</script>
+
+<!-- ── 히어로 ── -->
+<div class="hero">
+  <h1>TCG 캘린더</h1>
+  <p>전국 TCG 매장 대회 일정 · 결과 · 입상덱 정보를 한곳에서</p>
+  <span class="hero-badge">X(트위터) 기반 자동 수집 · 하루 1~2회 업데이트</span>
+</div>
+
+<!-- ── 이미지 배너 ── -->
+<div class="banner-wrap">
+  <div class="banner-slider" id="bannerSlider">
+    <!-- 이미지 추가 시: <div class="banner-slide"><img src="banner/이미지파일.png" alt="배너설명"></div> -->
+    <div class="banner-slide active"><div class="banner-placeholder">📅 배너 이미지를 여기에 추가하세요 (banner/ 폴더)</div></div>
+    <div class="banner-slide"><div class="banner-placeholder">🃏 배너 슬롯 2</div></div>
+    <div class="banner-slide"><div class="banner-placeholder">🏆 배너 슬롯 3</div></div>
+  </div>
+  <div class="banner-dots" id="bannerDots"></div>
+</div>
+
+<!-- ── 이주의 대회일정 ── -->
+<div class="section">
+  <div class="section-title">
+    📅 이주의 대회일정
+    <a class="more-btn" href="https://tcg-calendar.co.kr">더보기</a>
+  </div>
+  <div id="scheduleArea" class="schedule-loading">일정을 불러오는 중...</div>
+</div>
+
+<!-- ── 사이트 소개 ── -->
+<div class="section">
+  <div class="section-title">🛠 사이트 소개</div>
+  <div class="intro-grid">
+    <div class="intro-card">
+      <div class="ico">📅</div>
+      <h3>대회 일정 수집기</h3>
+      <p>X(트위터)에서 전국 TCG 매장의 대회 일정을 자동으로 수집합니다. 지역·게임 필터로 원하는 정보만 골라보세요.</p>
+      <p style="margin-top:8px"><a href="https://tcg-calendar.co.kr">바로가기 →</a></p>
+    </div>
+    <div class="intro-card">
+      <div class="ico">📋</div>
+      <h3>대회 결과 수집기</h3>
+      <p>대회 결과 및 입상자 정보를 수집합니다. 어떤 덱이 입상했는지 확인해보세요.</p>
+      <p style="margin-top:8px"><a href="https://tcg-calendar.co.kr/result.html">바로가기 →</a></p>
+    </div>
+    <div class="intro-card">
+      <div class="ico">🃏</div>
+      <h3>입상덱 메타</h3>
+      <p>수집된 대회 결과를 바탕으로 게임별 입상덱 메타를 통계로 확인할 수 있습니다.</p>
+      <p style="margin-top:8px"><a href="https://tcg-calendar.co.kr/deck_meta.html">바로가기 →</a></p>
+    </div>
+    <div class="intro-card">
+      <div class="ico">🏆</div>
+      <h3>스위스라운드 시스템</h3>
+      <p>소규모 대회 운영에 최적화된 스위스 라운드 진행 도구입니다. 간편하게 대회를 진행해보세요.</p>
+      <p style="margin-top:8px"><a href="https://tcg-calendar.co.kr/tcg-swisssystem.html">바로가기 →</a></p>
+    </div>
+    <div class="intro-card">
+      <div class="ico">⏱</div>
+      <h3>TCG 타이머</h3>
+      <p>대회 라운드 시간 관리를 위한 TCG 전용 타이머입니다. 종료 알림까지 깔끔하게 제공합니다.</p>
+      <p style="margin-top:8px"><a href="https://tcg-calendar.co.kr/tcgtimer.html">바로가기 →</a></p>
+    </div>
+    <div class="intro-card">
+      <div class="ico">🗺</div>
+      <h3>TCG 매장 지도</h3>
+      <p>전국 TCG 매장의 위치를 지도에서 확인하세요. 내 주변 매장을 쉽게 찾을 수 있습니다.</p>
+      <p style="margin-top:8px"><a href="https://tcg-calendar.co.kr/tcg_map.html">바로가기 →</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- ── 안내 ── -->
+<div class="section">
+  <div class="section-title">📌 이용 안내</div>
+  <div class="greeting">
+    <strong>매장 등록 방법 (매장 정보 수집을 원할 경우)</strong><br>
+    <ul style="margin:8px 0 20px; padding-left:20px; line-height:2;">
+      <li>매장 X 계정 생성</li>
+      <li>공개 계정 설정</li>
+      <li><a href="https://x.com/NMhR2XHHdBUMkuE" target="_blank" style="color:#1a9f77;">https://x.com/NMhR2XHHdBUMkuE</a> 에 DM(CHAT)</li>
+    </ul>
+    <strong>X 데이터 수집 방식 (수집 확률이 올라감)</strong><br>
+    <ul style="margin:8px 0 0; padding-left:20px; line-height:2;">
+      <li><b>(대회일정)</b> '대회' 또는 '일정' 또는 '스케줄'이라는 단어를 포함하여 작성된 글</li>
+      <li><b>(대회결과)</b> '우승' 또는 '결과' 또는 '대회'라는 단어를 포함하여 작성된 글</li>
+      <li><b>(입상덱)</b> 대회 결과에 입상덱 정보를 포함하여 작성된 글</li>
+    </ul>
+  </div>
+</div>
+
+<div class="footer"></div>
+
+<script>
+const GAME_LABEL = {
+  "VANGUARD":"뱅가드","DIGIMON":"디지몬","ONE PIECE":"원피스",
+  "NIVEL ARENA":"니벨아레나","HOLOLIVE":"홀로라이브",
+  "SHADOWVERSE EVOLVE":"섀도우버스 이볼브","GUNDAM":"건담",
+  "ULTRAMAN":"울트라맨","WEISS SCHWARZ":"바이스 슈발츠",
+  "UNION ARENA":"유니온 아레나","YUGIOH":"유희왕",
+  "YUGIOH RUSH DUEL":"유희왕 러쉬듀얼","POKEMON":"포켓몬",
+  "Starlight TCG":"스타라이트",
+};
+
+function getThisWeekRange() {
+  const now = new Date();
+  const day = now.getDay(); // 0=일
+  const mon = new Date(now); mon.setDate(now.getDate() - (day === 0 ? 6 : day - 1));
+  const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+  const fmt = d => d.toISOString().slice(0,10);
+  return { start: fmt(mon), end: fmt(sun) };
+}
+
+async function loadSchedule() {
+  const area = document.getElementById('scheduleArea');
+  try {
+    const idxResp = await fetch('data/calendar_index.json?v=' + Date.now());
+    if (!idxResp.ok) throw new Error('index not found');
+    const index = await idxResp.json();
+    const ver = (index.updated || '').replace(/\D/g,'');
+    const latest = index.latest;
+    if (!latest) throw new Error('no data');
+
+    // 이번 주 범위
+    const { start, end } = getThisWeekRange();
+    const thisMonth = start.slice(0,7);
+    const nextMonth = end.slice(0,7);
+
+    // 이번 달 + 혹시 걸치면 다음 달도 로드
+    const keys = [...new Set([thisMonth, nextMonth])];
+    let allEvents = [];
+    for (const key of keys) {
+      try {
+        const r = await fetch(`data/calendar_${key}.json?v=${ver}`);
+        if (!r.ok) continue;
+        const d = await r.json();
+        allEvents = allEvents.concat(d.events || []);
+      } catch(e) {}
+    }
+
+    // 이번 주 필터
+    const week = allEvents.filter(e => {
+      const d = e.start.slice(0,10);
+      return d >= start && d <= end;
+    });
+
+    // 날짜순 정렬
+    week.sort((a,b) => a.start.localeCompare(b.start));
+
+    if (week.length === 0) {
+      area.className = 'schedule-empty';
+      area.textContent = '이번 주 등록된 대회 일정이 없습니다.';
+      return;
+    }
+
+    // 최대 12개만 표시
+    const show = week.slice(0, 12);
+    area.className = 'schedule-grid';
+    area.innerHTML = '';
+    for (const ev of show) {
+      const title = ev.title || '';
+      const regionM = title.match(/^\[([^\]]+)\]/);
+      const region = regionM ? regionM[1] : '';
+      const rest = title.replace(/^\[[^\]]+\]\s*/, '');
+      const parts = rest.split(' - ');
+      const store = parts[0] || '';
+      const gameKey = parts[1] || '';
+      const gameLabel = GAME_LABEL[gameKey] || gameKey;
+      const dateStr = ev.start.slice(0,10);
+      const timeStr = ev.start.slice(11,16);
+      const card = document.createElement('div');
+      card.className = 'schedule-card';
+      card.innerHTML = `
+        <div class="scard-date">${dateStr}${timeStr && timeStr !== '00:00' ? ' ' + timeStr : ''}</div>
+        <div class="scard-store">${store}</div>
+        <span class="scard-game">${gameLabel}</span>
+        <div class="scard-region">${region}</div>
+      `;
+      area.appendChild(card);
+    }
+  } catch(e) {
+    area.className = 'schedule-empty';
+    area.textContent = '일정을 불러올 수 없습니다.';
+  }
+}
+
+loadSchedule();
+
+// ── 배너 슬라이더 ──
+(function() {
+  const slider = document.getElementById('bannerSlider');
+  const dotsEl = document.getElementById('bannerDots');
+  if (!slider) return;
+  const slides = Array.from(slider.querySelectorAll('.banner-slide'));
+  if (slides.length < 2) return;
+  let cur = 0;
+
+  // 도트 생성
+  slides.forEach((_, i) => {
+    const d = document.createElement('span');
+    d.className = 'banner-dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => goTo(i);
+    dotsEl.appendChild(d);
+  });
+
+  function goTo(idx) {
+    slides[cur].classList.remove('active');
+    dotsEl.children[cur].classList.remove('active');
+    cur = (idx + slides.length) % slides.length;
+    slides[cur].classList.add('active');
+    dotsEl.children[cur].classList.add('active');
+  }
+
+  setInterval(() => goTo(cur + 1), 3000);
+})();
+</script>
+</body>
+</html>
