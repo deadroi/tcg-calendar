@@ -528,7 +528,8 @@ function renderCalendar(monthKey, events) {
       initialView: 'dayGridMonth',
       initialDate: monthKey + '-01',
       locale: 'ko',
-      headerToolbar: { left:'prev,next today', center:'title', right:'dayGridMonth,listWeek' },
+      initialView: 'dayGridMonth',
+      headerToolbar: false,
       dayMaxEvents: true, fixedWeekCount: true, expandRows: true, height: 820,
       eventOrder: function(a,b) {
         const ar=a.extendedProps?.regionKey||"", br=b.extendedProps?.regionKey||"";
