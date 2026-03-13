@@ -103,34 +103,32 @@
     padding: 5px 16px; border-radius: 20px;
   }
 
-  /* ── 오늘의 대회일정 (지역 열 레이아웃) ── */
-  .schedule-region-grid {
-    display: flex; gap: 12px; overflow-x: auto; align-items: flex-start;
-    padding-bottom: 4px;
+  /* ── 오늘의 대회일정 ── */
+  .region-tabs {
+    display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px;
   }
-  .schedule-region-col {
-    flex: 0 0 220px; min-width: 160px;
-    background: #fff; border-radius: 12px;
-    border: 1px solid #eee; box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-    overflow: hidden;
+  .region-tab {
+    padding: 5px 14px; border-radius: 20px; font-size: 13px; font-weight: 600;
+    cursor: pointer; border: 1.5px solid #d0ede4; color: #555; background: #fff;
+    transition: background .15s, color .15s, border-color .15s;
   }
-  .schedule-region-header {
-    background: #f0faf6; padding: 9px 14px;
-    font-size: 13px; font-weight: 800; color: #1a9f77;
-    border-bottom: 1px solid #e0f4ec; text-align: center;
+  .region-tab:hover { border-color: #4ccfac; color: #1a9f77; }
+  .region-tab.active { background: #4ccfac; border-color: #4ccfac; color: #fff; }
+  .schedule-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 12px;
   }
-  .schedule-region-body { padding: 8px 10px; display: flex; flex-direction: column; gap: 8px; }
   .schedule-card {
-    background: #f9f9f9; border-radius: 8px; padding: 10px 12px;
-    border: 1px solid #eee;
+    background: #fff; border-radius: 10px; padding: 14px 16px;
+    border: 1px solid #eee; box-shadow: 0 2px 6px rgba(0,0,0,0.04);
     transition: box-shadow .15s;
   }
-  .schedule-card:hover { box-shadow: 0 3px 10px rgba(0,0,0,0.08); }
+  .schedule-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.09); }
   .scard-date { font-size: 11px; color: #888; margin-bottom: 4px; }
-  .scard-store { font-size: 13px; font-weight: 700; color: #111; margin-bottom: 4px; }
+  .scard-store { font-size: 14px; font-weight: 700; color: #111; margin-bottom: 4px; }
   .scard-game {
-    display: inline-block; font-size: 11px; font-weight: 600;
-    padding: 2px 7px; border-radius: 99px; background: #edf9f4; color: #1a9f77;
+    display: inline-block; font-size: 12px; font-weight: 600;
+    padding: 2px 8px; border-radius: 99px; background: #f0faf6; color: #1a9f77;
   }
   .schedule-loading { text-align: center; color: #888; font-size: 14px; padding: 30px 0; }
   .schedule-empty { text-align: center; color: #aaa; font-size: 14px; padding: 30px 0; }
@@ -226,6 +224,7 @@ document.addEventListener('click', e => {
     📅 오늘의 대회일정
     <a class="more-btn" href="https://tcg-calendar.co.kr">더보기</a>
   </div>
+  <div id="regionTabs" class="region-tabs"></div>
   <div id="scheduleArea" class="schedule-loading">일정을 불러오는 중...</div>
 </div>
 
@@ -368,16 +367,22 @@ async function loadSchedule() {
       regionMap.get(region).push({ store, gameLabel, dateStr, timeStr });
     }
 
-    area.className = 'schedule-region-grid';
-    area.innerHTML = '';
-    for (const [region, items] of regionMap) {
-      const col = document.createElement('div');
-      col.className = 'schedule-region-col';
-      const header = document.createElement('div');
-      header.className = 'schedule-region-header';
-      header.textContent = region;
-      const body = document.createElement('div');
-      body.className = 'schedule-region-body';
+    // 탭 렌더
+    const tabsEl = document.getElementById('regionTabs');
+    tabsEl.innerHTML = '';
+    const regions = [...regionMap.keys()];
+    // 기본 선택: 서울이 있으면 서울, 없으면 첫번째
+    let activeRegion = regions.includes('서울') ? '서울' : regions[0];
+
+    function renderCards(region) {
+      area.className = 'schedule-grid';
+      area.innerHTML = '';
+      const items = regionMap.get(region) || [];
+      if (items.length === 0) {
+        area.className = 'schedule-empty';
+        area.textContent = '해당 지역의 대회 일정이 없습니다.';
+        return;
+      }
       for (const item of items) {
         const card = document.createElement('div');
         card.className = 'schedule-card';
@@ -386,12 +391,24 @@ async function loadSchedule() {
           <div class="scard-store">${item.store}</div>
           <span class="scard-game">${item.gameLabel}</span>
         `;
-        body.appendChild(card);
+        area.appendChild(card);
       }
-      col.appendChild(header);
-      col.appendChild(body);
-      area.appendChild(col);
     }
+
+    for (const region of regions) {
+      const btn = document.createElement('button');
+      btn.className = 'region-tab' + (region === activeRegion ? ' active' : '');
+      btn.textContent = region;
+      btn.onclick = () => {
+        activeRegion = region;
+        tabsEl.querySelectorAll('.region-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderCards(region);
+      };
+      tabsEl.appendChild(btn);
+    }
+
+    renderCards(activeRegion);
   } catch(e) {
     area.className = 'schedule-empty';
     area.textContent = '일정을 불러올 수 없습니다.';
