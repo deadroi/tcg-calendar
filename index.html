@@ -149,14 +149,18 @@
     padding: 8px 0 16px 12px;
   }
   .schedule-card {
-    background: #fff; border-radius: 10px; padding: 12px 14px;
+    background: #fff; border-radius: 10px; padding: 10px 12px;
     border: 1px solid #eee; box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-    transition: box-shadow .15s; min-width: 160px; flex: 1 1 160px; max-width: 260px;
+    transition: box-shadow .15s; min-width: 150px; flex: 1 1 150px; max-width: 260px;
+    border-left: 3px solid #ccc;
   }
   .schedule-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.09); }
-  .scard-store { font-size: 14px; font-weight: 700; color: #111; margin-bottom: 4px; }
+  .scard-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; }
+  .scard-store { font-size: 13px; font-weight: 700; color: #111; }
+  .scard-x { font-size: 11px; color: #888; text-decoration: none; line-height: 1; }
+  .scard-x:hover { color: #1a9f77; }
   .scard-game {
-    display: inline-block; font-size: 12px; font-weight: 600;
+    display: inline-block; font-size: 11px; font-weight: 600;
     padding: 2px 8px; border-radius: 99px; background: #f0faf6; color: #1a9f77;
   }
   .schedule-loading { text-align: center; color: #888; font-size: 14px; padding: 30px 0; }
@@ -275,6 +279,30 @@ const GAME_LABEL = {
   "YUGIOH RUSH DUEL":"유희왕 러쉬듀얼","POKEMON":"포켓몬",
   "Starlight TCG":"스타라이트",
 };
+const GAME_COLORS = {
+  "VANGUARD":"#1f77b4","DIGIMON":"#2ca02c","ONE PIECE":"#ff7f0e",
+  "NIVEL ARENA":"#d62728","HOLOLIVE":"#9467bd",
+  "SHADOWVERSE EVOLVE":"#8c564b","GUNDAM":"#e377c2",
+  "ULTRAMAN":"#17becf","WEISS SCHWARZ":"#7f7f7f",
+  "UNION ARENA":"#bcbd22","YUGIOH":"#d62700",
+  "YUGIOH RUSH DUEL":"#ff6347","POKEMON":"#d4a800",
+  "Starlight TCG":"#e91e8c",
+};
+const STORE_PALETTE = [
+  '#3498db','#e74c3c','#2ecc71','#9b59b6','#f39c12',
+  '#1abc9c','#e67e22','#16a085','#8e44ad','#2980b9',
+  '#27ae60','#c0392b','#d35400','#7f8c8d','#2c3e50',
+];
+const _storeColorCache = {};
+function getStoreColor(name) {
+  if (_storeColorCache[name]) return _storeColorCache[name];
+  let h = 0;
+  for (const c of name) h = (h * 31 + c.charCodeAt(0)) & 0xffff;
+  return (_storeColorCache[name] = STORE_PALETTE[h % STORE_PALETTE.length]);
+}
+function getGameColor(gameKey) {
+  return GAME_COLORS[gameKey] || '#4ccfac';
+}
 
 function getTodayRange() {
   const today = new Date().toISOString().slice(0,10);
@@ -334,10 +362,13 @@ async function loadSchedule() {
       const store = parts[0] || '';
       const gameKey = parts[1] || '';
       const gameLabel = GAME_LABEL[gameKey] || gameKey;
+      const gameColor = getGameColor(gameKey);
+      const storeColor = getStoreColor(store);
       const dateStr = ev.start.slice(0,10);
       const timeStr = ev.start.slice(11,16);
+      const xUrl = ev.xUrl || '';
       if (!regionMap.has(region)) regionMap.set(region, []);
-      regionMap.get(region).push({ store, gameLabel, dateStr, timeStr });
+      regionMap.get(region).push({ store, gameLabel, gameColor, storeColor, dateStr, timeStr, xUrl });
     }
 
     // 탭 렌더
@@ -345,7 +376,7 @@ async function loadSchedule() {
     const gameTabsEl = document.getElementById('gameTabs');
     tabsEl.innerHTML = '';
     gameTabsEl.innerHTML = '';
-    const regions = [...regionMap.keys()];
+    const regions = [...regionMap.keys()].sort((a, b) => a.localeCompare(b, 'ko'));
     let activeRegion = regions.includes('서울') ? '서울' : regions[0];
     let activeGame = '전체';
 
@@ -370,7 +401,9 @@ async function loadSchedule() {
         for (const item of noTime) {
           const card = document.createElement('div');
           card.className = 'schedule-card';
-          card.innerHTML = `<div class="scard-store">${item.store}</div><span class="scard-game">${item.gameLabel}</span>`;
+          card.style.borderLeftColor = item.storeColor;
+          const xLink = item.xUrl ? `<a href="${item.xUrl}" target="_blank" class="scard-x" title="X 게시글">𝕏</a>` : '';
+          card.innerHTML = `<div class="scard-top"><div class="scard-store" style="color:${item.storeColor}">${item.store}</div>${xLink}</div><span class="scard-game" style="background:${item.gameColor}18;color:${item.gameColor}">${item.gameLabel}</span>`;
           row.appendChild(card);
         }
         block.appendChild(row);
@@ -414,7 +447,9 @@ async function loadSchedule() {
         for (const item of hourMap.get(h)) {
           const card = document.createElement('div');
           card.className = 'schedule-card';
-          card.innerHTML = `<div class="scard-store">${item.store}</div><span class="scard-game">${item.gameLabel}</span>`;
+          card.style.borderLeftColor = item.storeColor;
+          const xLink = item.xUrl ? `<a href="${item.xUrl}" target="_blank" class="scard-x" title="X 게시글">𝕏</a>` : '';
+          card.innerHTML = `<div class="scard-top"><div class="scard-store" style="color:${item.storeColor}">${item.store}</div>${xLink}</div><span class="scard-game" style="background:${item.gameColor}18;color:${item.gameColor}">${item.gameLabel}</span>`;
           eventsDiv.appendChild(card);
         }
 
