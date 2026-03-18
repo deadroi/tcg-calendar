@@ -15,63 +15,74 @@
 </script>
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
 <style>
-  :root { --panel-w: 260px; }
-  body { font-family: system-ui, -apple-system, Segoe UI, Roboto, 'Noto Sans KR', sans-serif; margin:0; background:#fff; }
+  :root { --panel-w: 260px; --accent: #4ccfac; }
+  body { font-family: system-ui, -apple-system, Segoe UI, Roboto, 'Noto Sans KR', sans-serif; margin:0; background:#f5f6fa; color:#222; }
   .app { display:flex; gap:16px; padding:20px 14px; max-width: 1600px; margin:0 auto; align-items:flex-start; }
   .sidebar {
     width: var(--panel-w); flex: 0 0 var(--panel-w);
-    border: 1px solid #eee; border-radius: 12px; padding: 14px 12px;
-    position: sticky; top: 20px; overflow:auto; max-height: calc(100vh - 40px); background:#fff;
+    border: 1px solid #e3e8ee; border-radius: 12px; padding: 14px 12px;
+    position: sticky; top: 20px; overflow:auto; max-height: calc(100vh - 40px);
+    background:#fff; box-shadow: 0 2px 12px rgba(0,0,0,0.06);
   }
-  .sidebar h2 { margin: 2px 6px 10px; font-size: 14px; color:#111; }
-  .filters { display:flex; flex-direction:column; gap:8px; padding: 0 6px 6px; }
+  .sidebar h2 {
+    margin: 2px 6px 10px; font-size: 14px; font-weight: 800; color:#111;
+    padding-bottom: 8px; border-bottom: 2px solid var(--accent);
+  }
+  .filters { display:flex; flex-direction:column; gap:4px; padding: 0 4px 6px; }
   .chk {
     display:flex; align-items:center; gap:10px;
-    padding: 8px 8px; border-radius: 10px; cursor:pointer; user-select:none;
+    padding: 7px 8px; border-radius: 8px; cursor:pointer; user-select:none;
+    transition: background .12s;
   }
-  .chk:hover { background:#f6f7f9; }
-  .chk input { width: 16px; height: 16px; }
+  .chk:hover { background:#eef9f6; }
+  .chk input { width: 15px; height: 15px; accent-color: var(--accent); }
   .badge {
-    margin-left:auto; font-size: 12px; color:#555;
+    margin-left:auto; font-size: 11px; color:#666;
     background:#f1f3f5; padding: 2px 8px; border-radius: 999px;
   }
   .color-chip {
     width: 10px; height: 10px; border-radius: 999px; display:inline-block;
     border: 1px solid rgba(0,0,0,0.08);
   }
-  .hint { margin: 10px 8px 0; font-size: 12px; color:#666; line-height: 1.35; }
+  .hint { margin: 10px 8px 0; font-size: 12px; color:#888; line-height: 1.5; }
   .main { flex: 1 1 auto; min-width: 740px; }
   #calendar { max-width:1200px; margin:0 auto; padding:0 10px; }
   .fc .fc-daygrid-day-frame { min-height: 110px; }
   .fc .fc-daygrid-day-events { overflow: visible; }
   .fc .fc-daygrid-day { cursor: pointer; }
+  .fc .fc-toolbar-title { font-size: 16px !important; font-weight: 800 !important; }
+  .fc .fc-button { background: var(--accent) !important; border-color: var(--accent) !important; }
+  .fc .fc-button:hover { filter: brightness(0.9); }
   .tcg-region-tag { font-weight: 700; margin-right: 6px; }
   .tcg-event-text { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
   .fc .fc-daygrid-event { overflow: hidden; }
   .fc .fc-event-main { overflow: hidden; min-width: 0; }
   .modal {
-    display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45);
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55);
     z-index: 9999; justify-content:center; align-items:center; padding: 18px;
   }
   .modal-content {
-    background:#fff; border-radius:10px; width: min(620px, 100%);
-    max-height: min(70vh, 680px); overflow:auto; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    background:#fff; border-radius:14px; width: min(620px, 100%);
+    max-height: min(70vh, 680px); overflow:auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
   }
   .modal-header {
     position: sticky; top: 0; background: #fff; padding: 14px 16px 10px;
-    border-bottom: 1px solid #eee; display:flex; align-items:center;
-    justify-content:space-between; gap: 12px;
+    border-bottom: 2px solid var(--accent); display:flex; align-items:center;
+    justify-content:space-between; gap: 12px; border-radius: 14px 14px 0 0;
   }
-  .modal-title { margin:0; font-size:16px; }
+  .modal-title { margin:0; font-size:17px; font-weight:800; color:#111; }
   .close-btn {
     border: 0; background: transparent; font-size: 20px; line-height: 1;
-    cursor: pointer; padding: 6px 8px;
+    cursor: pointer; padding: 4px 8px; color: #888; border-radius: 6px;
+    transition: background .12s, color .12s; margin-left: auto;
   }
+  .close-btn:hover { background: #f0f2f5; color: #111; }
   .modal-body { padding: 12px 16px 16px; }
   #modalList { margin:0; padding-left: 18px; }
   #modalList li { margin: 6px 0; white-space: pre-wrap; }
-  #modalList li a:hover { text-decoration: underline !important; color: #1a73e8 !important; }
-  .modal-subhint { color:#666; font-size:12px; margin-top:10px; }
+  #modalList li a:hover { text-decoration: underline !important; color: var(--accent) !important; }
+  .modal-subhint { color:#888; font-size:12px; margin-top:10px; }
   .site-nav { background: #0d0d1a; position: relative; z-index: 500; }
   .site-nav-inner { max-width: 1600px; margin: 0 auto; padding: 0 8px; display: flex; align-items: center; justify-content: space-between; }
   .site-nav-links { display: flex; flex-wrap: wrap; justify-content: center; flex: 1; }
@@ -92,51 +103,59 @@
     .site-nav-title { display: block; }
     .site-nav-hamburger { display: flex; }
   }
+  /* ── 페이지 헤더 (히어로) ── */
   .page-header {
-    text-align: center; padding: 14px 14px 8px;
-    border-bottom: 1px solid #eee; background: #fff;
+    background: linear-gradient(135deg, #0d0d1a 0%, #1a1a3a 100%);
+    text-align: center; padding: 32px 16px 28px;
   }
-  .page-header h1 { margin: 0 0 8px; font-size: 22px; color: #111; font-weight: 800; }
+  .page-header h1 {
+    margin: 0 0 6px; font-size: 26px; color: #fff; font-weight: 900; letter-spacing: -.5px;
+  }
+  .page-header-sub {
+    font-size: 14px; color: #8891a4; margin: 0 0 14px;
+  }
   /* 월 네비게이터 */
   .month-nav {
-    display: flex; align-items: center; justify-content: center; gap: 0;
-    margin-top: 6px;
+    display: inline-flex; align-items: center; justify-content: center; gap: 0;
+    margin-top: 4px;
   }
   .month-nav-arrow {
-    width: 32px; height: 32px; border: 1px solid #dee2e6; background: #fff;
-    color: #666; cursor: pointer; font-size: 16px; line-height: 1;
+    width: 34px; height: 34px;
+    border: 1.5px solid #4ccfac55; background: #4ccfac22;
+    color: #4ccfac; cursor: pointer; font-size: 18px; line-height: 1;
     display: flex; align-items: center; justify-content: center;
     transition: background .12s;
   }
   .month-nav-arrow:first-child { border-radius: 8px 0 0 8px; }
   .month-nav-arrow:last-child { border-radius: 0 8px 8px 0; }
-  .month-nav-arrow:hover { background: #f0f2f5; color: #111; }
+  .month-nav-arrow:hover { background: #4ccfac44; color: #fff; }
   .month-nav-arrow:disabled { opacity: 0.3; cursor: default; }
   .month-nav-label {
-    padding: 0 18px; height: 32px; border-top: 1px solid #dee2e6; border-bottom: 1px solid #dee2e6;
-    background: #fff; font-size: 14px; font-weight: 700; color: #111;
+    padding: 0 20px; height: 34px;
+    border-top: 1.5px solid #4ccfac55; border-bottom: 1.5px solid #4ccfac55;
+    background: #4ccfac22; font-size: 15px; font-weight: 800; color: #fff;
     cursor: pointer; display: flex; align-items: center; gap: 6px; user-select: none;
     transition: background .12s; position: relative;
   }
-  .month-nav-label:hover { background: #f0f2f5; }
-  .month-nav-label .arrow-icon { font-size: 10px; color: #888; }
+  .month-nav-label:hover { background: #4ccfac44; }
+  .month-nav-label .arrow-icon { font-size: 10px; color: #4ccfac; }
   .month-dropdown {
-    display: none; position: absolute; top: calc(100% + 4px); left: 50%; transform: translateX(-50%);
-    background: #fff; border: 1px solid #dee2e6; border-radius: 10px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.12); z-index: 999; min-width: 150px; overflow: hidden;
+    display: none; position: absolute; top: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+    background: #13131f; border: 1px solid #2a2a44; border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4); z-index: 999; min-width: 150px; overflow: hidden;
   }
   .month-dropdown.open { display: block; }
   .month-dropdown-item {
     padding: 10px 18px; font-size: 13px; font-weight: 600; cursor: pointer;
-    color: #111; transition: background .1s;
+    color: #ccc; transition: background .1s;
   }
-  .month-dropdown-item:hover { background: #f0f2f5; }
-  .month-dropdown-item.active { color: #4ccfac; background: #eef9f6; }
+  .month-dropdown-item:hover { background: #1e1e35; color: #fff; }
+  .month-dropdown-item.active { color: #4ccfac; background: #161628; }
   /* 로딩 */
   .loading-overlay {
-    position: fixed; inset: 0; background: rgba(255,255,255,0.7);
+    position: fixed; inset: 0; background: rgba(245,246,250,0.85);
     z-index: 8888; display: flex; align-items: center; justify-content: center;
-    font-size: 16px; font-weight: 700; color: #555;
+    font-size: 16px; font-weight: 700; color: #4ccfac;
   }
   .notice {
     max-width: 1200px; margin: 20px auto 0; padding: 14px 18px;
@@ -189,7 +208,8 @@ document.addEventListener('click', e => {
 </script>
 
 <div class="page-header">
-  <h1>TCG 대회 일정 수집기</h1>
+  <h1>📅 TCG 대회 일정 수집기</h1>
+  <p class="page-header-sub">TCG 매장 공식 X에서 수집한 대회 일정</p>
   <div class="month-nav" id="monthNav" style="display:none">
     <button class="month-nav-arrow" id="monthPrev">&#8249;</button>
     <div class="month-nav-label" id="monthLabel" onclick="toggleMonthDropdown()">
