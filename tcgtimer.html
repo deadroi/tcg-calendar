@@ -253,6 +253,20 @@ body { display: flex; flex-direction: column; overflow: hidden; }
 .lap-tag.fastest { background: #1a1e2e; color: #6090ff; }
 #self-no-laps { text-align: center; padding: 30px 0; font-size: 13px; color: rgba(255,255,255,0.2); }
 
+/* ── 세로 모드일 때 90도 회전하여 강제 가로 ── */
+@media screen and (orientation: portrait) {
+  html {
+    transform: rotate(90deg);
+    transform-origin: left top;
+    width: 100vh;
+    height: 100vw;
+    position: fixed;
+    top: 100%;
+    left: 0;
+    overflow: hidden;
+  }
+}
+
 @media (orientation: landscape) and (max-height: 500px) {
   #self-main { gap: 4px; padding: 6px 12px 8px; }
   #self-total-label { font-size: 10px; }
@@ -264,6 +278,21 @@ body { display: flex; flex-direction: column; overflow: hidden; }
   .chess-consumed-time, .consumed-time { font-size: clamp(28px, 10vh, 56px); }
 }
 </style>
+<script>
+  // Android Chrome 등에서 화면 회전 잠금 시도 (iOS는 미지원)
+  function tryLockLandscape() {
+    try {
+      if (screen.orientation && screen.orientation.lock) {
+        screen.orientation.lock('landscape').catch(() => {});
+      }
+    } catch(e) {}
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', tryLockLandscape);
+  } else {
+    tryLockLandscape();
+  }
+</script>
 </head>
 <body>
 <nav class="site-nav">
