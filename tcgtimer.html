@@ -253,18 +253,40 @@ body { display: flex; flex-direction: column; overflow: hidden; }
 .lap-tag.fastest { background: #1a1e2e; color: #6090ff; }
 #self-no-laps { text-align: center; padding: 30px 0; font-size: 13px; color: rgba(255,255,255,0.2); }
 
-/* ── 세로 모드일 때 90도 회전하여 강제 가로 ── */
+/* ── 세로 모드 안내 오버레이 ── */
+#portrait-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: #0d0d0d;
+  z-index: 9999;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  color: #fff;
+}
+#portrait-overlay .rotate-icon {
+  font-size: 64px;
+  animation: rotateHint 1.5s ease-in-out infinite;
+}
+#portrait-overlay .rotate-msg {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+#portrait-overlay .rotate-sub {
+  font-size: 13px;
+  color: #aaa;
+}
+@keyframes rotateHint {
+  0%   { transform: rotate(0deg); }
+  40%  { transform: rotate(90deg); }
+  60%  { transform: rotate(90deg); }
+  100% { transform: rotate(0deg); }
+}
 @media screen and (orientation: portrait) {
-  html {
-    transform: rotate(90deg);
-    transform-origin: left top;
-    width: 100vh;
-    height: 100vw;
-    position: fixed;
-    top: 100%;
-    left: 0;
-    overflow: hidden;
-  }
+  #portrait-overlay { display: flex; }
 }
 
 @media (orientation: landscape) and (max-height: 500px) {
@@ -295,6 +317,11 @@ body { display: flex; flex-direction: column; overflow: hidden; }
 </script>
 </head>
 <body>
+<div id="portrait-overlay">
+  <div class="rotate-icon">📱</div>
+  <div class="rotate-msg">화면을 가로로 돌려주세요</div>
+  <div class="rotate-sub">타이머는 가로 모드에서 사용할 수 있습니다</div>
+</div>
 <nav class="site-nav">
   <div class="site-nav-inner">
     <div class="site-nav-links">
