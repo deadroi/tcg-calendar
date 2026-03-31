@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>포켓몬/시티리그 결과(Beta)</title>
+<style>
+  :root {
+    --bg: #f5f6fa;
+    --accent: #4ccfac;
+    --dark: #0d0d1a;
+    --card: #ffffff;
+    --border: #e2e8f0;
+    --text: #2d3748;
+    --sub: #718096;
+    --rank1: #f6c90e;
+    --rank2: #b0b8c1;
+    --rank3: #cd7f32;
+    --rank4: #a0aec0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--bg); color: var(--text); }
+
+  /* site-nav */
+  .site-nav { background: #0d0d1a; position: relative; z-index: 500; }
+  .site-nav-inner { max-width: 1600px; margin: 0 auto; padding: 0 8px; display: flex; align-items: center; justify-content: space-between; }
+  .site-nav-links { display: flex; flex-wrap: wrap; justify-content: center; flex: 1; }
+  .site-nav-link { display: inline-block; padding: 10px 13px; color: #adb5bd; text-decoration: none; font-size: 13px; font-weight: 600; border-bottom: 3px solid transparent; transition: color .15s; white-space: nowrap; }
+  .site-nav-link:hover { color: #fff; }
+  .site-nav-link.active { color: #fff; border-bottom-color: #4ccfac; }
+  .site-nav-title { color: #4ccfac; font-size: 14px; font-weight: 700; letter-spacing: -.3px; display: none; }
+  .site-nav-hamburger { display: none; background: none; border: none; cursor: pointer; padding: 6px; flex-direction: column; gap: 5px; }
+  .site-nav-hamburger span { display: block; width: 22px; height: 2px; background: #adb5bd; border-radius: 2px; }
+  .site-nav-hamburger:hover span { background: #fff; }
+  .site-nav-dropdown { display: none; position: absolute; top: 100%; right: 0; min-width: 220px; background: #13131f; border: 1px solid #2a2a44; border-radius: 0 0 10px 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); overflow: hidden; }
+  .site-nav-dropdown.open { display: block; }
+  .site-nav-dropdown .site-nav-link { display: flex; align-items: center; gap: 10px; padding: 12px 18px; border-bottom: none; border-left: 3px solid transparent; }
+  .site-nav-dropdown .site-nav-link:hover { background: #1e1e35; }
+  .site-nav-dropdown .site-nav-link.active { color: #4ccfac; border-left-color: #4ccfac; background: #161628; }
+  @media (max-width: 600px) {
+    .site-nav-links { display: none; }
+    .site-nav-title { display: block; }
+    .site-nav-hamburger { display: flex; }
+  }
+  /* page-header */
+  .page-header { background: linear-gradient(135deg, #0d0d1a 0%, #1a1a3a 100%); text-align: center; padding: 32px 16px 28px; }
+  .page-header h1 { margin: 0 0 6px; font-size: 26px; color: #fff; font-weight: 900; letter-spacing: -.5px; }
+  .page-header-sub { font-size: 14px; color: #8891a4; margin: 0 0 14px; }
+  .page-header .badge {
+    background: var(--accent); color: #000; font-size: .75rem;
+    font-weight: 700; padding: 3px 10px; border-radius: 20px;
+  }
+
+  /* 레이아웃 */
+  .layout { display: flex; min-height: calc(100vh - 72px); }
+
+  /* 사이드바 */
+  .sidebar {
+    width: 280px; min-width: 280px; background: var(--card);
+    border-right: 1px solid var(--border);
+    flex-shrink: 0; display: flex; flex-direction: column;
+    height: calc(100vh - 72px); position: sticky; top: 0;
+    transition: width .25s ease, min-width .25s ease;
+  }
+  .sidebar.collapsed {
+    width: 0; min-width: 0; overflow: hidden; border-right: none;
+  }
+  #eventList {
+    overflow-y: auto; flex: 1;
+  }
+  .sidebar-header {
+    padding: 16px 20px;
+    border-bottom: 2px solid var(--accent);
+    font-size: .85rem; font-weight: 700; color: var(--sub);
+    letter-spacing: .05em;
+    display: flex; align-items: center; justify-content: space-between;
+    cursor: pointer; user-select: none; white-space: nowrap;
+  }
+  .sidebar-header:hover { background: #f0faf7; }
+  .sidebar-toggle {
+    font-size: 1rem; color: var(--sub); flex-shrink: 0;
+  }
+
+  /* 사이드바 열기 버튼 */
+  .layout { position: relative; }
+  .sidebar-open-btn {
+    display: none;
+    position: absolute; top: 12px; left: 0; z-index: 200;
+    width: 32px; height: 32px;
+    background: var(--accent); color: #000;
+    border: none; border-radius: 0 6px 6px 0;
+    font-size: .95rem; font-weight: 700; cursor: pointer;
+    box-shadow: 2px 2px 8px rgba(0,0,0,.18);
+    align-items: center; justify-content: center;
+  }
+  .sidebar-open-btn:hover { filter: brightness(1.1); }
+  .event-item {
+    padding: 14px 20px; border-bottom: 1px solid var(--border);
+    cursor: pointer; transition: background .15s;
+  }
+  .event-item:hover { background: #f0faf7; }
+  .event-item.active { background: #e6f9f3; border-left: 3px solid var(--accent); }
+  .event-item .date {
+    font-size: .75rem; color: var(--sub); margin-bottom: 4px;
+  }
+  .event-item .title {
+    font-size: .9rem; font-weight: 600; color: var(--text); line-height: 1.4;
+  }
+  .event-item .title-jp {
+    font-size: .75rem; color: var(--sub); margin-top: 2px;
+  }
+
+  /* 메인 콘텐츠 */
+  .main { flex: 1; padding: 28px; overflow-y: auto; }
+  .placeholder {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; height: 60vh; color: var(--sub); gap: 12px;
+  }
+  .placeholder .icon { font-size: 3rem; }
+
+  .event-header {
+    background: linear-gradient(135deg, #0d0d1a 0%, #1a1a3a 100%);
+    border-radius: 12px; padding: 24px 28px; margin-bottom: 24px; color: #fff;
+  }
+  .event-header .ev-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 4px; }
+  .event-header .ev-title-jp { font-size: .85rem; color: #9ca3af; margin-bottom: 12px; }
+  .event-header .ev-meta { font-size: .8rem; color: #9ca3af; display: flex; gap: 20px; flex-wrap: wrap; }
+  .event-header .ev-meta a { color: var(--accent); text-decoration: none; }
+  .event-header .ev-meta a:hover { text-decoration: underline; }
+
+  /* 순위 카드 */
+  .ranks { display: flex; flex-direction: column; gap: 20px; }
+  .rank-card {
+    background: var(--card); border-radius: 12px;
+    border: 1px solid var(--border); overflow: hidden;
+  }
+  .rank-header {
+    display: flex; align-items: center; gap: 14px;
+    padding: 16px 20px; border-bottom: 1px solid var(--border);
+  }
+  .rank-badge {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 1.1rem; flex-shrink: 0;
+  }
+  .rank-1 .rank-badge { background: var(--rank1); color: #000; }
+  .rank-2 .rank-badge { background: var(--rank2); color: #000; }
+  .rank-3 .rank-badge { background: var(--rank3); color: #fff; }
+  .rank-4 .rank-badge { background: var(--rank4); color: #fff; }
+  .rank-info .info-ko { font-weight: 600; font-size: .95rem; }
+  .rank-info .info-jp { font-size: .78rem; color: var(--sub); margin-top: 2px; }
+  .deck-type-title {
+    font-size: 1.1rem; font-weight: 700; color: var(--text);
+    padding: 12px 20px 4px;
+    border-bottom: 2px solid var(--accent);
+    margin-bottom: 14px;
+  }
+
+  /* 덱 레이아웃: 좌=이미지, 우=덱리스트 */
+  .deck-body { padding: 0; }
+  .deck-columns {
+    display: flex; align-items: flex-start; gap: 0;
+  }
+  .deck-col-img {
+    flex: 0 0 28%; max-width: 28%;
+    padding: 16px 14px 16px 20px;
+    border-right: 1px solid var(--border);
+  }
+  .deck-col-list {
+    flex: 1; min-width: 0;
+    padding: 16px 20px 16px 16px;
+  }
+
+  /* 이미지 */
+  .deck-img-thumb {
+    width: 100%; border-radius: 8px; border: 1px solid var(--border);
+    cursor: zoom-in; display: block; transition: opacity .15s;
+  }
+  .deck-img-thumb:hover { opacity: .88; cursor: pointer; }
+  .deck-no-img { color: var(--sub); font-size: .82rem; font-style: italic; padding: 20px 0; text-align: center; }
+
+
+  /* 덱 탭 (한국어/日本語) */
+  .deck-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+  .deck-tab {
+    padding: 5px 14px; border-radius: 20px; font-size: .8rem;
+    font-weight: 600; cursor: pointer; border: 1px solid var(--border);
+    background: var(--bg); color: var(--sub); transition: all .15s;
+  }
+  .deck-tab.active { background: var(--accent); color: #000; border-color: var(--accent); }
+  .deck-content { display: none; }
+  .deck-content.active { display: block; }
+  .deck-link-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: .78rem; color: var(--accent); text-decoration: none;
+    margin-bottom: 10px;
+  }
+  .deck-link-btn:hover { text-decoration: underline; }
+
+  /* 덱 카드 섹션 */
+  .deck-section { margin-bottom: 14px; }
+  .deck-section-title {
+    font-size: .8rem; font-weight: 700; color: var(--accent);
+    text-transform: uppercase; letter-spacing: .05em;
+    padding-bottom: 6px; border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
+  }
+  .deck-cards { display: flex; flex-wrap: wrap; gap: 6px; }
+  .deck-card-item {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 6px; padding: 4px 10px;
+    font-size: .82rem; display: flex; align-items: center; gap: 6px;
+  }
+  .deck-card-count {
+    background: var(--accent); color: #000;
+    border-radius: 4px; padding: 1px 6px;
+    font-size: .75rem; font-weight: 700;
+  }
+  .no-deck { color: var(--sub); font-size: .85rem; font-style: italic; }
+
+  @media (max-width: 900px) {
+    .deck-columns { flex-direction: column; }
+    .deck-col-img { flex: none; max-width: 100%; border-right: none; border-bottom: 1px solid var(--border); padding: 14px 16px; }
+    .deck-col-list { padding: 14px 16px; }
+  }
+
+  .loading { text-align: center; padding: 40px; color: var(--sub); }
+  .error { color: #e53e3e; padding: 20px; text-align: center; }
+
+  /* 검색 */
+  .search-wrap { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+  .search-input {
+    width: 100%; padding: 7px 12px 7px 32px;
+    border: 1px solid var(--border); border-radius: 20px;
+    font-size: .85rem; background: var(--bg); color: var(--text);
+    outline: none; transition: border-color .15s;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23718096' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: 10px center;
+  }
+  .search-input:focus { border-color: var(--accent); }
+  .search-hint { font-size: .72rem; color: var(--sub); margin-top: 4px; padding: 0 4px; }
+  .search-no-result { padding: 20px; text-align: center; color: var(--sub); font-size: .85rem; display: none; }
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="site-nav-inner">
+    <div class="site-nav-links">
+      <a href="https://tcg-calendar.co.kr/index.html" class="site-nav-link">🏠 메인</a>
+      <a href="https://tcg-calendar.co.kr/calendar_viewer.html" class="site-nav-link">📅 대회 일정</a>
+      <a href="https://tcg-calendar.co.kr/result.html" class="site-nav-link active">📋 대회 결과</a>
+      <a href="https://tcg-calendar.co.kr/deck_meta.html" class="site-nav-link">🃏 입상덱 메타</a>
+      <a href="https://tcg-calendar.co.kr/tcg-swisssystem.html" class="site-nav-link">🏆 스위스라운드 시스템</a>
+      <a href="https://tcg-calendar.co.kr/tcgtimer.html" class="site-nav-link">⏱ TCG 타이머</a>
+      <a href="https://tcg-calendar.co.kr/tcg_map.html" class="site-nav-link">🗺 TCG 매장 지도</a>
+    </div>
+    <span class="site-nav-title">🃏 TCG 캘린더</span>
+    <button class="site-nav-hamburger" onclick="this.nextElementSibling.classList.toggle('open')" aria-label="메뉴">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="site-nav-dropdown">
+      <a href="https://tcg-calendar.co.kr/index.html" class="site-nav-link">🏠 메인</a>
+      <a href="https://tcg-calendar.co.kr/calendar_viewer.html" class="site-nav-link">📅 대회 일정</a>
+      <a href="https://tcg-calendar.co.kr/result.html" class="site-nav-link active">📋 대회 결과</a>
+      <a href="https://tcg-calendar.co.kr/deck_meta.html" class="site-nav-link">🃏 입상덱 메타</a>
+      <a href="https://tcg-calendar.co.kr/tcg-swisssystem.html" class="site-nav-link">🏆 스위스라운드 시스템</a>
+      <a href="https://tcg-calendar.co.kr/tcgtimer.html" class="site-nav-link">⏱ TCG 타이머</a>
+      <a href="https://tcg-calendar.co.kr/tcg_map.html" class="site-nav-link">🗺 TCG 매장 지도</a>
+    </div>
+  </div>
+</nav>
+
+<div class="page-header">
+  <h1>포켓몬 시티리그 결과(Beta)</h1>
+  <p class="page-header-sub">일본 포켓몬카드게임 시티리그 대회 결과 및 덱리스트</p>
+  <span class="badge" id="countBadge">로딩중...</span>
+</div>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header" onclick="toggleSidebar()">
+      <span>대회 목록</span>
+      <span class="sidebar-toggle">◀</span>
+    </div>
+    <div class="search-wrap">
+      <input class="search-input" id="searchInput" type="text" placeholder="대회명 / 덱 카드명 검색..." autocomplete="off">
+      <div class="search-hint">한글·日本語 모두 검색 가능</div>
+    </div>
+    <div class="search-no-result" id="searchNoResult">검색 결과 없음</div>
+    <div id="eventList"><div class="loading">로딩중...</div></div>
+  </aside>
+  <button class="sidebar-open-btn" id="sidebarOpenBtn" onclick="toggleSidebar()">▶</button>
+  <main class="main">
+    <div class="placeholder" id="placeholder">
+      <div class="icon"></div>
+      <div>왼쪽에서 대회를 선택하세요</div>
+    </div>
+    <div id="eventDetail" style="display:none;"></div>
+  </main>
+</div>
+
+<script>
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const btn = document.getElementById('sidebarOpenBtn');
+  sidebar.classList.toggle('collapsed');
+  btn.style.display = sidebar.classList.contains('collapsed') ? 'flex' : 'none';
+}
+
+const INDEX_URL = 'pokedata/index.json';
+let currentFile = null;
+let indexData = [];
+const eventCache = {};   // file → loaded JSON data
+let searchTimer = null;
+
+// 날짜 포맷: 20260326 → 2026-03-26
+function fmtDate(d) {
+  return d ? `${d.slice(0,4)}-${d.slice(4,6)}-${d.slice(6,8)}` : '';
+}
+
+// 덱 텍스트 파싱 → [{section, cards:[{name,count}]}]
+function parseDeck(text) {
+  if (!text) return [];
+  const sections = [];
+  let current = null;
+  for (const line of text.split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    if (trimmed.startsWith('▶')) {
+      current = { section: trimmed.replace('▶', '').trim(), cards: [] };
+      sections.push(current);
+    } else if (current) {
+      // "카드명 N장" 파싱
+      const m = trimmed.match(/^(.+?)\s+(\d+)장\s*$/);
+      if (m) {
+        current.cards.push({ name: m[1].trim(), count: m[2] });
+      } else {
+        current.cards.push({ name: trimmed, count: '' });
+      }
+    }
+  }
+  return sections;
+}
+
+function renderDeckSections(sections) {
+  if (!sections.length) return '<div class="no-deck">덱 정보 없음</div>';
+  return sections.map(s => {
+    if (!s.cards.length) return '';
+    const cardsHtml = s.cards.map(c =>
+      `<div class="deck-card-item">${c.count ? `<span class="deck-card-count">${c.count}</span>` : ''}${c.name}</div>`
+    ).join('');
+    return `<div class="deck-section">
+      <div class="deck-section-title">${s.section}</div>
+      <div class="deck-cards">${cardsHtml}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderEvent(data) {
+  const detail = document.getElementById('eventDetail');
+  const placeholder = document.getElementById('placeholder');
+  placeholder.style.display = 'none';
+  detail.style.display = 'block';
+
+  const rankColors = ['rank-1','rank-2','rank-3','rank-4'];
+  const rankLabels = ['1위','2위','3위','4위'];
+
+  const ranksHtml = (data.results || []).map((r, i) => {
+    const infoKo = r.info_ko || r.text || '';
+    const infoJp = r.text || '';
+    const deckType = r.deck_type_ko || '';
+    const deckKo = parseDeck(r.deck_ko || '');
+    const deckJp = parseDeck(r.deck || '');
+    const hasDeck = deckKo.length || deckJp.length;
+    const deckUrl = r.deck_url || '';
+    const deckImg = r.deck_img ? `pokedata/${r.deck_img}` : '';
+
+    // 좌: 이미지 컬럼
+    const imgCol = `
+      <div class="deck-col-img">
+        ${deckImg
+          ? `<a href="${deckImg}" target="_blank"><img class="deck-img-thumb" src="${deckImg}" alt="덱 이미지" loading="lazy"></a>`
+          : `<div class="deck-no-img">이미지 없음</div>`}
+      </div>`;
+
+    // 우: 덱리스트 컬럼
+    const listInner = hasDeck ? `
+      <div class="deck-tabs">
+        ${deckKo.length ? `<div class="deck-tab active" onclick="switchTab(this,'ko-${i}','${i}')">한국어</div>` : ''}
+        ${deckJp.length ? `<div class="deck-tab${!deckKo.length?' active':''}" onclick="switchTab(this,'jp-${i}','${i}')">日本語</div>` : ''}
+      </div>
+      ${deckKo.length ? `<div class="deck-content active" id="deck-ko-${i}">${renderDeckSections(deckKo)}</div>` : ''}
+      ${deckJp.length ? `<div class="deck-content${!deckKo.length?' active':''}" id="deck-jp-${i}">${renderDeckSections(deckJp)}</div>` : ''}
+    ` : '<div class="no-deck">덱 정보 없음</div>';
+
+    const listCol = `
+      <div class="deck-col-list">
+        ${deckUrl ? `<a href="${deckUrl}" target="_blank" class="deck-link-btn">덱 보기 ↗</a>` : ''}
+        ${listInner}
+      </div>`;
+
+    return `<div class="rank-card ${rankColors[i] || ''}">
+      <div class="rank-header">
+        <div class="rank-badge">${rankLabels[i] || (i+1)+'위'}</div>
+        <div class="rank-info">
+          <div class="info-ko">${infoKo}</div>
+          ${infoJp !== infoKo ? `<div class="info-jp">${infoJp}</div>` : ''}
+        </div>
+      </div>
+      <div class="deck-body">
+        ${deckType ? `<div class="deck-type-title">${deckType}</div>` : ''}
+        <div class="deck-columns">${imgCol}${listCol}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  detail.innerHTML = `
+    <div class="event-header">
+      <div class="ev-title">${data.title_ko || data.title || '(제목 없음)'}</div>
+      ${data.title && data.title_ko ? `<div class="ev-title-jp">${data.title}</div>` : ''}
+      <div class="ev-meta">
+        <span>📅 ${fmtDate(data.date)}</span>
+        <span>🆔 ${data.event_id || ''}</span>
+        ${data.url ? `<a href="${data.url}" target="_blank">원본 페이지 ↗</a>` : ''}
+        <span>수집: ${data.collected_at || ''}</span>
+      </div>
+    </div>
+    <div class="ranks">${ranksHtml}</div>
+  `;
+}
+
+function switchTab(btn, targetId, groupId) {
+  // 같은 그룹 탭 비활성화
+  btn.closest('.deck-body').querySelectorAll('.deck-tab').forEach(t => t.classList.remove('active'));
+  btn.closest('.deck-body').querySelectorAll('.deck-content').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  const el = document.getElementById('deck-' + targetId);
+  if (el) el.classList.add('active');
+}
+
+// 덱 텍스트 풀 추출 (검색용)
+function getDeckSearchText(data) {
+  if (!data || !data.results) return '';
+  return data.results.map(r =>
+    [r.deck_ko || '', r.deck || '', r.deck_type_ko || '', r.info_ko || '', r.text || ''].join(' ')
+  ).join(' ');
+}
+
+// 검색 필터
+function filterEvents(query) {
+  const q = query.trim().toLowerCase();
+  const items = document.querySelectorAll('.event-item');
+  let visible = 0;
+
+  items.forEach(item => {
+    const file = item.dataset.file;
+    const entry = indexData.find(e => e.file === file) || {};
+
+    // 인덱스 필드 검색 (즉시)
+    const indexText = [
+      entry.title_ko || '', entry.title || '', entry.shop || ''
+    ].join(' ').toLowerCase();
+
+    // 캐시된 덱 내용 검색
+    const cached = eventCache[file];
+    const deckText = cached ? getDeckSearchText(cached).toLowerCase() : '';
+
+    const match = !q || indexText.includes(q) || deckText.includes(q);
+    item.style.display = match ? '' : 'none';
+    if (match) visible++;
+  });
+
+  document.getElementById('searchNoResult').style.display = (q && visible === 0) ? 'block' : 'none';
+}
+
+// 백그라운드에서 모든 이벤트 JSON 프리로드
+async function preloadAllEvents() {
+  for (const entry of indexData) {
+    if (!entry.file || eventCache[entry.file]) continue;
+    try {
+      const res = await fetch('pokedata/' + entry.file);
+      if (res.ok) {
+        eventCache[entry.file] = await res.json();
+        // 검색 중이면 결과 갱신
+        const q = document.getElementById('searchInput').value;
+        if (q.trim()) filterEvents(q);
+      }
+    } catch (_) {}
+    // 너무 빠르게 요청하지 않도록 짧은 딜레이
+    await new Promise(r => setTimeout(r, 80));
+  }
+}
+
+async function loadEvent(file, item) {
+  if (currentFile === file) return;
+  currentFile = file;
+  document.querySelectorAll('.event-item').forEach(el => el.classList.remove('active'));
+  item.classList.add('active');
+
+  document.getElementById('placeholder').style.display = 'none';
+  document.getElementById('eventDetail').innerHTML = '<div class="loading">로딩중...</div>';
+  document.getElementById('eventDetail').style.display = 'block';
+
+  try {
+    let data = eventCache[file];
+    if (!data) {
+      const res = await fetch('pokedata/' + file);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      data = await res.json();
+      eventCache[file] = data;
+    }
+    renderEvent(data);
+  } catch (e) {
+    document.getElementById('eventDetail').innerHTML = `<div class="error">불러오기 실패: ${e.message}</div>`;
+  }
+}
+
+async function init() {
+  try {
+    const res = await fetch(INDEX_URL);
+    if (!res.ok) throw new Error(`index.json 없음 (HTTP ${res.status})`);
+    indexData = await res.json();
+
+    document.getElementById('countBadge').textContent = `${indexData.length}개 대회`;
+
+    const listEl = document.getElementById('eventList');
+    if (!indexData.length) {
+      listEl.innerHTML = '<div class="loading">데이터 없음</div>';
+      return;
+    }
+
+    listEl.innerHTML = indexData.map(e => `
+      <div class="event-item" data-file="${e.file}">
+        <div class="date">${fmtDate(e.date)}${e.shop ? ' ' + e.shop : ''}</div>
+        <div class="title">${e.title_ko || e.title || e.file}</div>
+      </div>
+    `).join('');
+
+    listEl.querySelectorAll('.event-item').forEach(item => {
+      item.addEventListener('click', () => loadEvent(item.dataset.file, item));
+    });
+
+    // 검색 이벤트
+    document.getElementById('searchInput').addEventListener('input', e => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => filterEvents(e.target.value), 200);
+    });
+
+    // 첫 번째 자동 로드
+    const first = listEl.querySelector('.event-item');
+    if (first) first.click();
+
+    // 백그라운드 프리로드 (덱 검색용)
+    preloadAllEvents();
+
+  } catch (e) {
+    document.getElementById('eventList').innerHTML = `<div class="error">${e.message}</div>`;
+    document.getElementById('countBadge').textContent = '오류';
+  }
+}
+
+init();
+</script>
+</body>
+</html>
