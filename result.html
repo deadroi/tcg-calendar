@@ -446,6 +446,13 @@ function rebuildFilters(regionList, gameList) {
   const gameCounts = countBy(enrichedMaster, e => e.extendedProps?.gameKey||"", GAME_DEFS);
   renderCheckboxList(regionFiltersEl, REGION_DEFS, regionCounts, k => REGION_COLORS[k]||"", "region");
   renderCheckboxList(gameFiltersEl, GAME_DEFS, gameCounts, k => GAME_COLORS[k]||"", "game");
+  const pokemonLabel = gameFiltersEl.querySelector('label[for="game_POKEMON"]');
+  if (pokemonLabel) {
+    const cityLink = document.createElement('div');
+    cityLink.style.cssText = 'padding:1px 8px 5px 28px;';
+    cityLink.innerHTML = '<a href="pokedata_viewer.html" style="font-size:11px;color:var(--accent);text-decoration:none;opacity:0.85;">↗ 일본 | 시티리그 결과(바로가기)</a>';
+    pokemonLabel.insertAdjacentElement('afterend', cityLink);
+  }
   regionFiltersEl.addEventListener('change', ev => {
     const t = ev.target; if (!t || t.type !== 'checkbox') return;
     applyAllBehavior(regionFiltersEl, t.getAttribute('data-key'));
