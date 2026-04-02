@@ -441,7 +441,9 @@ function filterEvents() {
 }
 function rebuildFilters(regionList, gameList) {
   const REGION_DEFS = [{ key:"ALL", label:"전체" }, ...regionList.map(r => ({ key:r, label:r }))];
-  const GAME_DEFS = [{ key:"ALL", label:"전체" }, ...gameList.map(g => ({ key:g, label: GAME_LABEL[g]||g }))];
+  const allGameKeys = Object.keys(GAME_LABEL);
+  const extraKeys = gameList.filter(g => !allGameKeys.includes(g));
+  const GAME_DEFS = [{ key:"ALL", label:"전체" }, ...[...allGameKeys, ...extraKeys].map(g => ({ key:g, label: GAME_LABEL[g]||g }))];
   const regionCounts = countBy(enrichedMaster, e => e.extendedProps?.regionKey||"", REGION_DEFS);
   const gameCounts = countBy(enrichedMaster, e => e.extendedProps?.gameKey||"", GAME_DEFS);
   renderCheckboxList(regionFiltersEl, REGION_DEFS, regionCounts, k => REGION_COLORS[k]||"", "region");
