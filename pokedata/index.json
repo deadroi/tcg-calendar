@@ -1,5 +1,15 @@
 [
   {
+    "file": "20260401_952990.json",
+    "date": "20260401",
+    "event_id": "952990",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/大阪府",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/오사카",
+    "shop": "ドラゴンスター日本橋2号店",
+    "url": "https://players.pokemon-card.com/event/detail/952990/result",
+    "collected_at": "2026-04-02 09:10:50"
+  },
+  {
     "file": "20260331_952875.json",
     "date": "20260331",
     "event_id": "952875",
@@ -58,6 +68,16 @@
     "shop": "株式会社ポケモン",
     "url": "https://players.pokemon-card.com/event/detail/953306/result",
     "collected_at": "2026-03-31 14:42:03"
+  },
+  {
+    "file": "20260328_953304.json",
+    "date": "20260328",
+    "event_id": "953304",
+    "title": "チャンピオンズリーグ2026 大阪 マスターリーグ/大阪府",
+    "title_ko": "챔피언스리그 2026 오사카 마스터리그/오사카",
+    "shop": "株式会社ポケモン",
+    "url": "https://players.pokemon-card.com/event/detail/953304/result",
+    "collected_at": "2026-04-02 09:14:47"
   },
   {
     "file": "20260328_953308.json",
