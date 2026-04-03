@@ -319,6 +319,7 @@ function toggleSidebar() {
   btn.style.display = sidebar.classList.contains('collapsed') ? 'flex' : 'none';
 }
 
+const CACHE_BUST = () => `?v=${Date.now()}`;
 const INDEX_URL = 'pokedata/index.json';
 let currentFile = null;
 let indexData = [];
@@ -490,7 +491,7 @@ async function preloadAllEvents() {
   for (const entry of indexData) {
     if (!entry.file || eventCache[entry.file]) continue;
     try {
-      const res = await fetch('pokedata/' + entry.file);
+      const res = await fetch('pokedata/' + entry.file + CACHE_BUST());
       if (res.ok) {
         eventCache[entry.file] = await res.json();
         // 검색 중이면 결과 갱신
@@ -516,7 +517,7 @@ async function loadEvent(file, item) {
   try {
     let data = eventCache[file];
     if (!data) {
-      const res = await fetch('pokedata/' + file);
+      const res = await fetch('pokedata/' + file + CACHE_BUST());
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       data = await res.json();
       eventCache[file] = data;
@@ -529,7 +530,7 @@ async function loadEvent(file, item) {
 
 async function init() {
   try {
-    const res = await fetch(INDEX_URL);
+    const res = await fetch(INDEX_URL + CACHE_BUST());
     if (!res.ok) throw new Error(`index.json 없음 (HTTP ${res.status})`);
     indexData = await res.json();
 
