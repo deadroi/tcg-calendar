@@ -621,13 +621,9 @@ function renderCalendar(monthKey, events) {
 async function loadMonth(monthKey) {
   selectedMonthKey = monthKey;
   renderMonthNav();
-  if (jsonCache[monthKey]) {
-    applyMonthData(jsonCache[monthKey]);
-    return;
-  }
   document.getElementById('loadingOverlay').style.display = 'flex';
   try {
-    const v = window._cacheVer || Date.now();
+    const v = Date.now();
     const resp = await fetch(DATA_BASE + 'calendar_' + monthKey + '.json?v=' + v);
     if (!resp.ok) throw new Error('Not found');
     const data = await resp.json();
