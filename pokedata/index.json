@@ -1,13 +1,33 @@
 [
   {
+    "file": "20260404_952683.json",
+    "date": "20260404",
+    "event_id": "952683",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/宮城県",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/미야기현",
+    "shop": "シーガル　仙台駅前店",
+    "url": "https://players.pokemon-card.com/event/detail/952683/result",
+    "collected_at": "2026-04-05 14:55:52"
+  },
+  {
+    "file": "20260404_952670.json",
+    "date": "20260404",
+    "event_id": "952670",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/北海道",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/홋카이도",
+    "shop": "トーナメントセンターバトロコ　旭川駅前",
+    "url": "https://players.pokemon-card.com/event/detail/952670/result",
+    "collected_at": "2026-04-05 14:52:29"
+  },
+  {
     "file": "20260404_953269.json",
     "date": "20260404",
     "event_id": "953269",
     "title": "シティリーグ2026 シーズン4 オープンリーグ/愛知県",
-    "title_ko": "",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/아이치현",
     "shop": "BOOKOFF SUPER BAZAAR 248号西友岡崎店",
     "url": "https://players.pokemon-card.com/event/detail/953269/result",
-    "collected_at": "2026-04-05 13:38:58"
+    "collected_at": "2026-04-05 14:48:14"
   },
   {
     "file": "20260404_952992.json",
@@ -58,26 +78,6 @@
     "shop": "シーガル　仙台駅前店",
     "url": "https://players.pokemon-card.com/event/detail/952684/result",
     "collected_at": "2026-04-05 12:42:06"
-  },
-  {
-    "file": "20260404_952683.json",
-    "date": "20260404",
-    "event_id": "952683",
-    "title": "シティリーグ2026 シーズン4 オープンリーグ/宮城県",
-    "title_ko": "",
-    "shop": "シーガル　仙台駅前店",
-    "url": "https://players.pokemon-card.com/event/detail/952683/result",
-    "collected_at": "2026-04-05 12:31:32"
-  },
-  {
-    "file": "20260404_952670.json",
-    "date": "20260404",
-    "event_id": "952670",
-    "title": "シティリーグ2026 シーズン4 オープンリーグ/北海道",
-    "title_ko": "",
-    "shop": "トーナメントセンターバトロコ　旭川駅前",
-    "url": "https://players.pokemon-card.com/event/detail/952670/result",
-    "collected_at": "2026-04-05 12:20:56"
   },
   {
     "file": "20260404_953270.json",
@@ -408,26 +408,6 @@
     "shop": "BOOKOFF和歌山国体道路店",
     "url": "https://players.pokemon-card.com/event/detail/952985/result",
     "collected_at": "2026-03-31 16:06:34"
-  },
-  {
-    "file": "20260325_952984.json",
-    "date": "20260325",
-    "event_id": "952984",
-    "title": "シティリーグ2026 シーズン4 オープンリーグ/愛知県",
-    "title_ko": "",
-    "shop": "Torecacamp大須店",
-    "url": "https://players.pokemon-card.com/event/detail/952984/result",
-    "collected_at": "2026-03-31 16:14:55"
-  },
-  {
-    "file": "20260325_952781.json",
-    "date": "20260325",
-    "event_id": "952781",
-    "title": "シティリーグ2026 シーズン4 オープンリーグ/東京都",
-    "title_ko": "",
-    "shop": "Card Secret",
-    "url": "https://players.pokemon-card.com/event/detail/952781/result",
-    "collected_at": "2026-03-31 15:47:47"
   },
   {
     "file": "20260325_952681.json",
