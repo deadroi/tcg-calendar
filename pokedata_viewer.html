@@ -173,7 +173,7 @@
     display: flex; align-items: flex-start; gap: 0;
   }
   .deck-col-img {
-    flex: 0 0 28%; max-width: 28%;
+    flex: 0 0 44%; max-width: 44%;
     padding: 16px 14px 16px 20px;
     border-right: 1px solid var(--border);
   }
@@ -182,12 +182,31 @@
     padding: 16px 20px 16px 16px;
   }
 
-  /* 이미지 */
-  .deck-img-thumb {
-    width: 100%; border-radius: 8px; border: 1px solid var(--border);
-    cursor: zoom-in; display: block; transition: opacity .15s;
+  /* 카드 그리드 */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+    gap: 6px;
   }
-  .deck-img-thumb:hover { opacity: .88; cursor: pointer; }
+  .card-cell {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    font-size: .72rem; color: var(--sub); text-align: center;
+  }
+  .card-cell img {
+    width: 100%; border-radius: 5px; border: 1px solid var(--border);
+    cursor: zoom-in; transition: opacity .15s;
+  }
+  .card-cell img:hover { opacity: .82; }
+  .card-count {
+    background: var(--accent); color: #fff;
+    font-size: .68rem; font-weight: 700; border-radius: 10px;
+    padding: 1px 6px; line-height: 1.4;
+  }
+  .card-category {
+    grid-column: 1/-1;
+    font-size: .75rem; font-weight: 700; color: var(--accent);
+    padding: 4px 0 2px; border-bottom: 1px solid var(--border); margin-bottom: 2px;
+  }
   .deck-no-img { color: var(--sub); font-size: .82rem; font-style: italic; padding: 20px 0; text-align: center; }
 
 
@@ -343,8 +362,8 @@ function parseDeck(text) {
       current = { section: trimmed.replace('▶', '').trim(), cards: [] };
       sections.push(current);
     } else if (current) {
-      // "카드명 N장" 파싱
-      const m = trimmed.match(/^(.+?)\s+(\d+)장\s*$/);
+      // "카드명 N장" 또는 "카드명 N枚" 파싱
+      const m = trimmed.match(/^(.+?)\s+(\d+)[장枚]?\s*$/);
       if (m) {
         current.cards.push({ name: m[1].trim(), count: m[2] });
       } else {
@@ -360,7 +379,7 @@ function renderDeckSections(sections) {
   return sections.map(s => {
     if (!s.cards.length) return '';
     const cardsHtml = s.cards.map(c =>
-      `<div class="deck-card-item">${c.count ? `<span class="deck-card-count">${c.count}</span>` : ''}${c.name}</div>`
+      `<div class="deck-card-item">${c.count ? `<span class="deck-card-count">${String(c.count).replace(/[장枚]/g,'')}</span>` : ''}${c.name}</div>`
     ).join('');
     return `<div class="deck-section">
       <div class="deck-section-title">${s.section}</div>
@@ -386,15 +405,33 @@ function renderEvent(data) {
     const deckJp = parseDeck(r.deck || '');
     const hasDeck = deckKo.length || deckJp.length;
     const deckUrl = r.deck_url || '';
-    const deckImg = r.deck_img ? `pokedata/${r.deck_img}` : '';
+    const cardList = r.card_list || [];
+    const deckImg  = r.deck_img ? `pokedata/${r.deck_img}` : '';
 
-    // 좌: 이미지 컬럼
-    const imgCol = `
-      <div class="deck-col-img">
-        ${deckImg
-          ? `<a href="${deckImg}" target="_blank"><img class="deck-img-thumb" src="${deckImg}" alt="덱 이미지" loading="lazy"></a>`
-          : `<div class="deck-no-img">이미지 없음</div>`}
-      </div>`;
+    // 좌: 카드 그리드 컬럼
+    let imgColInner = '';
+    if (cardList.length) {
+      let lastCat = null;
+      imgColInner = '<div class="card-grid">';
+      for (const c of cardList) {
+        if (c.category && c.category !== lastCat) {
+          imgColInner += `<div class="card-category">${c.category}</div>`;
+          lastCat = c.category;
+        }
+        const imgSrc = c.img ? `pokedata/${c.img}` : '';
+        imgColInner += `<div class="card-cell">
+          ${imgSrc ? `<img src="${imgSrc}" alt="${c.name}" loading="lazy" title="${c.name}">` : `<div style="height:72px;background:var(--border);border-radius:5px"></div>`}
+          <span class="card-count">${String(c.count).replace(/[장枚]/g,'')}</span>
+        </div>`;
+      }
+      imgColInner += '</div>';
+    } else if (deckImg) {
+      // 구버전 호환: 전체 스크린샷 fallback
+      imgColInner = `<a href="${deckImg}" target="_blank"><img style="width:100%;border-radius:8px;border:1px solid var(--border)" src="${deckImg}" alt="덱 이미지" loading="lazy"></a>`;
+    } else {
+      imgColInner = `<div class="deck-no-img">이미지 없음</div>`;
+    }
+    const imgCol = `<div class="deck-col-img">${imgColInner}</div>`;
 
     // 우: 덱리스트 컬럼
     const listInner = hasDeck ? `
