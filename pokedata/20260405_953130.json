@@ -15,7 +15,8 @@
       "deck_ko": "",
       "deck_type_ko": "",
       "deck_url": "https://www.pokemon-card.com/deck/confirm.html/deckID/5bkdkk-wZWGZP-kF5F5d",
-      "deck_img": "img/953130/5bkdkk-wZWGZP-kF5F5d.png"
+      "deck_img": "img/953130/5bkdkk-wZWGZP-kF5F5d.png",
+      "card_list": []
     },
     {
       "rank": 0,
@@ -25,7 +26,8 @@
       "deck_ko": "",
       "deck_type_ko": "",
       "deck_url": "https://www.pokemon-card.com/deck/confirm.html/deckID/gnHngH-2U5i1G-9Qg9iL",
-      "deck_img": "img/953130/gnHngH-2U5i1G-9Qg9iL.png"
+      "deck_img": "img/953130/gnHngH-2U5i1G-9Qg9iL.png",
+      "card_list": []
     },
     {
       "rank": 0,
@@ -35,7 +37,8 @@
       "deck_ko": "",
       "deck_type_ko": "",
       "deck_url": "https://www.pokemon-card.com/deck/confirm.html/deckID/bVv5vd-W0fwnX-FkfF5k",
-      "deck_img": "img/953130/bVv5vd-W0fwnX-FkfF5k.png"
+      "deck_img": "img/953130/bVv5vd-W0fwnX-FkfF5k.png",
+      "card_list": []
     },
     {
       "rank": 0,
@@ -45,7 +48,8 @@
       "deck_ko": "",
       "deck_type_ko": "",
       "deck_url": "https://www.pokemon-card.com/deck/confirm.html/deckID/REy2pX-ROBith-yMXpM2",
-      "deck_img": "img/953130/REy2pX-ROBith-yMXpM2.png"
+      "deck_img": "img/953130/REy2pX-ROBith-yMXpM2.png",
+      "card_list": []
     }
   ]
 }
