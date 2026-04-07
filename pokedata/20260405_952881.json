@@ -15,7 +15,8 @@
       "deck_ko": "",
       "deck_type_ko": "",
       "deck_url": "https://www.pokemon-card.com/deck/confirm.html/deckID/DJcc8G-oiQxnB-8aJ4Dx",
-      "deck_img": "img/952881/DJcc8G-oiQxnB-8aJ4Dx.png"
+      "deck_img": "img/952881/DJcc8G-oiQxnB-8aJ4Dx.png",
+      "card_list": []
     },
     {
       "rank": 0,
@@ -25,7 +26,8 @@
       "deck_ko": "",
       "deck_type_ko": "",
       "deck_url": "https://www.pokemon-card.com/deck/confirm.html/deckID/FwvVk5-PA7lP0-FVbkkF",
-      "deck_img": "img/952881/FwvVk5-PA7lP0-FVbkkF.png"
+      "deck_img": "img/952881/FwvVk5-PA7lP0-FVbkkF.png",
+      "card_list": []
     },
     {
       "rank": 0,
@@ -35,7 +37,8 @@
       "deck_ko": "",
       "deck_type_ko": "",
       "deck_url": "https://www.pokemon-card.com/deck/confirm.html/deckID/cxcx48-KBEtx8-G8DD8c",
-      "deck_img": "img/952881/cxcx48-KBEtx8-G8DD8c.png"
+      "deck_img": "img/952881/cxcx48-KBEtx8-G8DD8c.png",
+      "card_list": []
     },
     {
       "rank": 0,
@@ -45,7 +48,8 @@
       "deck_ko": "",
       "deck_type_ko": "",
       "deck_url": "https://www.pokemon-card.com/deck/confirm.html/deckID/ng9LNH-uwDozq-gHiLng",
-      "deck_img": "img/952881/ng9LNH-uwDozq-gHiLng.png"
+      "deck_img": "img/952881/ng9LNH-uwDozq-gHiLng.png",
+      "card_list": []
     }
   ]
 }
