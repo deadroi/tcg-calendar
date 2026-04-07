@@ -1,5 +1,35 @@
 [
   {
+    "file": "20260406_953274.json",
+    "date": "20260406",
+    "event_id": "953274",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/東京都",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/도쿄",
+    "shop": "秋葉原チェルモ",
+    "url": "https://players.pokemon-card.com/event/detail/953274/result",
+    "collected_at": "2026-04-07 09:44:40"
+  },
+  {
+    "file": "20260406_953003.json",
+    "date": "20260406",
+    "event_id": "953003",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/大阪府",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/오사카부",
+    "shop": "BOOKOFF SUPER BAZAAR 307号枚方池之宮店",
+    "url": "https://players.pokemon-card.com/event/detail/953003/result",
+    "collected_at": "2026-04-07 09:41:25"
+  },
+  {
+    "file": "20260406_953004.json",
+    "date": "20260406",
+    "event_id": "953004",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/滋賀県",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/시가현",
+    "shop": "トレカショップVOW",
+    "url": "https://players.pokemon-card.com/event/detail/953004/result",
+    "collected_at": "2026-04-07 09:38:08"
+  },
+  {
     "file": "20260405_953181.json",
     "date": "20260405",
     "event_id": "953181",
