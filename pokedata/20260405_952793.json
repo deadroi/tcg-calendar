@@ -15,7 +15,8 @@
       "deck_ko": "",
       "deck_type_ko": "",
       "deck_url": "https://www.pokemon-card.com/deck/confirm.html/deckID/M2py2y-275ejc-EpR22S",
-      "deck_img": "img/952793/M2py2y-275ejc-EpR22S.png"
+      "deck_img": "img/952793/M2py2y-275ejc-EpR22S.png",
+      "card_list": []
     },
     {
       "rank": 0,
@@ -25,7 +26,8 @@
       "deck_ko": "",
       "deck_type_ko": "",
       "deck_url": "https://www.pokemon-card.com/deck/confirm.html/deckID/22Rpyy-vI91Ed-ypUX2M",
-      "deck_img": "img/952793/22Rpyy-vI91Ed-ypUX2M.png"
+      "deck_img": "img/952793/22Rpyy-vI91Ed-ypUX2M.png",
+      "card_list": []
     },
     {
       "rank": 0,
@@ -35,7 +37,8 @@
       "deck_ko": "",
       "deck_type_ko": "",
       "deck_url": "https://www.pokemon-card.com/deck/confirm.html/deckID/2p2Xp2-xyeN0i-Rppy2y",
-      "deck_img": "img/952793/2p2Xp2-xyeN0i-Rppy2y.png"
+      "deck_img": "img/952793/2p2Xp2-xyeN0i-Rppy2y.png",
+      "card_list": []
     },
     {
       "rank": 0,
@@ -45,7 +48,8 @@
       "deck_ko": "",
       "deck_type_ko": "",
       "deck_url": "https://www.pokemon-card.com/deck/confirm.html/deckID/8c484G-COAwNl-8cc4cY",
-      "deck_img": "img/952793/8c484G-COAwNl-8cc4cY.png"
+      "deck_img": "img/952793/8c484G-COAwNl-8cc4cY.png",
+      "card_list": []
     }
   ]
 }
