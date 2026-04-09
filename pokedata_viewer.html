@@ -381,8 +381,8 @@ function parseDeck(text) {
       current = { section: trimmed.replace('▶', '').trim(), cards: [] };
       sections.push(current);
     } else if (current) {
-      // "카드명 N장" 또는 "카드명 N枚" 파싱
-      const m = trimmed.match(/^(.+?)\s+(\d+)[장枚]?\s*$/);
+      // "카드명 N장" / "카드명 N 장" / "카드명 N枚" 파싱
+      const m = trimmed.match(/^(.+?)\s+(\d+)\s*[장枚]?\s*$/);
       if (m) {
         current.cards.push({ name: m[1].trim(), count: m[2] });
       } else {
@@ -393,6 +393,19 @@ function parseDeck(text) {
   return sections;
 }
 
+const CAT_KO = {
+  "ポケモン":"포켓몬","グッズ":"아이템","サポート":"서포터",
+  "スタジアム":"경기장","エネルギー":"에너지",
+  "特殊エネルギー":"특수 에너지","基本エネルギー":"기본 에너지",
+  "ポケモンのどうぐ":"포켓몬 도구"
+};
+function catKo(name) {
+  const m = (name || '').match(/^(.+?)\s*(\(\d+\))?\s*$/);
+  const base = m ? m[1].trim() : name;
+  const suffix = m && m[2] ? ' ' + m[2] : '';
+  return (CAT_KO[base] || base) + suffix;
+}
+
 function renderDeckSections(sections) {
   if (!sections.length) return '<div class="no-deck">덱 정보 없음</div>';
   return sections.map(s => {
@@ -401,7 +414,7 @@ function renderDeckSections(sections) {
       `<div class="deck-card-item">${c.count ? `<span class="deck-card-count">${String(c.count).replace(/[장枚]/g,'')}</span>` : ''}${c.name}</div>`
     ).join('');
     return `<div class="deck-section">
-      <div class="deck-section-title">${s.section}</div>
+      <div class="deck-section-title">${catKo(s.section)}</div>
       <div class="deck-cards">${cardsHtml}</div>
     </div>`;
   }).join('');
@@ -434,7 +447,8 @@ function renderEvent(data) {
       imgColInner = '<div class="card-grid">';
       for (const c of cardList) {
         if (c.category && c.category !== lastCat) {
-          imgColInner += `<div class="card-category">${c.category}</div>`;
+          const catLabel = catKo(c.category);
+          imgColInner += `<div class="card-category">${catLabel}</div>`;
           lastCat = c.category;
         }
         const imgSrc = c.img ? `pokedata/${c.img}` : '';
