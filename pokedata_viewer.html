@@ -613,7 +613,7 @@ async function init() {
     }
 
     listEl.innerHTML = indexData.map(e => `
-      <div class="event-item" data-file="${e.file}">
+      <div class="event-item" data-file="${e.file}" data-event-id="${e.event_id || ''}">
         <div class="date">${fmtDate(e.date)}${e.shop ? ' ' + e.shop : ''}</div>
         <div class="title">${e.title_ko || e.title || e.file}</div>
       </div>
@@ -629,9 +629,14 @@ async function init() {
       searchTimer = setTimeout(() => filterEvents(e.target.value), 200);
     });
 
-    // 첫 번째 자동 로드
-    const first = listEl.querySelector('.event-item');
+    // URL event_id 파라미터 처리
+    const urlEventId = new URLSearchParams(location.search).get('event_id');
+    const targetItem = urlEventId
+      ? listEl.querySelector(`.event-item[data-event-id="${urlEventId}"]`)
+      : null;
+    const first = targetItem || listEl.querySelector('.event-item');
     if (first) first.click();
+    if (targetItem) targetItem.scrollIntoView({ block: 'nearest' });
 
     // 백그라운드 프리로드 (덱 검색용)
     preloadAllEvents();
