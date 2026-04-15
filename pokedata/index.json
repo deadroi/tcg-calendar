@@ -1,5 +1,55 @@
 [
   {
+    "file": "20260414_952901.json",
+    "date": "20260414",
+    "event_id": "952901",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그",
+    "shop": "【CARDBOX】青馬堂矢向店",
+    "url": "https://players.pokemon-card.com/event/detail/952901/result",
+    "collected_at": "2026-04-15 13:52:56"
+  },
+  {
+    "file": "20260414_952808.json",
+    "date": "20260414",
+    "event_id": "952808",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그",
+    "shop": "トーナメントセンターバトロコ　柏駅前",
+    "url": "https://players.pokemon-card.com/event/detail/952808/result",
+    "collected_at": "2026-04-15 13:48:33"
+  },
+  {
+    "file": "20260414_953243.json",
+    "date": "20260414",
+    "event_id": "953243",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그",
+    "shop": "竜星のPAO　大宮店",
+    "url": "https://players.pokemon-card.com/event/detail/953243/result",
+    "collected_at": "2026-04-15 13:44:17"
+  },
+  {
+    "file": "20260414_953032.json",
+    "date": "20260414",
+    "event_id": "953032",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그",
+    "shop": "トレカショップ竜のしっぽ　布施店",
+    "url": "https://players.pokemon-card.com/event/detail/953032/result",
+    "collected_at": "2026-04-15 13:39:53"
+  },
+  {
+    "file": "20260414_953033.json",
+    "date": "20260414",
+    "event_id": "953033",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그",
+    "shop": "トレカショップ　スキップ玉出店",
+    "url": "https://players.pokemon-card.com/event/detail/953033/result",
+    "collected_at": "2026-04-15 13:35:13"
+  },
+  {
     "file": "20260413_953280.json",
     "date": "20260413",
     "event_id": "953280",
@@ -18,6 +68,16 @@
     "shop": "ドラゴンスター秋葉原駅前店",
     "url": "https://players.pokemon-card.com/event/detail/952807/result",
     "collected_at": "2026-04-14 08:53:07"
+  },
+  {
+    "file": "20260412_953135.json",
+    "date": "20260412",
+    "event_id": "953135",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그",
+    "shop": "フルコンプ福岡天神店",
+    "url": "https://players.pokemon-card.com/event/detail/953135/result",
+    "collected_at": "2026-04-15 13:57:46"
   },
   {
     "file": "20260412_953031.json",
