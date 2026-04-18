@@ -1,5 +1,75 @@
 [
   {
+    "file": "20260417_952810.json",
+    "date": "20260417",
+    "event_id": "952810",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그",
+    "shop": "トーナメントセンターバトロコ　高田馬場",
+    "url": "https://players.pokemon-card.com/event/detail/952810/result",
+    "collected_at": "2026-04-18 11:51:58"
+  },
+  {
+    "file": "20260417_952811.json",
+    "date": "20260417",
+    "event_id": "952811",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그",
+    "shop": "カードショップ竜星のPAO　立川店",
+    "url": "https://players.pokemon-card.com/event/detail/952811/result",
+    "collected_at": "2026-04-18 11:48:15"
+  },
+  {
+    "file": "20260417_952812.json",
+    "date": "20260417",
+    "event_id": "952812",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그",
+    "shop": "ドラゴンスター池袋店",
+    "url": "https://players.pokemon-card.com/event/detail/952812/result",
+    "collected_at": "2026-04-18 11:43:39"
+  },
+  {
+    "file": "20260416_953036.json",
+    "date": "20260416",
+    "event_id": "953036",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그",
+    "shop": "Torecacamp大須店",
+    "url": "https://players.pokemon-card.com/event/detail/953036/result",
+    "collected_at": "2026-04-18 12:09:20"
+  },
+  {
+    "file": "20260416_953281.json",
+    "date": "20260416",
+    "event_id": "953281",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그",
+    "shop": "秋葉原チェルモ",
+    "url": "https://players.pokemon-card.com/event/detail/953281/result",
+    "collected_at": "2026-04-18 12:04:58"
+  },
+  {
+    "file": "20260416_953037.json",
+    "date": "20260416",
+    "event_id": "953037",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그",
+    "shop": "トレカショップVOW",
+    "url": "https://players.pokemon-card.com/event/detail/953037/result",
+    "collected_at": "2026-04-18 11:59:43"
+  },
+  {
+    "file": "20260416_952809.json",
+    "date": "20260416",
+    "event_id": "952809",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그",
+    "shop": "ドラゴンスター町田店",
+    "url": "https://players.pokemon-card.com/event/detail/952809/result",
+    "collected_at": "2026-04-18 11:56:02"
+  },
+  {
     "file": "20260415_953034.json",
     "date": "20260415",
     "event_id": "953034",
