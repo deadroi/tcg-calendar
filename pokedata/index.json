@@ -1,5 +1,15 @@
 [
   {
+    "file": "20260423_953058.json",
+    "date": "20260423",
+    "event_id": "953058",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/大阪府",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/오사카부",
+    "shop": "ドラゴンスター日本橋3号店",
+    "url": "https://players.pokemon-card.com/event/detail/953058/result",
+    "collected_at": "2026-04-23 17:53:14"
+  },
+  {
     "file": "20260421_952824.json",
     "date": "20260421",
     "event_id": "952824",
@@ -18,6 +28,16 @@
     "shop": "トレカショップ竜のしっぽ　布施店",
     "url": "https://players.pokemon-card.com/event/detail/953057/result",
     "collected_at": "2026-04-21 20:40:00"
+  },
+  {
+    "file": "20260419_953196.json",
+    "date": "20260419",
+    "event_id": "953196",
+    "title": "シティリーグ2026 シーズン4 シニアリーグ/京都府",
+    "title_ko": "시티리그 2026 시즌 4 시니어리그/교토부",
+    "shop": "GIRAFULL京都店",
+    "url": "https://players.pokemon-card.com/event/detail/953196/result",
+    "collected_at": "2026-04-23 09:20:58"
   },
   {
     "file": "20260419_953053.json",
