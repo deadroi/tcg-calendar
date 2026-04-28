@@ -1,5 +1,45 @@
 [
   {
+    "file": "20260427_953069.json",
+    "date": "20260427",
+    "event_id": "953069",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/滋賀県",
+    "title_ko": "",
+    "shop": "トレカショップVOW",
+    "url": "https://players.pokemon-card.com/event/detail/953069/result",
+    "collected_at": "2026-04-28 09:28:27"
+  },
+  {
+    "file": "20260427_952831.json",
+    "date": "20260427",
+    "event_id": "952831",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/東京都",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/도쿄",
+    "shop": "ドラゴンスター秋葉原駅前店",
+    "url": "https://players.pokemon-card.com/event/detail/952831/result",
+    "collected_at": "2026-04-28 09:24:56"
+  },
+  {
+    "file": "20260427_953294.json",
+    "date": "20260427",
+    "event_id": "953294",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/東京都",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/도쿄",
+    "shop": "秋葉原チェルモ",
+    "url": "https://players.pokemon-card.com/event/detail/953294/result",
+    "collected_at": "2026-04-28 09:20:25"
+  },
+  {
+    "file": "20260426_953064.json",
+    "date": "20260426",
+    "event_id": "953064",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/京都府",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/교토현",
+    "shop": "カードボックス京都店",
+    "url": "https://players.pokemon-card.com/event/detail/953064/result",
+    "collected_at": "2026-04-28 10:17:53"
+  },
+  {
     "file": "20260426_953060.json",
     "date": "20260426",
     "event_id": "953060",
