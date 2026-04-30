@@ -1,5 +1,505 @@
 [
   {
+    "file": "20260429_953073.json",
+    "date": "20260429",
+    "event_id": "953073",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/山口県",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/야마구치현",
+    "shop": "ドラグーン周南",
+    "url": "https://players.pokemon-card.com/event/detail/953073/result",
+    "collected_at": "2026-04-30 14:32:42"
+  },
+  {
+    "file": "20260429_953072.json",
+    "date": "20260429",
+    "event_id": "953072",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/岐阜県",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/기후현",
+    "shop": "宝島　多治見店",
+    "url": "https://players.pokemon-card.com/event/detail/953072/result",
+    "collected_at": "2026-04-30 14:28:43"
+  },
+  {
+    "file": "20260429_953074.json",
+    "date": "20260429",
+    "event_id": "953074",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/愛知県",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/아이치현",
+    "shop": "ブックオフ　西尾下町店",
+    "url": "https://players.pokemon-card.com/event/detail/953074/result",
+    "collected_at": "2026-04-30 14:22:45"
+  },
+  {
+    "file": "20260429_953201.json",
+    "date": "20260429",
+    "event_id": "953201",
+    "title": "シティリーグ2026 シーズン4 シニアリーグ/秋田県",
+    "title_ko": "시티리그 2026 시즌 4 시니어리그/아키타현",
+    "shop": "鹿角ラボ",
+    "url": "https://players.pokemon-card.com/event/detail/953201/result",
+    "collected_at": "2026-04-30 14:18:32"
+  },
+  {
+    "file": "20260429_952697.json",
+    "date": "20260429",
+    "event_id": "952697",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/秋田県",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/아키타현",
+    "shop": "鹿角ラボ",
+    "url": "https://players.pokemon-card.com/event/detail/952697/result",
+    "collected_at": "2026-04-30 14:14:17"
+  },
+  {
+    "file": "20260429_952699.json",
+    "date": "20260429",
+    "event_id": "952699",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/宮城県",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/미야기현",
+    "shop": "シーガル　仙台駅前店",
+    "url": "https://players.pokemon-card.com/event/detail/952699/result",
+    "collected_at": "2026-04-30 14:10:16"
+  },
+  {
+    "file": "20260429_952698.json",
+    "date": "20260429",
+    "event_id": "952698",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/宮城県",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/궁성현",
+    "shop": "シーガル　仙台駅前店",
+    "url": "https://players.pokemon-card.com/event/detail/952698/result",
+    "collected_at": "2026-04-30 14:01:38"
+  },
+  {
+    "file": "20260429_952676.json",
+    "date": "20260429",
+    "event_id": "952676",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/北海道",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/홋카이도",
+    "shop": "トーナメントセンターバトロコ　札幌狸小路",
+    "url": "https://players.pokemon-card.com/event/detail/952676/result",
+    "collected_at": "2026-04-30 13:57:37"
+  },
+  {
+    "file": "20260429_953413.json",
+    "date": "20260429",
+    "event_id": "953413",
+    "title": "シティリーグ2026 シーズン4 ジュニアリーグ/東京都",
+    "title_ko": "시티리그 2026 시즌 4 주니어리그/도쿄",
+    "shop": "ポケモンセンタースカイツリータウン",
+    "url": "https://players.pokemon-card.com/event/detail/953413/result",
+    "collected_at": "2026-04-30 13:52:49"
+  },
+  {
+    "file": "20260429_953362.json",
+    "date": "20260429",
+    "event_id": "953362",
+    "title": "シティリーグ2026 シーズン4 ジュニアリーグ/愛知県",
+    "title_ko": "시티리그 2026 시즌 4 주니어리그/아이치현",
+    "shop": "ポケモンカードステーション・ポケモンセンターナゴヤ",
+    "url": "https://players.pokemon-card.com/event/detail/953362/result",
+    "collected_at": "2026-04-30 13:49:10"
+  },
+  {
+    "file": "20260429_953361.json",
+    "date": "20260429",
+    "event_id": "953361",
+    "title": "シティリーグ2026 シーズン4 ジュニアリーグ/石川県",
+    "title_ko": "시티리그 2026 시즌 4 주니어리그/이시카와현",
+    "shop": "ポケモンセンターカナザワ",
+    "url": "https://players.pokemon-card.com/event/detail/953361/result",
+    "collected_at": "2026-04-30 13:39:39"
+  },
+  {
+    "file": "20260429_953360.json",
+    "date": "20260429",
+    "event_id": "953360",
+    "title": "シティリーグ2026 シーズン4 ジュニアリーグ/沖縄県",
+    "title_ko": "시티리그 2026 시즌 4 주니어리그/오키나와현",
+    "shop": "ポケモンセンターオキナワ",
+    "url": "https://players.pokemon-card.com/event/detail/953360/result",
+    "collected_at": "2026-04-30 13:35:41"
+  },
+  {
+    "file": "20260429_953359.json",
+    "date": "20260429",
+    "event_id": "953359",
+    "title": "シティリーグ2026 シーズン4 ジュニアリーグ/福岡県",
+    "title_ko": "시티리그 2026 시즌 4 주니어리그/후쿠오카현",
+    "shop": "ポケモンセンターフクオカ",
+    "url": "https://players.pokemon-card.com/event/detail/953359/result",
+    "collected_at": "2026-04-30 13:31:49"
+  },
+  {
+    "file": "20260429_953358.json",
+    "date": "20260429",
+    "event_id": "953358",
+    "title": "シティリーグ2026 シーズン4 ジュニアリーグ/宮城県",
+    "title_ko": "시티리그 2026 시즌 4 주니어리그/미야기현",
+    "shop": "ポケモンセンタートウホク",
+    "url": "https://players.pokemon-card.com/event/detail/953358/result",
+    "collected_at": "2026-04-30 13:27:50"
+  },
+  {
+    "file": "20260429_953357.json",
+    "date": "20260429",
+    "event_id": "953357",
+    "title": "シティリーグ2026 シーズン4 ジュニアリーグ/広島県",
+    "title_ko": "시티리그 2026 시즌 4 주니어리그/히로시마현",
+    "shop": "ポケモンセンターヒロシマ",
+    "url": "https://players.pokemon-card.com/event/detail/953357/result",
+    "collected_at": "2026-04-30 13:24:15"
+  },
+  {
+    "file": "20260429_953356.json",
+    "date": "20260429",
+    "event_id": "953356",
+    "title": "シティリーグ2026 シーズン4 ジュニアリーグ/千葉県",
+    "title_ko": "시티리그 2026 시즌 4 주니어리그/치바현",
+    "shop": "ポケモンカードステーション・ポケモンセンタートウキョーベイ",
+    "url": "https://players.pokemon-card.com/event/detail/953356/result",
+    "collected_at": "2026-04-30 13:19:35"
+  },
+  {
+    "file": "20260429_953355.json",
+    "date": "20260429",
+    "event_id": "953355",
+    "title": "シティリーグ2026 シーズン4 ジュニアリーグ/大阪府",
+    "title_ko": "시티리그 2026 시즌 4 주니어리그/오사카부",
+    "shop": "ポケモンカードステーション・ポケモンセンターオーサカ",
+    "url": "https://players.pokemon-card.com/event/detail/953355/result",
+    "collected_at": "2026-04-30 13:15:32"
+  },
+  {
+    "file": "20260429_953353.json",
+    "date": "20260429",
+    "event_id": "953353",
+    "title": "シティリーグ2026 シーズン4 ジュニアリーグ/北海道",
+    "title_ko": "시티리그 2026 시즌 4 주니어리그/홋카이도",
+    "shop": "ポケモンセンターサッポロ",
+    "url": "https://players.pokemon-card.com/event/detail/953353/result",
+    "collected_at": "2026-04-30 13:11:13"
+  },
+  {
+    "file": "20260429_953202.json",
+    "date": "20260429",
+    "event_id": "953202",
+    "title": "シティリーグ2026 シーズン4 シニアリーグ/大阪府",
+    "title_ko": "시티리그 2026 시즌 4 시니어리그/오사카부",
+    "shop": "トイコンプ高槻店",
+    "url": "https://players.pokemon-card.com/event/detail/953202/result",
+    "collected_at": "2026-04-30 13:07:07"
+  },
+  {
+    "file": "20260429_953151.json",
+    "date": "20260429",
+    "event_id": "953151",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/福岡県",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/후쿠오카현",
+    "shop": "フルコンプ福岡天神店",
+    "url": "https://players.pokemon-card.com/event/detail/953151/result",
+    "collected_at": "2026-04-30 13:03:15"
+  },
+  {
+    "file": "20260429_953150.json",
+    "date": "20260429",
+    "event_id": "953150",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/鹿児島県",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/가고시마현",
+    "shop": "カードショップ＠ほ～む。鹿児島店",
+    "url": "https://players.pokemon-card.com/event/detail/953150/result",
+    "collected_at": "2026-04-30 12:59:06"
+  },
+  {
+    "file": "20260429_953149.json",
+    "date": "20260429",
+    "event_id": "953149",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/佐賀県",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/사가현",
+    "shop": "ブックオフプラス佐賀南部バイパス店",
+    "url": "https://players.pokemon-card.com/event/detail/953149/result",
+    "collected_at": "2026-04-30 12:55:27"
+  },
+  {
+    "file": "20260429_953148.json",
+    "date": "20260429",
+    "event_id": "953148",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/熊本県",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/구마모토현",
+    "shop": "遊ING　熊本上通り店",
+    "url": "https://players.pokemon-card.com/event/detail/953148/result",
+    "collected_at": "2026-04-30 12:45:58"
+  },
+  {
+    "file": "20260429_953147.json",
+    "date": "20260429",
+    "event_id": "953147",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/大分県",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/오이타현",
+    "shop": "TSUTAYA光吉店",
+    "url": "https://players.pokemon-card.com/event/detail/953147/result",
+    "collected_at": "2026-04-30 12:42:14"
+  },
+  {
+    "file": "20260429_953146.json",
+    "date": "20260429",
+    "event_id": "953146",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/沖縄県",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/오키나와현",
+    "shop": "カードスタジアム小禄店",
+    "url": "https://players.pokemon-card.com/event/detail/953146/result",
+    "collected_at": "2026-04-30 12:37:55"
+  },
+  {
+    "file": "20260429_953078.json",
+    "date": "20260429",
+    "event_id": "953078",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/高知県",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/고치현",
+    "shop": "カードショップ楓",
+    "url": "https://players.pokemon-card.com/event/detail/953078/result",
+    "collected_at": "2026-04-30 12:33:50"
+  },
+  {
+    "file": "20260429_953077.json",
+    "date": "20260429",
+    "event_id": "953077",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/大阪府",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/오사카",
+    "shop": "BOOKOFF SUPER BAZAAR 307号枚方池之宮店",
+    "url": "https://players.pokemon-card.com/event/detail/953077/result",
+    "collected_at": "2026-04-30 12:29:47"
+  },
+  {
+    "file": "20260429_953076.json",
+    "date": "20260429",
+    "event_id": "953076",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/愛知県",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/아이치현",
+    "shop": "三洋堂書店　新開橋店",
+    "url": "https://players.pokemon-card.com/event/detail/953076/result",
+    "collected_at": "2026-04-30 12:25:44"
+  },
+  {
+    "file": "20260429_953075.json",
+    "date": "20260429",
+    "event_id": "953075",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/愛媛県",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/에히메현",
+    "shop": "TCG桜華",
+    "url": "https://players.pokemon-card.com/event/detail/953075/result",
+    "collected_at": "2026-04-30 12:20:58"
+  },
+  {
+    "file": "20260429_952923.json",
+    "date": "20260429",
+    "event_id": "952923",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/福井県",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/후쿠이현",
+    "shop": "【CARDBOX】Super KaBoS 二の宮本店",
+    "url": "https://players.pokemon-card.com/event/detail/952923/result",
+    "collected_at": "2026-04-30 12:17:12"
+  },
+  {
+    "file": "20260429_953079.json",
+    "date": "20260429",
+    "event_id": "953079",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/広島県",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/히로시마현",
+    "shop": "BOOKOFFSUPERBAZAAR54号広島八木店",
+    "url": "https://players.pokemon-card.com/event/detail/953079/result",
+    "collected_at": "2026-04-30 12:12:48"
+  },
+  {
+    "file": "20260429_953363.json",
+    "date": "20260429",
+    "event_id": "953363",
+    "title": "シティリーグ2026 シーズン4 ジュニアリーグ/東京都",
+    "title_ko": "시티리그 2026 시즌 4 주니어리그/도쿄",
+    "shop": "ポケモンセンタートウキョーDX",
+    "url": "https://players.pokemon-card.com/event/detail/953363/result",
+    "collected_at": "2026-04-30 12:03:55"
+  },
+  {
+    "file": "20260429_953205.json",
+    "date": "20260429",
+    "event_id": "953205",
+    "title": "シティリーグ2026 シーズン4 シニアリーグ/東京都",
+    "title_ko": "시티리그 2026 시즌 4 시니어리그/도쿄",
+    "shop": "BOOKOFF SUPER BAZAAR 西友大森店",
+    "url": "https://players.pokemon-card.com/event/detail/953205/result",
+    "collected_at": "2026-04-30 11:58:15"
+  },
+  {
+    "file": "20260429_953204.json",
+    "date": "20260429",
+    "event_id": "953204",
+    "title": "シティリーグ2026 シーズン4 シニアリーグ/神奈川県",
+    "title_ko": "시티리그 2026 시즌 4 시니어리그/가나가와현",
+    "shop": "ブックオフ イトーヨカドー溝ノ口店",
+    "url": "https://players.pokemon-card.com/event/detail/953204/result",
+    "collected_at": "2026-04-30 11:53:56"
+  },
+  {
+    "file": "20260429_953250.json",
+    "date": "20260429",
+    "event_id": "953250",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/東京都",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/도쿄",
+    "shop": "ブックオフ武蔵小金井",
+    "url": "https://players.pokemon-card.com/event/detail/953250/result",
+    "collected_at": "2026-04-30 11:49:43"
+  },
+  {
+    "file": "20260429_952834.json",
+    "date": "20260429",
+    "event_id": "952834",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/東京都",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/도쿄",
+    "shop": "福福トレカ　秋葉原店",
+    "url": "https://players.pokemon-card.com/event/detail/952834/result",
+    "collected_at": "2026-04-30 11:45:43"
+  },
+  {
+    "file": "20260429_952833.json",
+    "date": "20260429",
+    "event_id": "952833",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/千葉県",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/치바현",
+    "shop": "BOOKOFF SUPER BAZAAR イトーヨーカドー流山店",
+    "url": "https://players.pokemon-card.com/event/detail/952833/result",
+    "collected_at": "2026-04-30 11:40:46"
+  },
+  {
+    "file": "20260429_952832.json",
+    "date": "20260429",
+    "event_id": "952832",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/東京都",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/도쿄",
+    "shop": "TSUTAYA西友町田店",
+    "url": "https://players.pokemon-card.com/event/detail/952832/result",
+    "collected_at": "2026-04-30 11:36:54"
+  },
+  {
+    "file": "20260429_952746.json",
+    "date": "20260429",
+    "event_id": "952746",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/埼玉県",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/사이타마현",
+    "shop": "トレカショップKCC",
+    "url": "https://players.pokemon-card.com/event/detail/952746/result",
+    "collected_at": "2026-04-30 11:33:00"
+  },
+  {
+    "file": "20260429_952835.json",
+    "date": "20260429",
+    "event_id": "952835",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/東京都",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/도쿄",
+    "shop": "ブックオフスーパーバザー　多摩永山",
+    "url": "https://players.pokemon-card.com/event/detail/952835/result",
+    "collected_at": "2026-04-30 11:29:04"
+  },
+  {
+    "file": "20260429_952748.json",
+    "date": "20260429",
+    "event_id": "952748",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/茨城県",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/이바라키현",
+    "shop": "ブックエースTSUTAYA　勝田東石川店",
+    "url": "https://players.pokemon-card.com/event/detail/952748/result",
+    "collected_at": "2026-04-30 11:24:28"
+  },
+  {
+    "file": "20260429_952747.json",
+    "date": "20260429",
+    "event_id": "952747",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/栃木県",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/도치기현",
+    "shop": "TSUTAYA Trading Card 宇都宮インターパークビレッジ店",
+    "url": "https://players.pokemon-card.com/event/detail/952747/result",
+    "collected_at": "2026-04-30 11:19:57"
+  },
+  {
+    "file": "20260429_953364.json",
+    "date": "20260429",
+    "event_id": "953364",
+    "title": "シティリーグ2026 シーズン4 ジュニアリーグ/神奈川県",
+    "title_ko": "시티리그 2026 시즌 4 주니어리그/가나가와현",
+    "shop": "ポケモンセンターヨコハマ",
+    "url": "https://players.pokemon-card.com/event/detail/953364/result",
+    "collected_at": "2026-04-30 11:15:39"
+  },
+  {
+    "file": "20260429_952836.json",
+    "date": "20260429",
+    "event_id": "952836",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/東京都",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/도쿄",
+    "shop": "フルコンプ　PLAYERS CENTER　八王子本店",
+    "url": "https://players.pokemon-card.com/event/detail/952836/result",
+    "collected_at": "2026-04-30 11:11:24"
+  },
+  {
+    "file": "20260429_953251.json",
+    "date": "20260429",
+    "event_id": "953251",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/埼玉県",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/사이타마현",
+    "shop": "竜星のPAO　大宮店",
+    "url": "https://players.pokemon-card.com/event/detail/953251/result",
+    "collected_at": "2026-04-30 11:07:21"
+  },
+  {
+    "file": "20260429_953206.json",
+    "date": "20260429",
+    "event_id": "953206",
+    "title": "シティリーグ2026 シーズン4 シニアリーグ/大阪府",
+    "title_ko": "시티리그 2026 시즌 4 시니어리그/오사카",
+    "shop": "ドラゴンスター日本橋2号店",
+    "url": "https://players.pokemon-card.com/event/detail/953206/result",
+    "collected_at": "2026-04-30 11:02:53"
+  },
+  {
+    "file": "20260429_953252.json",
+    "date": "20260429",
+    "event_id": "953252",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/東京都",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/도쿄",
+    "shop": "カードショップリドル京急蒲田店",
+    "url": "https://players.pokemon-card.com/event/detail/953252/result",
+    "collected_at": "2026-04-30 10:59:00"
+  },
+  {
+    "file": "20260428_952922.json",
+    "date": "20260428",
+    "event_id": "952922",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/神奈川県",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/가나가와현",
+    "shop": "【CARDBOX】青馬堂矢向店",
+    "url": "https://players.pokemon-card.com/event/detail/952922/result",
+    "collected_at": "2026-04-29 09:35:31"
+  },
+  {
+    "file": "20260428_953070.json",
+    "date": "20260428",
+    "event_id": "953070",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/大阪府",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/오사카부",
+    "shop": "トレカショップ竜のしっぽ　布施店",
+    "url": "https://players.pokemon-card.com/event/detail/953070/result",
+    "collected_at": "2026-04-29 09:31:30"
+  },
+  {
+    "file": "20260428_953071.json",
+    "date": "20260428",
+    "event_id": "953071",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/大阪府",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/오사카",
+    "shop": "トレカショップ　スキップ玉出店",
+    "url": "https://players.pokemon-card.com/event/detail/953071/result",
+    "collected_at": "2026-04-29 09:27:55"
+  },
+  {
     "file": "20260427_953069.json",
     "date": "20260427",
     "event_id": "953069",
