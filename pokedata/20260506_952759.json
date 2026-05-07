@@ -1,0 +1,725 @@
+{
+  "event_id": "952759",
+  "title": "シティリーグ2026 シーズン4 オープンリーグ/茨城県",
+  "title_ko": "시티리그 2026 시즌 4 오픈리그/이바라키현",
+  "shop": "カードショップ裁龍",
+  "date": "20260506",
+  "url": "https://players.pokemon-card.com/event/detail/952759/result",
+  "collected_at": "2026-05-07 11:22:11",
+  "results": [
+    {
+      "rank": 1,
+      "text": "1 位 | なおすけ | プレイヤー ID: 0050113965 | 埼玉県",
+      "info_ko": "1 위 | 나오스케 | 플레이어 ID: 0050113965 | 사이타마현",
+      "deck": "▶ ポケモン (24)\n  ドラメシヤSV8a118/187 4枚\n  ドロンチSV8a119/187 4枚\n  ドラパルトexSV8a120/187 2枚\n  アチャモSV10018/098 2枚\n  ワカシャモSV10019/098 1枚\n  バシャーモexSVM016/175 2枚\n  リーリエのピッピexMC287/742 1枚\n  キチキギスexSVN002/045 1枚\n  ニャースexM3061/080 1枚\n  マシマシラMC358/742 2枚\n  シェイミM2a012/193 1枚\n  スボミーM2a196/193 1枚\n  イーユイSV5a018/066 1枚\n  ファイヤーM2014/080 1枚\n▶ グッズ (16)\n  なかよしポフィン 4枚\n  ハイパーボール 4枚\n  ポケパッド 3枚\n  ふしぎなアメ 2枚\n  夜のタンカ 2枚\n  アンフェアスタンプ(ACE SPEC) 1枚\n▶ ポケモンのどうぐ (0)\n▶ サポート (10)\n  リーリエの決心 4枚\n  ボスの指令 3枚\n  アカマツ 2枚\n  ヒカリ 1枚\n▶ スタジアム (2)\n  ロケット団の監視塔 1枚\n  ジャミングタワー 1枚\n▶ エネルギー (8)\n  基本超エネルギー 3枚\n  基本炎エネルギー 3枚\n  基本悪エネルギー 2枚",
+      "deck_ko": "▶ 포켓몬 (24 장)\n  드라꼰 4 장\n  드래런치 4 장\n  드래펄트 ex 2 장\n  아차모 2 장\n  영치코 1 장\n  번치코 ex 2 장\n  릴리에의 삐삐 ex 1 장\n  기로치 1 장\n  나옹 ex 1 장\n  이야후 2 장\n  쉐이미 1 장\n  꼬몽울 1 장\n  이브이 1 장\n  파이어 1 장\n▶ 아이템 (16 장)\n  친밀포핀 4 장\n  하이퍼볼 4 장\n  포켓패드 3 장\n  이상한사탕 2 장\n  밤의들것 2 장\n  언페어스탬프 (ACE SPEC) 1 장\n▶ 포켓몬 도구 (0 장)\n▶ 서포터 (10 장)\n  릴리에의결심 4 장\n  보스의지령 3 장\n  하솔 2 장\n  빛나 1 장\n▶ 스타디움 (2 장)\n  로켓단의감시탑 1 장\n  재밍타워 1 장\n▶ 에너지 (8 장)\n  기본에스퍼에너지 3 장\n  기본불꽃에너지 3 장\n  기본악에너지 2 장",
+      "deck_type_ko": "드래펄트 ex",
+      "deck_url": "https://www.pokemon-card.com/deck/confirm.html/deckID/4J8cYc-5a1inW-xGY4c8",
+      "deck_img": "",
+      "card_list": [
+        {
+          "category": "ポケモン (24)",
+          "name": "ドラメシヤSV8a118/187",
+          "count": "4枚",
+          "img": "cards/ドラメシヤSV8a118_187.png"
+        },
+        {
+          "category": "ポケモン (24)",
+          "name": "ドロンチSV8a119/187",
+          "count": "4枚",
+          "img": "cards/ドロンチSV8a119_187.png"
+        },
+        {
+          "category": "ポケモン (24)",
+          "name": "ドラパルトexSV8a120/187",
+          "count": "2枚",
+          "img": "cards/ドラパルトexSV8a120_187.png"
+        },
+        {
+          "category": "ポケモン (24)",
+          "name": "アチャモSV10018/098",
+          "count": "2枚",
+          "img": "cards/アチャモSV10018_098.png"
+        },
+        {
+          "category": "ポケモン (24)",
+          "name": "ワカシャモSV10019/098",
+          "count": "1枚",
+          "img": "cards/ワカシャモSV10019_098.png"
+        },
+        {
+          "category": "ポケモン (24)",
+          "name": "バシャーモexSVM016/175",
+          "count": "2枚",
+          "img": "cards/バシャーモexSVM016_175.png"
+        },
+        {
+          "category": "ポケモン (24)",
+          "name": "リーリエのピッピexMC287/742",
+          "count": "1枚",
+          "img": "cards/リーリエのピッピexMC287_742.png"
+        },
+        {
+          "category": "ポケモン (24)",
+          "name": "キチキギスexSVN002/045",
+          "count": "1枚",
+          "img": "cards/キチキギスexSVN002_045.png"
+        },
+        {
+          "category": "ポケモン (24)",
+          "name": "ニャースexM3061/080",
+          "count": "1枚",
+          "img": "cards/ニャースexM3061_080.png"
+        },
+        {
+          "category": "ポケモン (24)",
+          "name": "マシマシラMC358/742",
+          "count": "2枚",
+          "img": "cards/マシマシラMC358_742.png"
+        },
+        {
+          "category": "ポケモン (24)",
+          "name": "シェイミM2a012/193",
+          "count": "1枚",
+          "img": "cards/シェイミM2a012_193.png"
+        },
+        {
+          "category": "ポケモン (24)",
+          "name": "スボミーM2a196/193",
+          "count": "1枚",
+          "img": "cards/スボミーM2a196_193.png"
+        },
+        {
+          "category": "ポケモン (24)",
+          "name": "イーユイSV5a018/066",
+          "count": "1枚",
+          "img": "cards/イーユイSV5a018_066.png"
+        },
+        {
+          "category": "ポケモン (24)",
+          "name": "ファイヤーM2014/080",
+          "count": "1枚",
+          "img": "cards/ファイヤーM2014_080.png"
+        },
+        {
+          "category": "グッズ (16)",
+          "name": "なかよしポフィン",
+          "count": "4枚",
+          "img": "cards/なかよしポフィン.png"
+        },
+        {
+          "category": "グッズ (16)",
+          "name": "ハイパーボール",
+          "count": "4枚",
+          "img": "cards/ハイパーボール.png"
+        },
+        {
+          "category": "グッズ (16)",
+          "name": "ポケパッド",
+          "count": "3枚",
+          "img": "cards/ポケパッド.png"
+        },
+        {
+          "category": "グッズ (16)",
+          "name": "ふしぎなアメ",
+          "count": "2枚",
+          "img": "cards/ふしぎなアメ.png"
+        },
+        {
+          "category": "グッズ (16)",
+          "name": "夜のタンカ",
+          "count": "2枚",
+          "img": "cards/夜のタンカ.png"
+        },
+        {
+          "category": "グッズ (16)",
+          "name": "アンフェアスタンプ(ACE SPEC)",
+          "count": "1枚",
+          "img": "cards/アンフェアスタンプ(ACE SPEC).png"
+        },
+        {
+          "category": "サポート (10)",
+          "name": "リーリエの決心",
+          "count": "4枚",
+          "img": "cards/リーリエの決心.png"
+        },
+        {
+          "category": "サポート (10)",
+          "name": "ボスの指令",
+          "count": "3枚",
+          "img": "cards/ボスの指令.png"
+        },
+        {
+          "category": "サポート (10)",
+          "name": "アカマツ",
+          "count": "2枚",
+          "img": "cards/アカマツ.png"
+        },
+        {
+          "category": "サポート (10)",
+          "name": "ヒカリ",
+          "count": "1枚",
+          "img": "cards/ヒカリ.png"
+        },
+        {
+          "category": "スタジアム (2)",
+          "name": "ロケット団の監視塔",
+          "count": "1枚",
+          "img": "cards/ロケット団の監視塔.png"
+        },
+        {
+          "category": "スタジアム (2)",
+          "name": "ジャミングタワー",
+          "count": "1枚",
+          "img": "cards/ジャミングタワー.png"
+        },
+        {
+          "category": "エネルギー (8)",
+          "name": "基本超エネルギー",
+          "count": "3枚",
+          "img": "cards/基本超エネルギー.png"
+        },
+        {
+          "category": "エネルギー (8)",
+          "name": "基本炎エネルギー",
+          "count": "3枚",
+          "img": "cards/基本炎エネルギー.png"
+        },
+        {
+          "category": "エネルギー (8)",
+          "name": "基本悪エネルギー",
+          "count": "2枚",
+          "img": "cards/基本悪エネルギー.png"
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "text": "2 位 | モンテ | プレイヤー ID: 0003354937 | 茨城県",
+      "info_ko": "2 위 | 몬테 | 플레이어 ID: 0003354937 | 이바라키현",
+      "deck": "▶ ポケモン (19)\n  タケルライコexSV5K053/071 2枚\n  オーガポン みどりのめんexSV6016/101 4枚\n  メガガルーラexM1S051/063 3枚\n  ニャースexM3061/080 3枚\n  ラティアスexSV7a019/064 2枚\n  テツノイサハexSV5M016/071 1枚\n  リーリエのピッピexSV9033/100 1枚\n  キチキギスexSV6a038/064 1枚\n  ナゲツケサルSV7a031/064 1枚\n  パオジアンSV8032/106 1枚\n▶ グッズ (14)\n  ハイパーボール 4枚\n  エネルギーつけかえ 4枚\n  ガラスのラッパ 2枚\n  むしとりセット 1枚\n  エネルギー回収 1枚\n  夜のタンカ 1枚\n  プライムキャッチャー(ACE SPEC) 1枚\n▶ ポケモンのどうぐ (0)\n▶ サポート (8)\n  アカマツ 4枚\n  シアノ 2枚\n  ボスの指令 2枚\n▶ スタジアム (4)\n  ゼロの大空洞 4枚\n▶ エネルギー (15)\n  基本草エネルギー 8枚\n  基本雷エネルギー 3枚\n  基本闘エネルギー 3枚\n  基本超エネルギー 1枚",
+      "deck_ko": "▶ 포켓몬 (19 장)\n  날뛰는우레 ex 2 장\n  오거폰 벽록의가면 ex 4 장\n  메가캥카 ex 3 장\n  나옹 ex 3 장\n  라티아스 ex 2 장\n  무쇠잎새 ex 1 장\n  릴리에의 삐삐 ex 1 장\n  기로치 1 장\n  던지미원 1 장\n  디디무상 1 장\n▶ 아이템 (14 장)\n  하이퍼볼 4 장\n  에너지교체 4 장\n  유리나팔 2 장\n  벌레잡이세트 1 장\n  에너지회수 1 장\n  밤의들것 1 장\n  프라임캐처 (ACE SPEC) 1 장\n▶ 포켓몬 도구 (0 장)\n▶ 서포터 (8 장)\n  하솔 4 장\n  사이노 2 장\n  보스의지령 2 장\n▶ 스타디움 (4 장)\n  제로의대공허 4 장\n▶ 에너지 (15 장)\n  기본풀에너지 8 장\n  기본전기에너지 3 장\n  기본격투에너지 3 장\n  기본에스퍼에너지 1 장",
+      "deck_type_ko": "오거폰 벽록의가면 ex",
+      "deck_url": "https://www.pokemon-card.com/deck/confirm.html/deckID/VfF5kv-ixD68F-kkbFFk",
+      "deck_img": "",
+      "card_list": [
+        {
+          "category": "ポケモン (19)",
+          "name": "タケルライコexSV5K053/071",
+          "count": "2枚",
+          "img": "cards/タケルライコexSV5K053_071.png"
+        },
+        {
+          "category": "ポケモン (19)",
+          "name": "オーガポン みどりのめんexSV6016/101",
+          "count": "4枚",
+          "img": "cards/オーガポン みどりのめんexSV6016_101.png"
+        },
+        {
+          "category": "ポケモン (19)",
+          "name": "メガガルーラexM1S051/063",
+          "count": "3枚",
+          "img": "cards/メガガルーラexM1S051_063.png"
+        },
+        {
+          "category": "ポケモン (19)",
+          "name": "ニャースexM3061/080",
+          "count": "3枚",
+          "img": "cards/ニャースexM3061_080.png"
+        },
+        {
+          "category": "ポケモン (19)",
+          "name": "ラティアスexSV7a019/064",
+          "count": "2枚",
+          "img": "cards/ラティアスexSV7a019_064.png"
+        },
+        {
+          "category": "ポケモン (19)",
+          "name": "テツノイサハexSV5M016/071",
+          "count": "1枚",
+          "img": "cards/テツノイサハexSV5M016_071.png"
+        },
+        {
+          "category": "ポケモン (19)",
+          "name": "リーリエのピッピexSV9033/100",
+          "count": "1枚",
+          "img": "cards/リーリエのピッピexSV9033_100.png"
+        },
+        {
+          "category": "ポケモン (19)",
+          "name": "キチキギスexSV6a038/064",
+          "count": "1枚",
+          "img": "cards/キチキギスexSV6a038_064.png"
+        },
+        {
+          "category": "ポケモン (19)",
+          "name": "ナゲツケサルSV7a031/064",
+          "count": "1枚",
+          "img": "cards/ナゲツケサルSV7a031_064.png"
+        },
+        {
+          "category": "ポケモン (19)",
+          "name": "パオジアンSV8032/106",
+          "count": "1枚",
+          "img": "cards/パオジアンSV8032_106.png"
+        },
+        {
+          "category": "グッズ (14)",
+          "name": "ハイパーボール",
+          "count": "4枚",
+          "img": "cards/ハイパーボール.png"
+        },
+        {
+          "category": "グッズ (14)",
+          "name": "エネルギーつけかえ",
+          "count": "4枚",
+          "img": "cards/エネルギーつけかえ.png"
+        },
+        {
+          "category": "グッズ (14)",
+          "name": "ガラスのラッパ",
+          "count": "2枚",
+          "img": "cards/ガラスのラッパ.png"
+        },
+        {
+          "category": "グッズ (14)",
+          "name": "むしとりセット",
+          "count": "1枚",
+          "img": "cards/むしとりセット.png"
+        },
+        {
+          "category": "グッズ (14)",
+          "name": "エネルギー回収",
+          "count": "1枚",
+          "img": "cards/エネルギー回収.png"
+        },
+        {
+          "category": "グッズ (14)",
+          "name": "夜のタンカ",
+          "count": "1枚",
+          "img": "cards/夜のタンカ.png"
+        },
+        {
+          "category": "グッズ (14)",
+          "name": "プライムキャッチャー(ACE SPEC)",
+          "count": "1枚",
+          "img": "cards/プライムキャッチャー(ACE SPEC).png"
+        },
+        {
+          "category": "サポート (8)",
+          "name": "アカマツ",
+          "count": "4枚",
+          "img": "cards/アカマツ.png"
+        },
+        {
+          "category": "サポート (8)",
+          "name": "シアノ",
+          "count": "2枚",
+          "img": "cards/シアノ.png"
+        },
+        {
+          "category": "サポート (8)",
+          "name": "ボスの指令",
+          "count": "2枚",
+          "img": "cards/ボスの指令.png"
+        },
+        {
+          "category": "スタジアム (4)",
+          "name": "ゼロの大空洞",
+          "count": "4枚",
+          "img": "cards/ゼロの大空洞.png"
+        },
+        {
+          "category": "エネルギー (15)",
+          "name": "基本草エネルギー",
+          "count": "8枚",
+          "img": "cards/基本草エネルギー.png"
+        },
+        {
+          "category": "エネルギー (15)",
+          "name": "基本雷エネルギー",
+          "count": "3枚",
+          "img": "cards/基本雷エネルギー.png"
+        },
+        {
+          "category": "エネルギー (15)",
+          "name": "基本闘エネルギー",
+          "count": "3枚",
+          "img": "cards/基本闘エネルギー.png"
+        },
+        {
+          "category": "エネルギー (15)",
+          "name": "基本超エネルギー",
+          "count": "1枚",
+          "img": "cards/基本超エネルギー.png"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "text": "3 位 | しふ゛や | プレイヤー ID: 0015514488 | 千葉県",
+      "info_ko": "3 위 | 시부야 | 플레이어 ID: 0015514488 | 지바현",
+      "deck": "▶ ポケモン (23)\n  ドラパルトexSV6120/101 2枚\n  ドロンチM2a133/193 4枚\n  ドラメシヤM2a132/193 4枚\n  バシャーモexSVM016/175 2枚\n  ワカシャモSV10019/098 1枚\n  アチャモSV10018/098 2枚\n  イーユイSV5a018/066 1枚\n  マシマシラM2a081/193 2枚\n  スボミーM2a011/193 1枚\n  シェイミM2a012/193 1枚\n  キチキギスexSV6a081/064 1枚\n  リーリエのピッピexSV9115/100 1枚\n  ニャースexM3100/080 1枚\n▶ グッズ (16)\n  なかよしポフィン 4枚\n  ハイパーボール 4枚\n  ポケパッド 3枚\n  ふしぎなアメ 2枚\n  夜のタンカ 1枚\n  スペシャルレッドカード 1枚\n  アンフェアスタンプ(ACE SPEC) 1枚\n▶ ポケモンのどうぐ (0)\n▶ サポート (11)\n  リーリエの決心 4枚\n  ボスの指令 3枚\n  ヒカリ 2枚\n  アカマツ 2枚\n▶ スタジアム (2)\n  ジャミングタワー 1枚\n  ロケット団の監視塔 1枚\n▶ エネルギー (8)\n  基本超エネルギー 3枚\n  基本炎エネルギー 3枚\n  基本悪エネルギー 2枚",
+      "deck_ko": "▶ 포켓몬 (23 장)\n  드래펄트 ex 2 장\n  드래런치 4 장\n  드라꼰 4 장\n  번치코 ex 2 장\n  영치코 1 장\n  아차모 2 장\n  이브이 1 장\n  이야후 2 장\n  꼬몽울 1 장\n  쉐이미 1 장\n  기로치 1 장\n  릴리에의 삐삐 ex 1 장\n  나옹 ex 1 장\n▶ 아이템 (16 장)\n  친밀포핀 4 장\n  하이퍼볼 4 장\n  포켓패드 3 장\n  이상한사탕 2 장\n  밤의들것 1 장\n  스페셜레드카드 1 장\n  언페어스탬프 (ACE SPEC) 1 장\n▶ 포켓몬 도구 (0 장)\n▶ 서포터 (11 장)\n  릴리에의결심 4 장\n  보스의지령 3 장\n  빛나 2 장\n  하솔 2 장\n▶ 스타디움 (2 장)\n  재밍타워 1 장\n  로켓단의감시탑 1 장\n▶ 에너지 (8 장)\n  기본에스퍼에너지 3 장\n  기본불꽃에너지 3 장\n  기본악에너지 2 장",
+      "deck_type_ko": "드래펄트 ex",
+      "deck_url": "https://www.pokemon-card.com/deck/confirm.html/deckID/ppMRSy-hJyUfE-yXpSME",
+      "deck_img": "",
+      "card_list": [
+        {
+          "category": "ポケモン (23)",
+          "name": "ドラパルトexSV6120/101",
+          "count": "2枚",
+          "img": "cards/ドラパルトexSV6120_101.png"
+        },
+        {
+          "category": "ポケモン (23)",
+          "name": "ドロンチM2a133/193",
+          "count": "4枚",
+          "img": "cards/ドロンチM2a133_193.png"
+        },
+        {
+          "category": "ポケモン (23)",
+          "name": "ドラメシヤM2a132/193",
+          "count": "4枚",
+          "img": "cards/ドラメシヤM2a132_193.png"
+        },
+        {
+          "category": "ポケモン (23)",
+          "name": "バシャーモexSVM016/175",
+          "count": "2枚",
+          "img": "cards/バシャーモexSVM016_175.png"
+        },
+        {
+          "category": "ポケモン (23)",
+          "name": "ワカシャモSV10019/098",
+          "count": "1枚",
+          "img": "cards/ワカシャモSV10019_098.png"
+        },
+        {
+          "category": "ポケモン (23)",
+          "name": "アチャモSV10018/098",
+          "count": "2枚",
+          "img": "cards/アチャモSV10018_098.png"
+        },
+        {
+          "category": "ポケモン (23)",
+          "name": "イーユイSV5a018/066",
+          "count": "1枚",
+          "img": "cards/イーユイSV5a018_066.png"
+        },
+        {
+          "category": "ポケモン (23)",
+          "name": "マシマシラM2a081/193",
+          "count": "2枚",
+          "img": "cards/マシマシラM2a081_193.png"
+        },
+        {
+          "category": "ポケモン (23)",
+          "name": "スボミーM2a011/193",
+          "count": "1枚",
+          "img": "cards/スボミーM2a011_193.png"
+        },
+        {
+          "category": "ポケモン (23)",
+          "name": "シェイミM2a012/193",
+          "count": "1枚",
+          "img": "cards/シェイミM2a012_193.png"
+        },
+        {
+          "category": "ポケモン (23)",
+          "name": "キチキギスexSV6a081/064",
+          "count": "1枚",
+          "img": "cards/キチキギスexSV6a081_064.png"
+        },
+        {
+          "category": "ポケモン (23)",
+          "name": "リーリエのピッピexSV9115/100",
+          "count": "1枚",
+          "img": "cards/リーリエのピッピexSV9115_100.png"
+        },
+        {
+          "category": "ポケモン (23)",
+          "name": "ニャースexM3100/080",
+          "count": "1枚",
+          "img": "cards/ニャースexM3100_080.png"
+        },
+        {
+          "category": "グッズ (16)",
+          "name": "なかよしポフィン",
+          "count": "4枚",
+          "img": "cards/なかよしポフィン.png"
+        },
+        {
+          "category": "グッズ (16)",
+          "name": "ハイパーボール",
+          "count": "4枚",
+          "img": "cards/ハイパーボール.png"
+        },
+        {
+          "category": "グッズ (16)",
+          "name": "ポケパッド",
+          "count": "3枚",
+          "img": "cards/ポケパッド.png"
+        },
+        {
+          "category": "グッズ (16)",
+          "name": "ふしぎなアメ",
+          "count": "2枚",
+          "img": "cards/ふしぎなアメ.png"
+        },
+        {
+          "category": "グッズ (16)",
+          "name": "夜のタンカ",
+          "count": "1枚",
+          "img": "cards/夜のタンカ.png"
+        },
+        {
+          "category": "グッズ (16)",
+          "name": "スペシャルレッドカード",
+          "count": "1枚",
+          "img": "cards/スペシャルレッドカード.png"
+        },
+        {
+          "category": "グッズ (16)",
+          "name": "アンフェアスタンプ(ACE SPEC)",
+          "count": "1枚",
+          "img": "cards/アンフェアスタンプ(ACE SPEC).png"
+        },
+        {
+          "category": "サポート (11)",
+          "name": "リーリエの決心",
+          "count": "4枚",
+          "img": "cards/リーリエの決心.png"
+        },
+        {
+          "category": "サポート (11)",
+          "name": "ボスの指令",
+          "count": "3枚",
+          "img": "cards/ボスの指令.png"
+        },
+        {
+          "category": "サポート (11)",
+          "name": "ヒカリ",
+          "count": "2枚",
+          "img": "cards/ヒカリ.png"
+        },
+        {
+          "category": "サポート (11)",
+          "name": "アカマツ",
+          "count": "2枚",
+          "img": "cards/アカマツ.png"
+        },
+        {
+          "category": "スタジアム (2)",
+          "name": "ジャミングタワー",
+          "count": "1枚",
+          "img": "cards/ジャミングタワー.png"
+        },
+        {
+          "category": "スタジアム (2)",
+          "name": "ロケット団の監視塔",
+          "count": "1枚",
+          "img": "cards/ロケット団の監視塔.png"
+        },
+        {
+          "category": "エネルギー (8)",
+          "name": "基本超エネルギー",
+          "count": "3枚",
+          "img": "cards/基本超エネルギー.png"
+        },
+        {
+          "category": "エネルギー (8)",
+          "name": "基本炎エネルギー",
+          "count": "3枚",
+          "img": "cards/基本炎エネルギー.png"
+        },
+        {
+          "category": "エネルギー (8)",
+          "name": "基本悪エネルギー",
+          "count": "2枚",
+          "img": "cards/基本悪エネルギー.png"
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "text": "3 位 | ゆはみ | プレイヤー ID: 0020572927 | 東京都",
+      "info_ko": "3 위 | 유타미 | 플레이어 ID: 0020572927 | 도쿄",
+      "deck": "▶ ポケモン (21)\n  ドラメシヤSV8a118/187 4枚\n  ドロンチSV8a119/187 4枚\n  ドラパルトexSV8a120/187 3枚\n  ヨマワルMC308/742 2枚\n  サマヨールMC309/742 1枚\n  ヨノワールSV6a020/064 1枚\n  マシマシラSV8a075/187 2枚\n  スボミーSV8a001/187 1枚\n  キチキギスexSVN002/045 1枚\n  ニャースexM3061/080 2枚\n▶ グッズ (17)\n  ハイパーボール 4枚\n  なかよしポフィン 4枚\n  ポケパッド 4枚\n  夜のタンカ 1枚\n  ふしぎなアメ 2枚\n  アンフェアスタンプ(ACE SPEC) 1枚\n  スペシャルレッドカード 1枚\n▶ ポケモンのどうぐ (0)\n▶ サポート (11)\n  リーリエの決心 4枚\n  ボスの指令 3枚\n  アカマツ 2枚\n  メイのはげまし 1枚\n  ロケット団のラムダ 1枚\n▶ スタジアム (3)\n  ジャミングタワー 1枚\n  ロケット団の監視塔 1枚\n  危ない廃墟 1枚\n▶ エネルギー (8)\n  基本超エネルギー 3枚\n  基本炎エネルギー 3枚\n  基本悪エネルギー 2枚",
+      "deck_ko": "▶ 포켓몬 (21 장)\n  드라꼰 4 장\n  드래런치 4 장\n  드래펄트 ex 3 장\n  해골몽 2 장\n  미라몽 1 장\n  야느와르몽 1 장\n  이야후 2 장\n  꼬몽울 1 장\n  기로치 1 장\n  나옹 ex 2 장\n▶ 아이템 (17 장)\n  하이퍼볼 4 장\n  친밀포핀 4 장\n  포켓패드 4 장\n  밤의들것 1 장\n  이상한사탕 2 장\n  언페어스탬프 (ACE SPEC) 1 장\n  스페셜레드카드 1 장\n▶ 포켓몬 도구 (0 장)\n▶ 서포터 (11 장)\n  릴리에의결심 4 장\n  보스의지령 3 장\n  하솔 2 장\n  명희의격려 1 장\n  로켓단의 람다 1 장\n▶ 스타디움 (3 장)\n  재밍타워 1 장\n  로켓단의감시탑 1 장\n  위험한폐허 1 장\n▶ 에너지 (8 장)\n  기본에스퍼에너지 3 장\n  기본불꽃에너지 3 장\n  기본악에너지 2 장",
+      "deck_type_ko": "드래펄트 ex",
+      "deck_url": "https://www.pokemon-card.com/deck/confirm.html/deckID/kF5vbf-QYp0ao-vkFFvF",
+      "deck_img": "",
+      "card_list": [
+        {
+          "category": "ポケモン (21)",
+          "name": "ドラメシヤSV8a118/187",
+          "count": "4枚",
+          "img": "cards/ドラメシヤSV8a118_187.png"
+        },
+        {
+          "category": "ポケモン (21)",
+          "name": "ドロンチSV8a119/187",
+          "count": "4枚",
+          "img": "cards/ドロンチSV8a119_187.png"
+        },
+        {
+          "category": "ポケモン (21)",
+          "name": "ドラパルトexSV8a120/187",
+          "count": "3枚",
+          "img": "cards/ドラパルトexSV8a120_187.png"
+        },
+        {
+          "category": "ポケモン (21)",
+          "name": "ヨマワルMC308/742",
+          "count": "2枚",
+          "img": "cards/ヨマワルMC308_742.png"
+        },
+        {
+          "category": "ポケモン (21)",
+          "name": "サマヨールMC309/742",
+          "count": "1枚",
+          "img": "cards/サマヨールMC309_742.png"
+        },
+        {
+          "category": "ポケモン (21)",
+          "name": "ヨノワールSV6a020/064",
+          "count": "1枚",
+          "img": "cards/ヨノワールSV6a020_064.png"
+        },
+        {
+          "category": "ポケモン (21)",
+          "name": "マシマシラSV8a075/187",
+          "count": "2枚",
+          "img": "cards/マシマシラSV8a075_187.png"
+        },
+        {
+          "category": "ポケモン (21)",
+          "name": "スボミーSV8a001/187",
+          "count": "1枚",
+          "img": "cards/スボミーSV8a001_187.png"
+        },
+        {
+          "category": "ポケモン (21)",
+          "name": "キチキギスexSVN002/045",
+          "count": "1枚",
+          "img": "cards/キチキギスexSVN002_045.png"
+        },
+        {
+          "category": "ポケモン (21)",
+          "name": "ニャースexM3061/080",
+          "count": "2枚",
+          "img": "cards/ニャースexM3061_080.png"
+        },
+        {
+          "category": "グッズ (17)",
+          "name": "ハイパーボール",
+          "count": "4枚",
+          "img": "cards/ハイパーボール.png"
+        },
+        {
+          "category": "グッズ (17)",
+          "name": "なかよしポフィン",
+          "count": "4枚",
+          "img": "cards/なかよしポフィン.png"
+        },
+        {
+          "category": "グッズ (17)",
+          "name": "ポケパッド",
+          "count": "4枚",
+          "img": "cards/ポケパッド.png"
+        },
+        {
+          "category": "グッズ (17)",
+          "name": "夜のタンカ",
+          "count": "1枚",
+          "img": "cards/夜のタンカ.png"
+        },
+        {
+          "category": "グッズ (17)",
+          "name": "ふしぎなアメ",
+          "count": "2枚",
+          "img": "cards/ふしぎなアメ.png"
+        },
+        {
+          "category": "グッズ (17)",
+          "name": "アンフェアスタンプ(ACE SPEC)",
+          "count": "1枚",
+          "img": "cards/アンフェアスタンプ(ACE SPEC).png"
+        },
+        {
+          "category": "グッズ (17)",
+          "name": "スペシャルレッドカード",
+          "count": "1枚",
+          "img": "cards/スペシャルレッドカード.png"
+        },
+        {
+          "category": "サポート (11)",
+          "name": "リーリエの決心",
+          "count": "4枚",
+          "img": "cards/リーリエの決心.png"
+        },
+        {
+          "category": "サポート (11)",
+          "name": "ボスの指令",
+          "count": "3枚",
+          "img": "cards/ボスの指令.png"
+        },
+        {
+          "category": "サポート (11)",
+          "name": "アカマツ",
+          "count": "2枚",
+          "img": "cards/アカマツ.png"
+        },
+        {
+          "category": "サポート (11)",
+          "name": "メイのはげまし",
+          "count": "1枚",
+          "img": "cards/メイのはげまし.png"
+        },
+        {
+          "category": "サポート (11)",
+          "name": "ロケット団のラムダ",
+          "count": "1枚",
+          "img": "cards/ロケット団のラムダ.png"
+        },
+        {
+          "category": "スタジアム (3)",
+          "name": "ジャミングタワー",
+          "count": "1枚",
+          "img": "cards/ジャミングタワー.png"
+        },
+        {
+          "category": "スタジアム (3)",
+          "name": "ロケット団の監視塔",
+          "count": "1枚",
+          "img": "cards/ロケット団の監視塔.png"
+        },
+        {
+          "category": "スタジアム (3)",
+          "name": "危ない廃墟",
+          "count": "1枚",
+          "img": "cards/危ない廃墟.png"
+        },
+        {
+          "category": "エネルギー (8)",
+          "name": "基本超エネルギー",
+          "count": "3枚",
+          "img": "cards/基本超エネルギー.png"
+        },
+        {
+          "category": "エネルギー (8)",
+          "name": "基本炎エネルギー",
+          "count": "3枚",
+          "img": "cards/基本炎エネルギー.png"
+        },
+        {
+          "category": "エネルギー (8)",
+          "name": "基本悪エネルギー",
+          "count": "2枚",
+          "img": "cards/基本悪エネルギー.png"
+        }
+      ]
+    }
+  ]
+}
