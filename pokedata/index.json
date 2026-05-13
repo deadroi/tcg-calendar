@@ -1,5 +1,75 @@
 [
   {
+    "file": "20260510_981404.json",
+    "date": "20260510",
+    "event_id": "981404",
+    "title": "チャンピオンズリーグ2026 愛知 May オープンリーグ【エクストラレギュレーション】/愛知県",
+    "title_ko": "챔피언스리그 2026 아이치 May 오픈리그【엑스트라레귤레이션】/아이치현",
+    "shop": "株式会社ポケモン",
+    "url": "https://players.pokemon-card.com/event/detail/981404/result",
+    "collected_at": "2026-05-12 15:09:05"
+  },
+  {
+    "file": "20260510_981255.json",
+    "date": "20260510",
+    "event_id": "981255",
+    "title": "チャンピオンズリーグ2026 愛知 May シニアリーグ 2日目大会/愛知県",
+    "title_ko": "챔피언스리그 2026 아이치 May 시니어리그 2 일째 대회/아이치현",
+    "shop": "株式会社ポケモン",
+    "url": "https://players.pokemon-card.com/event/detail/981255/result",
+    "collected_at": "2026-05-12 15:04:42"
+  },
+  {
+    "file": "20260510_981402.json",
+    "date": "20260510",
+    "event_id": "981402",
+    "title": "チャンピオンズリーグ2026 愛知 May ジュニアリーグ 2日目大会/愛知県",
+    "title_ko": "챔피언스리그 2026 아이치 메이 주니어리그 2 일째 대회/아이치현",
+    "shop": "株式会社ポケモン",
+    "url": "https://players.pokemon-card.com/event/detail/981402/result",
+    "collected_at": "2026-05-12 15:00:21"
+  },
+  {
+    "file": "20260510_981571.json",
+    "date": "20260510",
+    "event_id": "981571",
+    "title": "チャンピオンズリーグ2026 愛知 May マスターリーグDay2/愛知県",
+    "title_ko": "챔피언스리그 2026 아이치 May 마스터리그 Day2/아이치현",
+    "shop": "株式会社ポケモン",
+    "url": "https://players.pokemon-card.com/event/detail/981571/result",
+    "collected_at": "2026-05-12 14:56:37"
+  },
+  {
+    "file": "20260509_981254.json",
+    "date": "20260509",
+    "event_id": "981254",
+    "title": "チャンピオンズリーグ2026 愛知 May シニアリーグ 1日目大会/愛知県",
+    "title_ko": "챔피언스리그 2026 아이치 메이 시니어리그 1 일차 대회/아이치현",
+    "shop": "株式会社ポケモン",
+    "url": "https://players.pokemon-card.com/event/detail/981254/result",
+    "collected_at": "2026-05-12 15:20:39"
+  },
+  {
+    "file": "20260509_981401.json",
+    "date": "20260509",
+    "event_id": "981401",
+    "title": "チャンピオンズリーグ2026 愛知 May ジュニアリーグ 1日目大会/愛知県",
+    "title_ko": "챔피언스리그 2026 아이치 May 주니어리그 1 일차 대회/아이치현",
+    "shop": "株式会社ポケモン",
+    "url": "https://players.pokemon-card.com/event/detail/981401/result",
+    "collected_at": "2026-05-12 15:16:20"
+  },
+  {
+    "file": "20260509_981253.json",
+    "date": "20260509",
+    "event_id": "981253",
+    "title": "チャンピオンズリーグ2026 愛知 May マスターリーグ/愛知県",
+    "title_ko": "챔피언스리그 2026 아이치 May 마스터리그/아이치현",
+    "shop": "株式会社ポケモン",
+    "url": "https://players.pokemon-card.com/event/detail/981253/result",
+    "collected_at": "2026-05-12 15:12:25"
+  },
+  {
     "file": "20260506_953108.json",
     "date": "20260506",
     "event_id": "953108",
@@ -498,6 +568,16 @@
     "shop": "トレカショップ竜のしっぽ　布施店",
     "url": "https://players.pokemon-card.com/event/detail/953107/result",
     "collected_at": "2026-05-06 10:40:13"
+  },
+  {
+    "file": "20260504_952847.json",
+    "date": "20260504",
+    "event_id": "952847",
+    "title": "シティリーグ2026 シーズン4 オープンリーグ/東京都",
+    "title_ko": "시티리그 2026 시즌 4 오픈리그/도쿄",
+    "shop": "BOOKOFF SUPER BAZAAR 立川駅北口店",
+    "url": "https://players.pokemon-card.com/event/detail/952847/result",
+    "collected_at": "2026-05-11 08:35:59"
   },
   {
     "file": "20260504_953098.json",
