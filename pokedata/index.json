@@ -1,5 +1,65 @@
 [
   {
+    "file": "20260607_1032137.json",
+    "date": "20260607",
+    "event_id": "1032137",
+    "title": "ポケモンジャパンチャンピオンシップス2026 カードゲーム部門 ジュニアリーグ Day2/神奈川県",
+    "title_ko": "포켓몬 재팬 챔피언십스 2026 카드게임 부문 주니어리그 데이 2/가나가와현",
+    "shop": "株式会社ポケモン",
+    "url": "https://players.pokemon-card.com/event/detail/1032137/result",
+    "collected_at": "2026-06-17 09:35:41"
+  },
+  {
+    "file": "20260607_1032135.json",
+    "date": "20260607",
+    "event_id": "1032135",
+    "title": "ポケモンジャパンチャンピオンシップス2026 カードゲーム部門 マスターリーグ Day2/神奈川県",
+    "title_ko": "포켓몬 재팬 챔피언십 2026 카드게임 부문 마스터리그 Day2/가나가와현",
+    "shop": "株式会社ポケモン",
+    "url": "https://players.pokemon-card.com/event/detail/1032135/result",
+    "collected_at": "2026-06-17 09:31:05"
+  },
+  {
+    "file": "20260607_1032136.json",
+    "date": "20260607",
+    "event_id": "1032136",
+    "title": "ポケモンジャパンチャンピオンシップス2026 カードゲーム部門 シニアリーグ Day2/神奈川県",
+    "title_ko": "포켓몬 재팬 챔피언십스 2026 카드게임 부문 시니어리그 데이 2/가나가와현",
+    "shop": "株式会社ポケモン",
+    "url": "https://players.pokemon-card.com/event/detail/1032136/result",
+    "collected_at": "2026-06-17 09:26:45"
+  },
+  {
+    "file": "20260606_1032094.json",
+    "date": "20260606",
+    "event_id": "1032094",
+    "title": "ポケモンジャパンチャンピオンシップス2026 カードゲーム部門 ジュニアリーグ/神奈川県",
+    "title_ko": "포켓몬 재팬 챔피언십스 2026 카드게임 부문 주니어리그/가나가와현",
+    "shop": "株式会社ポケモン",
+    "url": "https://players.pokemon-card.com/event/detail/1032094/result",
+    "collected_at": "2026-06-17 09:41:58"
+  },
+  {
+    "file": "20260606_1032093.json",
+    "date": "20260606",
+    "event_id": "1032093",
+    "title": "ポケモンジャパンチャンピオンシップス2026 カードゲーム部門 シニアリーグ/神奈川県",
+    "title_ko": "포켓몬 재팬 챔피언십스 2026 카드게임 부문 시니어리그/가나가와현",
+    "shop": "株式会社ポケモン",
+    "url": "https://players.pokemon-card.com/event/detail/1032093/result",
+    "collected_at": "2026-06-17 09:40:35"
+  },
+  {
+    "file": "20260606_1032092.json",
+    "date": "20260606",
+    "event_id": "1032092",
+    "title": "ポケモンジャパンチャンピオンシップス2026 カードゲーム部門 マスターリーグ/神奈川県",
+    "title_ko": "포켓몬 재팬 챔피언십 2026 카드게임 부문 마스터리그/가나가와현",
+    "shop": "株式会社ポケモン",
+    "url": "https://players.pokemon-card.com/event/detail/1032092/result",
+    "collected_at": "2026-06-17 09:38:56"
+  },
+  {
     "file": "20260510_981404.json",
     "date": "20260510",
     "event_id": "981404",
