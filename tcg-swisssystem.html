@@ -567,8 +567,8 @@ function calcOMW(pid) {
   return rates.reduce((a, b) => a + b, 0) / rates.length;
 }
 
-// GW% = 본인 게임 승수 / 전체 게임 수, 최소 33% (MTG 3순위)
-function calcGW(pid) {
+// 본인 게임 승수/전체 게임 수 집계 (BYE 포함)
+function _gwRaw(pid) {
   let gw = 0, total = 0;
   T.rounds.forEach(r => r.pairings.forEach(p => {
     if (p.p2Id === null && p.p1Id === pid) { gw += 1; total += 1; return; } // BYE
@@ -579,8 +579,21 @@ function calcGW(pid) {
     const ow = isP1 ? p.p2w : p.p1w;
     gw += mw; total += mw + ow;
   }));
+  return { gw, total };
+}
+
+// GW% = 본인 게임 승수 / 전체 게임 수, 최소 33% (MTG 3순위) — OGW% 계산 시 "상대 입력값"으로만 사용
+function calcGW(pid) {
+  const { gw, total } = _gwRaw(pid);
   if (total === 0) return 0.33;
   return Math.max(0.33, gw / total);
+}
+
+// 본인 실제 GW% (33% 보정 없음) — 본인 순위 표시/정렬(3순위 타이브레이커)용
+function calcGWReal(pid) {
+  const { gw, total } = _gwRaw(pid);
+  if (total === 0) return 0;
+  return gw / total;
 }
 
 // OGW% = 상대 GW% 평균 (MTG 4순위)
@@ -609,7 +622,7 @@ function getStandings(withDropped = false) {
   const players = withDropped ? T.players : T.players.filter(p => !p.dropped);
   return players.map(p => {
     const s = calcStats(p.id);
-    return { ...p, ...s, omw: calcOMW(p.id), gw: calcGW(p.id), ogw: calcOGW(p.id) };
+    return { ...p, ...s, omw: calcOMW(p.id), gw: calcGWReal(p.id), ogw: calcOGW(p.id) };
   }).sort((a, b) =>
     b.pts - a.pts ||
     b.omw - a.omw ||
