@@ -180,35 +180,12 @@ wcs_do();
     .main { min-width: 0; }
   }
 </style>
+<link rel="stylesheet" href="asset/data-pages-theme.css">
+<script src="asset/site-nav.js" defer></script>
 </head>
 <body>
 
-<nav class="site-nav">
-  <div class="site-nav-inner">
-    <div class="site-nav-links">
-      <a href="https://tcg-calendar.co.kr/index.html" class="site-nav-link">🏠 메인</a>
-      <a href="https://tcg-calendar.co.kr" class="site-nav-link active">📅 대회 일정</a>
-      <a href="https://tcg-calendar.co.kr/result.html" class="site-nav-link">📋 대회 결과</a>
-      <a href="https://tcg-calendar.co.kr/deck_meta.html" class="site-nav-link">🃏 입상덱 메타</a>
-      <a href="https://tcg-calendar.co.kr/tcg-swisssystem.html" class="site-nav-link">🏆 스위스라운드 시스템</a>
-      <a href="https://tcg-calendar.co.kr/tcgtimer.html" class="site-nav-link">⏱ TCG 타이머</a>
-      <a href="https://tcg-calendar.co.kr/tcg_map.html" class="site-nav-link">🗺 TCG 매장 지도</a>
-    </div>
-    <span class="site-nav-title">🃏 TCG 캘린더</span>
-    <button class="site-nav-hamburger" onclick="this.nextElementSibling.classList.toggle('open')" aria-label="메뉴">
-      <span></span><span></span><span></span>
-    </button>
-    <div class="site-nav-dropdown">
-      <a href="https://tcg-calendar.co.kr/index.html" class="site-nav-link">🏠 메인</a>
-      <a href="https://tcg-calendar.co.kr" class="site-nav-link active">📅 대회 일정</a>
-      <a href="https://tcg-calendar.co.kr/result.html" class="site-nav-link">📋 대회 결과</a>
-      <a href="https://tcg-calendar.co.kr/deck_meta.html" class="site-nav-link">🃏 입상덱 메타</a>
-      <a href="https://tcg-calendar.co.kr/tcg-swisssystem.html" class="site-nav-link">🏆 스위스라운드 시스템</a>
-      <a href="https://tcg-calendar.co.kr/tcgtimer.html" class="site-nav-link">⏱ TCG 타이머</a>
-      <a href="https://tcg-calendar.co.kr/tcg_map.html" class="site-nav-link">🗺 TCG 매장 지도</a>
-    </div>
-  </div>
-</nav>
+<nav class="site-nav" aria-label="?? ??"></nav>
 <script>
 document.addEventListener('click', e => {
   const nav = document.querySelector('.site-nav-dropdown');
@@ -217,7 +194,7 @@ document.addEventListener('click', e => {
 </script>
 
 <div class="page-header">
-  <h1>📅 TCG 대회 일정</h1>
+  <h1>TCG 대회 일정</h1>
   <p class="page-header-sub">TCG 매장 공식 X에서 수집한 대회 일정</p>
   <div class="month-nav" id="monthNav" style="display:none">
     <button class="month-nav-arrow" id="monthPrev">&#8249;</button>
