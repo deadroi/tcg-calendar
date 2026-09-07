@@ -1,0 +1,22 @@
+/* 일정·결과·입상덱 공통 화면 테마 */
+:root{--page-navy:#172334;--page-navy-2:#22344b;--page-orange:#f08c00;--page-orange-dark:#d97706;--page-line:#dce3eb;--page-bg:#edf1f5}
+body{background:var(--page-bg)!important;color:#253247}
+.page-header{background:linear-gradient(135deg,var(--page-navy) 0%,var(--page-navy-2) 100%)!important;border-bottom:1px solid #2b3b50!important}
+.page-header h1{color:#fff!important}.page-header-sub,.page-header .sub{color:#9baabd!important}
+.month-nav-arrow{border-color:#f08c0066!important;background:#f08c001a!important;color:var(--page-orange)!important}
+.month-nav-arrow:hover{background:#f08c0038!important;color:#fff!important}
+.month-nav-label{border-color:#f08c0066!important;background:#f08c001a!important;color:#fff!important}
+.month-nav-label:hover{background:#f08c0038!important}.month-nav-label .arrow-icon{color:var(--page-orange)!important}
+.month-dropdown{background:var(--page-navy)!important;border-color:#34465d!important;box-shadow:0 10px 28px #0007!important}
+.month-dropdown-item{color:#cbd4df!important}.month-dropdown-item:hover{background:#253850!important;color:#fff!important}.month-dropdown-item.active{color:var(--page-orange)!important;background:#1d2c40!important}
+.period-toggle{border-color:#f08c0066!important}.period-btn{background:#f08c0012!important;color:#b8c3d1!important}.period-btn+.period-btn{border-color:#f08c0066!important}.period-btn.active{background:var(--page-orange)!important;color:#fff!important}
+.app{gap:16px}.sidebar{border-color:var(--page-line)!important;box-shadow:0 4px 16px rgba(23,35,52,.05)}
+.sidebar h2{color:var(--page-navy)!important;border-bottom:2px solid #edf0f4;padding-bottom:9px!important}
+.chk:hover,.filter-btn:hover{background:#f3f6f9!important}.chk input{accent-color:var(--page-orange)}
+.filter-btn.active{background:#fff4e5!important;color:var(--page-orange-dark)!important;box-shadow:inset 3px 0 var(--page-orange)}
+.badge{background:#edf1f5!important;color:#5c6b7e!important}
+.notice{background:#fff8ed!important;border-color:#f6c477!important;color:#5e6470!important}.notice h3{color:var(--page-orange-dark)!important}.notice a{color:var(--page-orange-dark)!important;font-weight:700}
+.fc .fc-button-primary{background:var(--page-navy)!important;border-color:var(--page-navy)!important}.fc .fc-button-primary:hover{background:#263a53!important;border-color:#263a53!important}.fc .fc-button-active{background:var(--page-orange)!important;border-color:var(--page-orange)!important}.fc .fc-toolbar-title{color:var(--page-navy)!important;font-weight:850}
+.main-content,.meta-card,.game-section{border-color:var(--page-line)!important}.game-card,.deck-card{box-shadow:0 3px 12px rgba(23,35,52,.06)!important}
+.detail-overlay .detail-panel,.modal-content{border-top:3px solid var(--page-orange)}
+@media(max-width:600px){.page-header{padding:26px 12px 23px!important}.page-header h1{font-size:23px!important}}
