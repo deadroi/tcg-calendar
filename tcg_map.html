@@ -53,26 +53,26 @@ html, body { height: 100%; font-family: 'Malgun Gothic', system-ui, sans-serif; 
 
 /* ── 상단바 ── */
 #topbar {
-  position: fixed; top: 39px; left: 0; right: 0; z-index: 1000;
-  background: rgba(13,13,26,0.96);
+  position: fixed; top: 52px; left: 0; right: 0; z-index: 490;
+  background: rgba(23,35,52,0.97);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid #2a2a44;
+  border-bottom: 1px solid #34465d;
   padding: 7px 12px;
   display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
 }
-@media (max-width: 600px) { #topbar { top: 44px; } }
-#topbar-title { font-size: 15px; color: #4ccfac; font-weight: 700; white-space: nowrap; }
+@media (max-width: 760px) { #topbar { top: 50px; } }
+#topbar-title { font-size: 15px; color: #f08c00; font-weight: 800; white-space: nowrap; }
 #region-filter { display: flex; gap: 4px; flex-wrap: wrap; flex: 1; }
 .rfbtn {
   padding: 4px 10px; border-radius: 20px;
-  border: 1.5px solid #2a2a44; background: #111128;
-  color: #666; font-size: 11px; font-weight: 700;
+  border: 1px solid #43566e; background: #1d2b3e;
+  color: #a9b6c7; font-size: 11px; font-weight: 700;
   cursor: pointer; white-space: nowrap; transition: all .15s;
   line-height: 1.4;
 }
-.rfbtn:hover { color: #aaa; border-color: #444; }
-.rfbtn.on { color: #111 !important; border-color: transparent !important; }
-#count-label { font-size: 11px; color: rgba(255,255,255,0.35); white-space: nowrap; }
+.rfbtn:hover { color: #fff; border-color: #f08c00; }
+.rfbtn.on { color: #fff !important; border-color: #f08c00 !important; background: #f08c00 !important; }
+#count-label { font-size: 11px; color: #9baabd; white-space: nowrap; }
 
 /* ── 검색창 ── */
 #search-wrap {
@@ -84,7 +84,7 @@ html, body { height: 100%; font-family: 'Malgun Gothic', system-ui, sans-serif; 
   padding: 5px 12px 5px 28px; outline: none; width: 160px;
   transition: border-color .15s, width .2s;
 }
-#search-input:focus { border-color: #4ccfac; width: 200px; }
+#search-input:focus { border-color: #f08c00; box-shadow: 0 0 0 3px rgba(240,140,0,.16); width: 200px; }
 #search-input::placeholder { color: #aaa; }
 #search-icon {
   position: absolute; left: 9px; top: 50%; transform: translateY(-50%);
@@ -92,7 +92,7 @@ html, body { height: 100%; font-family: 'Malgun Gothic', system-ui, sans-serif; 
 }
 #search-results {
   display: none; position: absolute; top: calc(100% + 6px); right: 0;
-  background: #1a1a2e; border: 1px solid #2a2a44;
+  background: #172334; border: 1px solid #34465d;
   border-radius: 10px; min-width: 220px; max-width: 300px;
   box-shadow: 0 8px 24px rgba(0,0,0,0.6); overflow: hidden; z-index: 2000;
   max-height: 260px; overflow-y: auto;
@@ -100,10 +100,10 @@ html, body { height: 100%; font-family: 'Malgun Gothic', system-ui, sans-serif; 
 #search-results.open { display: block; }
 .sr-item {
   padding: 9px 12px; cursor: pointer; display: flex; align-items: center; gap: 8px;
-  border-bottom: 1px solid #2a2a44; transition: background .1s;
+  border-bottom: 1px solid #34465d; transition: background .1s;
 }
 .sr-item:last-child { border-bottom: none; }
-.sr-item:hover { background: #22223a; }
+.sr-item:hover { background: #253850; }
 .sr-badge {
   font-size: 10px; font-weight: 700; padding: 2px 6px;
   border-radius: 4px; color: #fff; flex-shrink: 0;
@@ -184,7 +184,7 @@ document.addEventListener('click', e => {
 </script>
 
 <div id="topbar">
-  <span id="topbar-title">🃏 TCG 매장 지도</span>
+  <span id="topbar-title">TCG 매장 지도</span>
   <div id="region-filter"></div>
   <span id="count-label"></span>
   <div id="search-wrap">
@@ -441,7 +441,7 @@ function makeBtn(label, value, on) {
   b.className = 'rfbtn' + (on ? ' on' : '');
   b.textContent = label;
   b.dataset.value = value;
-  if (on) { b.style.background = '#4ccfac'; b.style.color = '#111'; }
+  if (on) { b.style.background = '#f08c00'; b.style.color = '#fff'; }
   b.onclick = () => {
     if (value === 'all') {
       // 전체 버튼: 모두 초기화
@@ -460,8 +460,8 @@ function makeBtn(label, value, on) {
       const v = x.dataset.value;
       const isOn = activeFilters.has(v);
       x.classList.toggle('on', isOn);
-      x.style.background = isOn ? (v === 'all' ? '#4ccfac' : rc(v)) : '';
-      x.style.color = isOn ? '#111' : '';
+      x.style.background = isOn ? '#f08c00' : '';
+      x.style.color = isOn ? '#fff' : '';
     });
     applyFilter();
   };
