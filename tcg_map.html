@@ -230,6 +230,7 @@ const STORES = [
   {region:"서울", name:"봉천 데쿠데쿠",           addr:"서울 관악구 봉천로31길 9 지하 1층",                x:"https://x.com/deckdecktcg",       lat:37.4845664,  lon:126.9406332},
   {region:"서울", name:"용산 카드모아나",          addr:"서울 용산구 청파로43길 7 2층",                     x:"https://x.com/cardmoana",         lat:37.5435,     lon:126.9702},
   {region:"서울", name:"학여울 카드래곤",          addr:"서울 강남구 영동대로 210 대치쌍용아파트상가 3층 304호", x:"https://x.com/CarDragonx",     lat:37.4988557,  lon:127.0713671},
+  {region:"서울", name:"신촌 리얼카드샵",          addr:"서울 서대문구 연세로9길 17 지하1층",              x:"https://www.instagram.com/realcardshop/", linkLabel:"Instagram"},
   {region:"경기", name:"서현역 라이프링크",        addr:"경기 성남시 분당구 분당로53번길 19 피아자코코빌딩 3층", x:"https://x.com/TCGLifelink",    lat:37.3843229,  lon:127.122196},
   {region:"경기", name:"구리 듀얼파크",           addr:"경기 구리시 경춘로227번길 6-9 2층",                x:"",                                lat:37.6031169,  lon:127.1461794},
   {region:"경기", name:"평택 카드빌리지",          addr:"경기 평택시 통복시장1로 29 지하1층",               x:"https://x.com/card_village",      lat:37.0005685,  lon:127.0883775},
@@ -249,6 +250,7 @@ const STORES = [
   {region:"경기", name:"수내 카드빈",             addr:"경기 성남시 분당구 황새울로214번길 8 MS프라자 802호", x:"https://x.com/cardbean1",        lat:37.3825999,  lon:127.1188},
   {region:"경기", name:"안성 하얀숲 카드하우스",   addr:"경기 안성시 아양1로 77-31 해송프라자 3층 303호",    x:"https://x.com/AnseongWFTCG",      lat:37.0072604,  lon:127.2577669},
   {region:"경기", name:"이천 정무샵",             addr:"경기 이천시 중리천로14번길 25-12 2층",             x:"https://x.com/TCG2000JUNGMOO",    lat:37.2790336,  lon:127.4398640},
+  {region:"경기", name:"가천대 D CAVE",           addr:"경기 성남시 수정구 복정로 8 지층 B07호",           x:""},
   {region:"인천", name:"인천 타이쿤",             addr:"인천 미추홀구 경인남길30번길 49 2층",              x:"",                                lat:37.4515492,  lon:126.6579167},
   {region:"인천", name:"만수 듀얼존",             addr:"인천 남동구 백범로 173 스토리빌딩 5층",             x:"https://x.com/jurassic_tcg",      lat:37.460387,   lon:126.7237838},
   {region:"인천", name:"계산동 위치스 브루",       addr:"인천 계양구 계양대로 166 정우빌딩 2층",             x:"",                                lat:37.5291918,  lon:126.7225202},
@@ -309,7 +311,7 @@ let map = null;
 
 function addMarker(s, pos) {
   const xHtml = s.x
-    ? `<a class="popup-xlink" href="${s.x}" target="_blank">🐦 X(트위터)</a>`
+    ? `<a class="popup-xlink" href="${s.x}" target="_blank">${s.linkLabel || '🐦 X(트위터)'}</a>`
     : '';
   const popupContent = `
     <div class="custom-overlay">
