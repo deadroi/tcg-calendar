@@ -25,7 +25,7 @@ wcs_do();
 <meta name="google-adsense-account" content="ca-pub-4158709673269015">
 <style>
   * { box-sizing: border-box; }
-  body { font-family: system-ui, -apple-system, Segoe UI, Roboto, 'Noto Sans KR', sans-serif; margin: 0; background: #f5f6fa; color: #222; }
+  body { font-family: system-ui, -apple-system, Segoe UI, Roboto, 'Noto Sans KR', sans-serif; margin: 0; background: #edf1f5; color: #222; }
 
   /* ── 네비게이션 ── */
   .site-nav { background: #0d0d1a; position: relative; z-index: 500; }
@@ -50,20 +50,24 @@ wcs_do();
   }
 
   /* ── 공통 섹션 ── */
-  .section { max-width: 1100px; margin: 0 auto 36px; padding: 0 16px; }
+  .section {
+    max-width: 1100px; margin: 0 auto 24px; padding: 22px 24px 24px;
+    background: #fff; border: 1px solid #dce3eb; border-radius: 12px;
+    box-shadow: 0 5px 18px rgba(23,35,52,.06);
+  }
   .section-title {
-    font-size: 18px; font-weight: 800; color: #111;
-    margin: 0 0 14px; padding-bottom: 8px;
-    border-bottom: 2px solid #4ccfac;
+    font-size: 18px; font-weight: 850; color: #172334;
+    margin: 0 0 18px; padding-bottom: 12px;
+    border-bottom: 2px solid #e8edf2;
     display: flex; align-items: center; justify-content: space-between;
   }
-  .section-title span { font-size: 13px; font-weight: 600; color: #4ccfac; }
+  .section-title span { font-size: 13px; font-weight: 600; color: #66758a; }
   .more-btn {
-    font-size: 13px; font-weight: 600; color: #4ccfac; text-decoration: none;
-    padding: 4px 12px; border: 1.5px solid #4ccfac; border-radius: 20px;
+    font-size: 13px; font-weight: 700; color: #d97706; text-decoration: none;
+    padding: 5px 13px; border: 1px solid #f08c00; border-radius: 5px;
     transition: background .15s, color .15s;
   }
-  .more-btn:hover { background: #4ccfac; color: #fff; }
+  .more-btn:hover { background: #f08c00; color: #fff; }
 
   /* ── 이미지 배너 ── */
   .banner-wrap {
@@ -100,15 +104,15 @@ wcs_do();
 
   /* ── 히어로 헤더 ── */
   .hero {
-    background: linear-gradient(135deg, #0d0d1a 0%, #1a1a3a 100%);
+    background: linear-gradient(135deg, #172334 0%, #22344b 100%);
     padding: 48px 16px 40px; text-align: center; margin-bottom: 40px;
   }
   .hero h1 { margin: 0 0 10px; font-size: 32px; font-weight: 900; color: #fff; letter-spacing: -.5px; }
   .hero p { margin: 0; font-size: 15px; color: #8891a4; line-height: 1.7; }
   .hero .hero-badge {
     display: inline-block; margin-top: 18px;
-    background: #4ccfac22; border: 1px solid #4ccfac55;
-    color: #4ccfac; font-size: 13px; font-weight: 600;
+    background: #f08c001a; border: 1px solid #f08c0066;
+    color: #f08c00; font-size: 13px; font-weight: 600;
     padding: 5px 16px; border-radius: 20px;
   }
 
@@ -118,11 +122,11 @@ wcs_do();
   }
   .region-tab {
     padding: 5px 14px; border-radius: 20px; font-size: 13px; font-weight: 600;
-    cursor: pointer; border: 1.5px solid #d0ede4; color: #555; background: #fff;
+    cursor: pointer; border: 1px solid #cfd8e3; color: #526174; background: #f8fafc;
     transition: background .15s, color .15s, border-color .15s;
   }
-  .region-tab:hover { border-color: #4ccfac; color: #1a9f77; }
-  .region-tab.active { background: #4ccfac; border-color: #4ccfac; color: #fff; }
+  .region-tab:hover { border-color: #f08c00; color: #c96f00; }
+  .region-tab.active { background: #f08c00; border-color: #f08c00; color: #fff; box-shadow: 0 2px 7px rgba(240,140,0,.25); }
 
   /* 타임라인 */
   .schedule-timeline { display: flex; flex-direction: column; }
@@ -140,17 +144,17 @@ wcs_do();
     position: relative; padding-top: 12px;
   }
   .timeline-hour {
-    font-size: 12px; font-weight: 700; color: #1a9f77; line-height: 1;
+    font-size: 12px; font-weight: 700; color: #d97706; line-height: 1;
     background: #fff; position: relative; z-index: 1; padding: 0 2px;
   }
   .timeline-vline {
     position: absolute; top: 0; bottom: 0; left: 50%; width: 2px;
-    background: #e0f4ec; transform: translateX(-50%);
+    background: #d9e1ea; transform: translateX(-50%);
   }
   .timeline-dot {
     width: 10px; height: 10px; border-radius: 50%;
-    background: #4ccfac; border: 2px solid #fff;
-    box-shadow: 0 0 0 2px #4ccfac44;
+    background: #f08c00; border: 2px solid #fff;
+    box-shadow: 0 0 0 2px #f08c0044;
     margin-top: 4px; position: relative; z-index: 1; flex-shrink: 0;
   }
   .timeline-events {
@@ -160,17 +164,17 @@ wcs_do();
   .schedule-card {
     display: block; text-decoration: none;
     background: #fff; border-radius: 10px; padding: 10px 12px;
-    border: 1px solid #eee; box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    border: 1px solid #dce3eb; box-shadow: 0 2px 6px rgba(23,35,52,0.05);
     transition: box-shadow .15s, border-color .15s; min-width: 150px; flex: 1 1 150px; max-width: 260px;
     border-left: 3px solid #ccc; cursor: pointer;
   }
-  .schedule-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.12); border-color: #cce; }
+  .schedule-card:hover { box-shadow: 0 5px 16px rgba(23,35,52,0.14); border-color: #9cabbc; transform: translateY(-1px); }
   .scard-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; }
   .scard-store { font-size: 13px; font-weight: 700; color: #111; }
   .scard-x { font-size: 10px; color: #bbb; line-height: 1; }
   .scard-game {
     display: inline-block; font-size: 11px; font-weight: 600;
-    padding: 2px 8px; border-radius: 99px; background: #f0faf6; color: #1a9f77;
+    padding: 2px 8px; border-radius: 99px; background: #edf2f7; color: #46566b;
   }
   .schedule-loading { text-align: center; color: #888; font-size: 14px; padding: 30px 0; }
   .schedule-empty { text-align: center; color: #aaa; font-size: 14px; padding: 30px 0; }
@@ -178,48 +182,26 @@ wcs_do();
 
   /* ── 인사말 ── */
   .greeting {
-    background: #fff; border-radius: 12px; padding: 28px 28px;
-    border: 1px solid #eee; box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    background: #f7f9fc; border-radius: 8px; padding: 24px 26px;
+    border: 1px solid #e0e6ed; border-left: 4px solid #f08c00; box-shadow: none;
     font-size: 14px; color: #444; line-height: 1.85;
   }
-  .greeting strong { color: #111; }
+  .greeting strong { color: #172334; }
+  .greeting a { color: #d97706 !important; font-weight: 650; }
 
   /* ── 하단 여백 ── */
   .footer { height: 48px; }
 
   @media (max-width: 600px) {
     .hero h1 { font-size: 22px; }
+    .section { margin: 0 10px 18px; padding: 18px 16px; }
   }
 </style>
+<script src="asset/site-nav.js" defer></script>
 </head>
 <body>
 
-<nav class="site-nav">
-  <div class="site-nav-inner">
-    <div class="site-nav-links">
-      <a href="https://tcg-calendar.co.kr/index.html" class="site-nav-link active">🏠 메인</a>
-      <a href="https://tcg-calendar.co.kr/calendar_viewer.html" class="site-nav-link">📅 대회 일정</a>
-      <a href="https://tcg-calendar.co.kr/result.html" class="site-nav-link">📋 대회 결과</a>
-      <a href="https://tcg-calendar.co.kr/deck_meta.html" class="site-nav-link">🃏 입상덱 메타</a>
-      <a href="https://tcg-calendar.co.kr/tcg-swisssystem.html" class="site-nav-link">🏆 스위스라운드 시스템</a>
-      <a href="https://tcg-calendar.co.kr/tcgtimer.html" class="site-nav-link">⏱ TCG 타이머</a>
-      <a href="https://tcg-calendar.co.kr/tcg_map.html" class="site-nav-link">🗺 TCG 매장 지도</a>
-    </div>
-    <span class="site-nav-title">🃏 TCG 캘린더</span>
-    <button class="site-nav-hamburger" onclick="this.nextElementSibling.classList.toggle('open')" aria-label="메뉴">
-      <span></span><span></span><span></span>
-    </button>
-    <div class="site-nav-dropdown">
-      <a href="https://tcg-calendar.co.kr/index.html" class="site-nav-link active">🏠 메인</a>
-      <a href="https://tcg-calendar.co.kr/calendar_viewer.html" class="site-nav-link">📅 대회 일정</a>
-      <a href="https://tcg-calendar.co.kr/result.html" class="site-nav-link">📋 대회 결과</a>
-      <a href="https://tcg-calendar.co.kr/deck_meta.html" class="site-nav-link">🃏 입상덱 메타</a>
-      <a href="https://tcg-calendar.co.kr/tcg-swisssystem.html" class="site-nav-link">🏆 스위스라운드 시스템</a>
-      <a href="https://tcg-calendar.co.kr/tcgtimer.html" class="site-nav-link">⏱ TCG 타이머</a>
-      <a href="https://tcg-calendar.co.kr/tcg_map.html" class="site-nav-link">🗺 TCG 매장 지도</a>
-    </div>
-  </div>
-</nav>
+<nav class="site-nav" aria-label="?? ??"></nav>
 <script>
 document.addEventListener('click', e => {
   const nav = document.querySelector('.site-nav-dropdown');
@@ -248,8 +230,8 @@ document.addEventListener('click', e => {
 <!-- ── 이주의 대회일정 ── -->
 <div class="section">
   <div class="section-title">
-    📅 오늘의 대회일정 <span id="todayDateLabel" style="font-size:13px;font-weight:500;color:#555;"></span>
-    <a class="more-btn" href="https://tcg-calendar.co.kr/calendar_viewer.html">더보기</a>
+    오늘의 대회일정 <span id="todayDateLabel" style="font-size:13px;font-weight:500;color:#555;"></span>
+    <a class="more-btn" href="calendar_viewer.html">더보기</a>
   </div>
   <div id="regionTabs" class="region-tabs"></div>
   <div id="gameTabs" class="region-tabs" style="margin-top:-6px;"></div>
