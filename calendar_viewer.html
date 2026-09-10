@@ -91,6 +91,7 @@ wcs_do();
   #modalList { margin:0; padding-left: 18px; }
   #modalList li { margin: 6px 0; white-space: pre-wrap; }
   #modalList li a:hover { text-decoration: underline !important; color: var(--accent) !important; }
+  .modal-subject { color:#666; font-size:12.5px; margin-top:2px; }
   .modal-subhint { color:#888; font-size:12px; margin-top:10px; }
   .site-nav { background: #0d0d1a; position: relative; z-index: 500; }
   .site-nav-inner { max-width: 1600px; margin: 0 auto; padding: 0 8px; display: flex; align-items: center; justify-content: space-between; }
@@ -289,7 +290,7 @@ const ALIAS = {
   "YUGIOH":"YUGIOH","유희왕":"YUGIOH","YUGIOH RUSH DUEL":"YUGIOH RUSH DUEL",
   "유희왕 러쉬듀얼":"YUGIOH RUSH DUEL","POKEMON":"POKEMON","포켓몬":"POKEMON",
   "Starlight TCG":"Starlight TCG","스타라이트":"Starlight TCG",
-  "Stacker Battle":"Stacker Battle","스태커배틀":"Stacker Battle",
+  "Stacker Battle":"Stacker Battle","스태커배틀":"Stacker Battle","STACKER BATTLE":"Stacker Battle",
   "LUMEN CONDENSOR":"LUMEN CONDENSOR","루멘콘댄서":"LUMEN CONDENSOR",
   "RIFTBOUND":"RIFTBOUND","리프트바운드":"RIFTBOUND",
   "FLESH AND BLOOD":"FLESH AND BLOOD","플레시 앤 블러드":"FLESH AND BLOOD","프레쉬 앤 블러드":"FLESH AND BLOOD",
@@ -343,7 +344,7 @@ function enrich(events, regionList) {
         ...e,
         backgroundColor: gameColor || e.backgroundColor,
         borderColor: gameColor || e.borderColor,
-        extendedProps: { ...(e.extendedProps||{}), regionKey: p.regionKey, storeKey: p.storeKey, gameKey: p.gameKey, xUrl: e.xUrl || "" }
+        extendedProps: { ...(e.extendedProps||{}), regionKey: p.regionKey, storeKey: p.storeKey, gameKey: p.gameKey, xUrl: e.xUrl || "", subject: e.subject || "" }
       };
     });
 }
@@ -479,9 +480,16 @@ function openModal(dateStr) {
     const time = e.start.substring(11,16);
     const r = e.extendedProps?.regionKey||"", store = e.extendedProps?.storeKey||"";
     const g = e.extendedProps?.gameKey||"", xUrl = e.extendedProps?.xUrl||"";
+    const subject = e.extendedProps?.subject||"";
     const rColor = REGION_COLORS[r]||"#111", gLabel = GAME_LABEL[g]||g;
     const text = `${time} | <span class="tcg-region-tag" style="color:${rColor}">[${r}]</span> ${store} - ${gLabel}`;
     li.innerHTML = xUrl ? `<a href="${xUrl}" target="_blank" style="color:inherit;text-decoration:none;">${text} <span style="font-size:11px;color:#888;">🔗</span></a>` : text;
+    if (subject) {
+      const sub = document.createElement('div');
+      sub.className = 'modal-subject';
+      sub.textContent = subject;
+      li.appendChild(sub);
+    }
     modalList.appendChild(li);
   }
   const sr = getSelectedKeys(regionFiltersEl), sg = getSelectedKeys(gameFiltersEl);
