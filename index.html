@@ -176,6 +176,7 @@ wcs_do();
     display: inline-block; font-size: 11px; font-weight: 600;
     padding: 2px 8px; border-radius: 99px; background: #edf2f7; color: #46566b;
   }
+  .scard-subject { margin-top: 6px; font-size: 12px; color: #666; line-height: 1.35; word-break: keep-all; }
   .schedule-loading { text-align: center; color: #888; font-size: 14px; padding: 30px 0; }
   .schedule-empty { text-align: center; color: #aaa; font-size: 14px; padding: 30px 0; }
 
@@ -387,8 +388,9 @@ async function loadSchedule() {
       const dateStr = ev.start.slice(0,10);
       const timeStr = ev.start.slice(11,16);
       const xUrl = ev.xUrl || '';
+      const subject = ev.subject || '';
       if (!regionMap.has(region)) regionMap.set(region, []);
-      regionMap.get(region).push({ store, gameLabel, gameColor, storeColor, dateStr, timeStr, xUrl });
+      regionMap.get(region).push({ store, gameLabel, gameColor, storeColor, dateStr, timeStr, xUrl, subject });
     }
 
     // 탭 렌더
@@ -425,6 +427,12 @@ async function loadSchedule() {
           if (item.xUrl) { card.href = item.xUrl; card.target = '_blank'; card.rel = 'noopener'; }
           const xBadge = item.xUrl ? `<span class="scard-x">𝕏</span>` : '';
           card.innerHTML = `<div class="scard-top"><div class="scard-store" style="color:${item.storeColor}">${item.store}</div>${xBadge}</div><span class="scard-game" style="background:${item.gameColor}18;color:${item.gameColor}">${item.gameLabel}</span>`;
+          if (item.subject) {
+            const sub = document.createElement('div');
+            sub.className = 'scard-subject';
+            sub.textContent = item.subject;
+            card.appendChild(sub);
+          }
           row.appendChild(card);
         }
         block.appendChild(row);
@@ -472,6 +480,12 @@ async function loadSchedule() {
           if (item.xUrl) { card.href = item.xUrl; card.target = '_blank'; card.rel = 'noopener'; }
           const xBadge = item.xUrl ? `<span class="scard-x">𝕏</span>` : '';
           card.innerHTML = `<div class="scard-top"><div class="scard-store" style="color:${item.storeColor}">${item.store}</div>${xBadge}</div><span class="scard-game" style="background:${item.gameColor}18;color:${item.gameColor}">${item.gameLabel}</span>`;
+          if (item.subject) {
+            const sub = document.createElement('div');
+            sub.className = 'scard-subject';
+            sub.textContent = item.subject;
+            card.appendChild(sub);
+          }
           eventsDiv.appendChild(card);
         }
 
