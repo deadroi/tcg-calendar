@@ -23,41 +23,51 @@ wcs_do();
 </script>
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
 <style>
-  :root { --panel-w: 260px; --accent: #4ccfac; }
+  :root { --panel-w: 260px; --accent: #f08c00; --accent-soft: #fff8ed; --accent-line: #f6c477; }  /* 사이트 공통 오렌지 (data-pages-theme.css --page-orange) */
   body { font-family: system-ui, -apple-system, Segoe UI, Roboto, 'Noto Sans KR', sans-serif; margin:0; background:#f5f6fa; color:#222; }
-  .app { display:flex; gap:16px; padding:20px 14px; max-width: 1600px; margin:0 auto; align-items:flex-start; }
-  .sidebar {
-    width: var(--panel-w); flex: 0 0 var(--panel-w);
-    border: 1px solid #e3e8ee; border-radius: 12px; padding: 14px 12px;
-    position: sticky; top: 20px; overflow:auto; max-height: calc(100vh - 40px);
+  .app { display:flex; flex-direction:column; gap:12px; padding:16px 14px; max-width: 1600px; margin:0 auto; }
+  /* 필터: 달력 위에 가로 바 두 줄(지역 / 게임). 공통 테마의 .sidebar 규칙을 피하려고 filter-row로 분리 */
+  .filter-bar { display:flex; flex-direction:column; gap:8px; }
+  .filter-row {
+    display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+    border: 1px solid #e3e8ee; border-radius: 12px; padding: 8px 12px;
     background:#fff; box-shadow: 0 2px 12px rgba(0,0,0,0.06);
   }
-  .sidebar h2 {
-    margin: 2px 6px 10px; font-size: 14px; font-weight: 800; color:#111;
-    padding-bottom: 8px; border-bottom: 2px solid var(--accent);
+  .filter-row h2 {
+    margin: 0; font-size: 12px; font-weight: 800; white-space:nowrap; letter-spacing:.2px;
+    padding: 5px 12px; border-radius: 999px; background:#172334; color:var(--accent);
   }
-  .filters { display:flex; flex-direction:column; gap:4px; padding: 0 4px 6px; }
+  .filters { display:flex; flex-direction:row; flex-wrap:wrap; gap:6px; flex:1; }
   .chk {
-    display:flex; align-items:center; gap:10px;
-    padding: 7px 8px; border-radius: 8px; cursor:pointer; user-select:none;
-    transition: background .12s;
+    display:flex; align-items:center; gap:6px; font-size:13px;
+    padding: 4px 10px 4px 6px; border-radius: 999px; border:1px solid #e3e8ee;
+    cursor:pointer; user-select:none; transition: background .12s, border-color .12s;
   }
-  .chk:hover { background:#eef9f6; }
-  .chk input { width: 15px; height: 15px; accent-color: var(--accent); }
+  .chk:hover { background:var(--accent-soft); border-color:var(--accent-line); }
+  .chk:has(input:checked) { background:var(--accent-soft); border-color:var(--accent); }
+  .chk input { width: 14px; height: 14px; accent-color: var(--accent); }
   .badge {
-    margin-left:auto; font-size: 11px; color:#666;
-    background:#f1f3f5; padding: 2px 8px; border-radius: 999px;
+    font-size: 11px; color:#666;
+    background:#f1f3f5; padding: 1px 7px; border-radius: 999px;
   }
   .color-chip {
     width: 10px; height: 10px; border-radius: 999px; display:inline-block;
     border: 1px solid rgba(0,0,0,0.08);
   }
-  .hint { margin: 10px 8px 0; font-size: 12px; color:#888; line-height: 1.5; }
-  .main { flex: 1 1 auto; min-width: 740px; }
-  #calendar { max-width:1200px; margin:0 auto; padding:0 10px; }
+  .hint { display:none; }
+  .main { width:100%; min-width: 0; }
+  #calendar { max-width:none; margin:0 auto; padding:0; }
   .fc .fc-daygrid-day-frame { min-height: 110px; }
   .fc .fc-daygrid-day-events { overflow: visible; }
   .fc .fc-daygrid-day { cursor: pointer; }
+  /* "+N개 더보기"를 버튼처럼 보이게 (링크 글자만 있으면 클릭 가능한지 모른다) */
+  .fc .fc-daygrid-more-link {
+    display:inline-block; margin:2px 0 0 2px; padding:3px 9px;
+    font-size:11.5px; font-weight:700; color:var(--accent);
+    background:var(--accent-soft); border:1px solid var(--accent-line); border-radius:999px;
+    transition: background .12s, color .12s;
+  }
+  .fc .fc-daygrid-more-link:hover { background:var(--accent); color:#fff; border-color:var(--accent); text-decoration:none; }
   .fc .fc-toolbar-title { font-size: 16px !important; font-weight: 800 !important; }
   .fc .fc-button { background: var(--accent) !important; border-color: var(--accent) !important; }
   .fc .fc-button:hover { filter: brightness(0.9); }
@@ -182,10 +192,8 @@ wcs_do();
   .notice h3 { margin: 0 0 6px; font-size: 14px; color: #e67700; }
   .notice ul { margin: 4px 0 0; padding-left: 18px; }
   .notice li { margin: 3px 0; }
-  @media (max-width: 1220px) {
-    .app { flex-direction:column; }
-    .sidebar { width:auto; flex: 0 0 auto; height:auto; position: static; }
-    .main { min-width: 0; }
+  @media (max-width: 760px) {
+    .filter-row { align-items:flex-start; }
   }
 </style>
 <link rel="stylesheet" href="asset/data-pages-theme.css">
@@ -212,7 +220,8 @@ wcs_do();
 <div id="loadingOverlay" class="loading-overlay">결과 불러오는 중...</div>
 
 <div class="app">
-  <aside class="sidebar" style="order:0">
+  <div class="filter-bar">
+  <aside class="filter-row" style="order:0">
     <h2>지역 필터</h2>
     <div class="filters" id="regionFilters"></div>
     <div class="hint">
@@ -220,7 +229,7 @@ wcs_do();
       • 특정 지역만 보고 싶으면 해당 지역만 체크하세요.
     </div>
   </aside>
-  <aside class="sidebar" style="order:1">
+  <aside class="filter-row" style="order:1">
     <h2>게임 필터</h2>
     <div class="filters" id="gameFilters"></div>
     <div class="hint">
@@ -228,6 +237,7 @@ wcs_do();
       • 날짜 칸을 클릭하면 해당 날의 결과 목록이 뜹니다.
     </div>
   </aside>
+  </div>
   <main class="main" style="order:2">
     <div id="calendar"></div>
     <div class="notice">
@@ -442,13 +452,6 @@ function rebuildFilters(regionList, gameList) {
   const gameCounts = countBy(enrichedMaster, e => e.extendedProps?.gameKey||"", GAME_DEFS);
   renderCheckboxList(regionFiltersEl, REGION_DEFS, regionCounts, k => REGION_COLORS[k]||"", "region");
   renderCheckboxList(gameFiltersEl, GAME_DEFS, gameCounts, k => GAME_COLORS[k]||"", "game");
-  const pokemonLabel = gameFiltersEl.querySelector('label[for="game_POKEMON"]');
-  if (pokemonLabel) {
-    const cityLink = document.createElement('div');
-    cityLink.style.cssText = 'padding:1px 8px 5px 28px;';
-    cityLink.innerHTML = '<a href="pokedata_viewer.html" style="font-size:11px;color:var(--accent);text-decoration:none;opacity:0.85;">↗ 일본 | 시티리그 결과(바로가기)</a>';
-    pokemonLabel.insertAdjacentElement('afterend', cityLink);
-  }
   regionFiltersEl.addEventListener('change', ev => {
     const t = ev.target; if (!t || t.type !== 'checkbox') return;
     applyAllBehavior(regionFiltersEl, t.getAttribute('data-key'));
@@ -568,6 +571,7 @@ function renderCalendar(monthKey, events) {
           openModal(String(info.event.startStr).substring(0,10));
         }
       },
+      moreLinkContent: function(arg) { return '+' + arg.num + '개 더보기'; },
       moreLinkClick: function(info) { openModal(info.dateStr); return 'none'; },
       views: { listWeek: { noEventsContent: '결과가 없습니다.' } },
       datesSet: function() {}
