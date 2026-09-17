@@ -26,8 +26,12 @@ wcs_do();
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; font-family: 'Malgun Gothic', system-ui, sans-serif; }
+/* 메뉴(53px)+지도(100vh)가 화면보다 길어 페이지가 53px 스크롤되면 메뉴가 위로 사라지던 문제
+   → 메뉴+지도를 화면 높이에 맞추고 페이지 스크롤을 막는다 */
+body { display: flex; flex-direction: column; overflow: hidden; }
+.site-nav { flex-shrink: 0; }
 
-#map { width: 100%; height: 100vh; }
+#map { width: 100%; flex: 1; min-height: 0; }
 
 /* ── 사이트 네비게이션 ── */
 .site-nav { background: #0d0d1a; position: fixed; top: 0; left: 0; right: 0; z-index: 1001; border-bottom: 1px solid #2a2a44; }
@@ -297,6 +301,7 @@ const STORES = [
   {region:"경남",   name:"양산 카드캐처",           addr:"경남 양산시 양산역로 69 4층 402호",                x:"https://x.com/yangsan_tcg",       lat:35.3342257,  lon:129.0289197},
   {region:"경남",   name:"성산 TCG라이프",          addr:"경상남도 창원시 성산구 원이대로579번길 10",         x:"https://x.com/tcglife12",         lat:35.2297820,  lon:128.6796259},
   {region:"경남",   name:"마산 Card Elixir",        addr:"경상남도 창원시 마산회원구 합성동 162-30",          x:"https://x.com/CardElixir_TCG",    lat:35.2514100,  lon:128.5730400},
+  {region:"경남",   name:"창원 티씨지짐",           addr:"경남 창원시 의창구 남산로17번길 2 2층",             x:"",                                lat:35.2601780,  lon:128.6122700},
 ];
 
 // ── 지역 색상 ──
