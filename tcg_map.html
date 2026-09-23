@@ -382,8 +382,17 @@ function addMarker(s, pos) {
 
 function initMap() {
   const center = new kakao.maps.LatLng(37.5663, 126.9779);
-  map = new kakao.maps.Map(document.getElementById('map'), { center, level: 8 });
+  const mapEl = document.getElementById('map');
+  map = new kakao.maps.Map(mapEl, { center, level: 8 });
   map.addControl(new kakao.maps.ZoomControl(), kakao.maps.ControlPosition.BOTTOMRIGHT);
+
+  // 구글 앵커 광고가 뜨고 닫힐 때 지도 높이가 바뀌는데, 지도는 처음 크기 그대로라
+  // 광고가 있던 자리가 비어 보인다 → 크기가 바뀌면 중심을 유지한 채 다시 그린다
+  new ResizeObserver(() => {
+    const c = map.getCenter();
+    map.relayout();
+    map.setCenter(c);
+  }).observe(mapEl);
 
   buildFilter();
 
