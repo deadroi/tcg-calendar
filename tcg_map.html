@@ -27,11 +27,13 @@ wcs_do();
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; font-family: 'Malgun Gothic', system-ui, sans-serif; }
 /* 메뉴(53px)+지도(100vh)가 화면보다 길어 페이지가 53px 스크롤되면 메뉴가 위로 사라지던 문제
-   → 메뉴+지도를 화면 높이에 맞추고 페이지 스크롤을 막는다 */
-body { display: flex; flex-direction: column; overflow: hidden; }
-.site-nav { flex-shrink: 0; }
+   → 페이지 스크롤을 막고, 지도는 메뉴 아래를 화면에 고정해서 채운다.
+   지도를 문서 흐름에 두면 구글 광고 스크립트가 body에 붙이는 요소에 밀려
+   지도 높이가 줄고, 광고를 닫아도 그 자리가 비어 보인다. --nav-h는 JS가 메뉴 높이로 채운다. */
+body { overflow: hidden; }
+.site-nav { position: relative; z-index: 500; }
 
-#map { width: 100%; flex: 1; min-height: 0; }
+#map { position: fixed; top: var(--nav-h, 52px); left: 0; right: 0; bottom: 0; }
 
 /* ── 사이트 네비게이션 ── */
 .site-nav { background: #0d0d1a; position: fixed; top: 0; left: 0; right: 0; z-index: 1001; border-bottom: 1px solid #2a2a44; }
@@ -386,8 +388,28 @@ function initMap() {
   map = new kakao.maps.Map(mapEl, { center, level: 8 });
   map.addControl(new kakao.maps.ZoomControl(), kakao.maps.ControlPosition.BOTTOMRIGHT);
 
-  // 구글 앵커 광고가 뜨고 닫힐 때 지도 높이가 바뀌는데, 지도는 처음 크기 그대로라
-  // 광고가 있던 자리가 비어 보인다 → 크기가 바뀌면 중심을 유지한 채 다시 그린다
+  // 메뉴 높이만큼 지도를 내린다 (메뉴는 데스크톱 52px, 모바일 50px).
+  // site-nav.js가 메뉴를 나중에 교체하므로 그때마다 다시 재서 관찰 대상도 바꾼다.
+  let observedNav = null;
+  const navRO = new ResizeObserver(() => syncNavHeight());
+  function syncNavHeight() {
+    const nav = document.querySelector('.site-nav');
+    if (!nav) return;
+    if (nav !== observedNav) {
+      navRO.disconnect();
+      navRO.observe(nav);
+      observedNav = nav;
+    }
+    if (nav.offsetHeight) {
+      document.documentElement.style.setProperty('--nav-h', nav.offsetHeight + 'px');
+    }
+  }
+  syncNavHeight();
+  document.addEventListener('DOMContentLoaded', syncNavHeight);
+  window.addEventListener('load', syncNavHeight);
+
+  // 지도 크기가 바뀌면(메뉴 높이 변화, 화면 회전, 모바일 주소창 등)
+  // 카카오 지도는 처음 크기 그대로라 빈 자리가 생긴다 → 중심을 유지한 채 다시 그린다
   new ResizeObserver(() => {
     const c = map.getCenter();
     map.relayout();
