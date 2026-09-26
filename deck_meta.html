@@ -13,6 +13,19 @@
   gtag('js', new Date());
   gtag('config', 'G-9N9WTDYW2G');
 </script>
+<script>
+  // 필터 클릭을 GA4로 보낸다(맞춤 측정기준: filter_type, filter_value, page_name).
+  // '전체'(ALL)는 다른 항목을 껐다 켜는 초기화 버튼이라 기록하지 않는다.
+  function trackFilter(type, value, checked) {
+    if (value === 'ALL' || typeof gtag !== 'function') return;
+    gtag('event', 'filter_select', {
+      filter_type: type,
+      filter_value: value,
+      checked: checked,
+      page_name: 'deck_meta'
+    });
+  }
+</script>
 <script type="text/javascript" src="//wcs.pstatic.net/wcslog.js"></script>
 <script type="text/javascript">
 if(!wcs_add) var wcs_add = {};
@@ -454,6 +467,7 @@ document.addEventListener('click', e => {
 /* ─── 기간 토글 ─── */
 document.querySelectorAll('.period-btn').forEach(btn => {
   btn.addEventListener('click', () => {
+    trackFilter('period', btn.dataset.period, true);
     selectedPeriod = btn.dataset.period;
     document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
@@ -496,6 +510,7 @@ function makeFilterBtn(key, label, color, data) {
   }
   btn.innerHTML = `${chip}<span>${escHtml(label)}</span><span class="badge">${total}</span>`;
   btn.addEventListener('click', () => {
+    trackFilter('game', key, true);
     selectedGame = key;
     updateFilterActive();
     renderContent();
