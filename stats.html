@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="description" content="TCG 대회 통계 - 지역별 · 게임별"/>
+<title>TCG 대회 통계</title>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4158709673269015" crossorigin="anonymous"></script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-9N9WTDYW2G"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-9N9WTDYW2G');
+</script>
+<script>
+  // 필터 클릭을 GA4로 보낸다(맞춤 측정기준: filter_type, filter_value, page_name).
+  // '전체'(ALL)는 다른 항목을 껐다 켜는 초기화 버튼이라 기록하지 않는다.
+  function trackFilter(type, value, checked) {
+    if (value === 'ALL' || typeof gtag !== 'function') return;
+    gtag('event', 'filter_select', {
+      filter_type: type,
+      filter_value: value,
+      checked: checked,
+      page_name: 'stats'
+    });
+  }
+</script>
+<style>
+  :root {
+    --navy: #172334;
+    --accent: #f08c00;
+    --accent-soft: #fff8ed;
+    --accent-line: #f6c477;
+    --bg: #f5f6f8;
+    --card: #fff;
+    --line: #e3e6ea;
+    --text: #222;
+    --muted: #7a8794;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans KR', sans-serif; }
+
+  .wrap { max-width: 1220px; margin: 0 auto; padding: 16px 12px 48px; }
+  h1.page-title { font-size: 20px; margin: 4px 0 14px; }
+  h1.page-title small { font-size: 12px; font-weight: 500; color: var(--muted); margin-left: 8px; }
+
+  /* ── 필터 바 ── */
+  .filter-bar { background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+                padding: 12px 14px; margin-bottom: 16px; }
+  .filter-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .filter-row + .filter-row { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--line); }
+  .filter-row h2 { margin: 0; font-size: 12px; font-weight: 700; white-space: nowrap;
+                   background: var(--navy); color: var(--accent); padding: 5px 12px; border-radius: 999px; }
+  .chk { border: 1px solid var(--line); background: #fbfbfc; color: #444; border-radius: 999px;
+         padding: 5px 11px; font-size: 12px; font-weight: 600; cursor: pointer; }
+  .chk:hover { border-color: var(--accent-line); }
+  .chk.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .filter-row input[type="month"], .filter-row input[type="date"] {
+    border: 1px solid var(--line); border-radius: 8px; padding: 5px 8px; font-size: 12px;
+    font-family: inherit; color: #333; }
+  .range-hint { font-size: 12px; color: var(--muted); }
+
+  /* ── 카드 ── */
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+  .card.wide { grid-column: 1 / -1; }
+  .card h3 { margin: 0 0 4px; font-size: 14px; }
+  .card .desc { margin: 0 0 12px; font-size: 11px; color: var(--muted); }
+
+  .summary { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+  .kpi { flex: 1 1 150px; background: var(--card); border: 1px solid var(--line);
+         border-radius: 12px; padding: 12px 14px; }
+  .kpi .v { font-size: 22px; font-weight: 800; color: var(--navy); }
+  .kpi .l { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* ── 가로 막대 ── */
+  .bars { display: flex; flex-direction: column; gap: 6px; }
+  .bar-row { display: grid; grid-template-columns: 96px 1fr 68px; align-items: center; gap: 8px; font-size: 12px; }
+  .bar-row .nm { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #333; }
+  .bar-track { display: block; background: #eef0f3; border-radius: 5px; height: 16px; overflow: hidden; }
+  /* span이라 display를 지정하지 않으면 inline이 되어 width가 먹지 않는다 */
+  .bar-fill { display: block; height: 100%; background: var(--accent); border-radius: 5px; min-width: 2px; }
+  .bar-row .vv { text-align: right; color: #555; font-variant-numeric: tabular-nums; }
+  .bar-row .vv b { color: var(--navy); }
+
+  /* ── 세로 막대(높이로 비교) ── */
+  .vbars { display: flex; align-items: flex-end; gap: 4px; overflow-x: auto; padding: 4px 0 2px; }
+  .vbar { flex: 1 0 22px; display: flex; flex-direction: column; justify-content: flex-end;
+          align-items: center; cursor: default; }
+  .vbar .val { font-size: 10px; color: #55606c; font-variant-numeric: tabular-nums;
+               margin-bottom: 3px; white-space: nowrap; }
+  .vbar .col { width: 100%; background: var(--accent); border-radius: 3px 3px 0 0; min-height: 2px; }
+  /* 세로쓰기 라벨은 이름이 길면 카드가 한없이 길어져서 높이를 제한한다 */
+  .vbar .lb { font-size: 10px; color: var(--muted); margin-top: 5px; white-space: nowrap;
+              writing-mode: vertical-rl; max-height: 84px; overflow: hidden; text-overflow: ellipsis; }
+  .vbar .lb.flat { writing-mode: horizontal-tb; max-height: none; }
+  .vbar.dim .col { background: #cdd4dc; }
+  .vbar.dim .val { color: #9aa5b1; }
+  .vbar:hover .col { background: #d97706; }
+
+  /* ── 요일 x 시간 히트맵 ── */
+  .heat { overflow-x: auto; }
+  /* table-layout:fixed + 첫/마지막 열만 폭 지정 → 시간 칸이 남는 폭을 고르게 나눠 가진다 */
+  .heat table { border-collapse: separate; border-spacing: 2px; width: 100%;
+                min-width: 620px; table-layout: fixed; }
+  .heat th, .heat td { border: 0; padding: 0; }
+  .heat th.h { font-size: 10px; color: var(--muted); font-weight: 600; text-align: center; }
+  .heat th.d { width: 30px; font-size: 11px; color: #555; font-weight: 700; text-align: right;
+               padding-right: 6px; white-space: nowrap; }
+  .heat th.sum { width: 46px; }
+  .heat td.c { height: 22px; border-radius: 4px; background: #eef0f3; text-align: center;
+               font-size: 10px; color: #7b4a00; font-variant-numeric: tabular-nums; }
+  .heat td.c.hot { color: #fff; }
+  .heat tfoot td { font-size: 10px; color: var(--muted); text-align: center; }
+  .heat-legend { display: flex; align-items: center; gap: 6px; margin-top: 10px;
+                 font-size: 10px; color: var(--muted); }
+  .heat-legend i { display: inline-block; width: 18px; height: 10px; border-radius: 2px; }
+
+  /* ── 표 ── */
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th, td { padding: 6px 8px; border-bottom: 1px solid var(--line); text-align: right; }
+  th { color: var(--muted); font-weight: 600; font-size: 11px; }
+  th:first-child, td:first-child { text-align: left; }
+  tbody tr:hover { background: var(--accent-soft); }
+  td b { color: var(--navy); }
+
+  .empty { padding: 26px; text-align: center; color: var(--muted); font-size: 13px; }
+  @media (max-width: 600px) {
+    .bar-row { grid-template-columns: 78px 1fr 58px; }
+  }
+</style>
+<link rel="stylesheet" href="asset/site-nav.css" data-common-site-nav>
+<script src="asset/site-nav.js" defer></script>
+</head>
+<body>
+
+<nav class="site-nav" aria-label="주요 메뉴">
+  <div class="site-nav-inner">
+    <a class="site-nav-brand" href="index.html" aria-label="TCG Calendar 홈"><span><b>TCG</b> CALENDAR</span></a>
+
+    <div class="site-nav-links">
+      <a href="index.html" class="site-nav-link" data-page="index.html">
+        <svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5M5.5 9v11h13V9M9 20v-6h6v6"/></svg><span>메인</span>
+      </a>
+
+      <div class="site-nav-group child-active">
+        <button class="site-nav-link site-nav-group-button" type="button" aria-expanded="false">
+          <svg viewBox="0 0 24 24"><path d="M5 3v3m14-3v3M3.5 9h17M5 5h14a2 2 0 0 1 2 2v13H3V7a2 2 0 0 1 2-2Z"/><path d="M7 13h3m4 0h3m-10 4h3m4 0h3"/></svg><span>매장대회정보</span><svg class="site-nav-chevron" viewBox="0 0 24 24"><path d="m8 10 4 4 4-4"/></svg>
+        </button>
+        <div class="site-nav-submenu">
+          <a href="calendar_viewer.html" class="site-nav-submenu-link" data-page="calendar_viewer.html"><span><b>대회 일정</b><small>매장별 대회 확인</small></span></a>
+          <a href="result.html" class="site-nav-submenu-link" data-page="result.html"><span><b>대회 결과</b><small>매장별 대회 결과 확인</small></span></a>
+          <a href="deck_meta.html" class="site-nav-submenu-link" data-page="deck_meta.html"><span><b>입상덱 메타</b><small>주간·월간 입상덱 분석</small></span></a>
+          <a href="stats.html" class="site-nav-submenu-link active" data-page="stats.html" aria-current="page"><span><b>대회 통계</b><small>지역별·게임별 개최 현황</small></span></a>
+        </div>
+      </div>
+
+      <div class="site-nav-group">
+        <button class="site-nav-link site-nav-group-button" type="button" aria-expanded="false">
+          <svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5 5L4 17l3 3 5.7-5.7a4 4 0 0 0 5-5l-2.4 2.4-3-3 2.4-2.4Z"/></svg><span>도구</span><svg class="site-nav-chevron" viewBox="0 0 24 24"><path d="m8 10 4 4 4-4"/></svg>
+        </button>
+        <div class="site-nav-submenu">
+          <a href="tcg-swisssystem.html" class="site-nav-submenu-link" data-page="tcg-swisssystem.html"><span><b>스위스라운드 시스템</b><small>대진 및 순위 자동 계산</small></span></a>
+          <a href="tcgtimer.html" class="site-nav-submenu-link" data-page="tcgtimer.html"><span><b>TCG 타이머</b><small>대회용 라운드 타이머</small></span></a>
+        </div>
+      </div>
+
+      <a href="tcg_map.html" class="site-nav-link" data-page="tcg_map.html">
+        <svg viewBox="0 0 24 24"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg><span>매장 지도</span>
+      </a>
+    </div>
+
+    <button class="site-nav-hamburger" type="button" aria-label="메뉴 열기" aria-expanded="false"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<div class="wrap">
+  <h1 class="page-title">TCG 대회 통계 <small id="genLabel"></small></h1>
+
+  <div class="filter-bar">
+    <div class="filter-row">
+      <h2>기간</h2>
+      <button class="chk on" data-mode="all">전체</button>
+      <button class="chk" data-mode="month">월간</button>
+      <input type="month" id="monthPick" hidden>
+      <span class="range-hint" id="rangeHint"></span>
+    </div>
+    <div class="filter-row">
+      <h2>지역</h2>
+      <div id="regionChips" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+    </div>
+    <div class="filter-row">
+      <h2>게임</h2>
+      <div id="gameChips" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+    </div>
+  </div>
+
+  <div class="summary" id="kpis"></div>
+  <div class="cards" id="cards"></div>
+</div>
+
+<script>
+let DATA = null;
+let state = { mode: 'all', month: null, region: 'ALL', game: 'ALL' };
+
+const $ = id => document.getElementById(id);
+const fmt = n => n.toLocaleString('ko-KR');
+const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
+
+/* ── 날짜 유틸: rows의 offset ↔ 실제 날짜 ── */
+function dayToDate(off) {
+  const d = new Date(DATA.baseMs + off * 86400000);
+  return d;
+}
+function isoOf(off) { return dayToDate(off).toISOString().slice(0, 10); }
+function monthOf(off) { return isoOf(off).slice(0, 7); }
+
+/* ── 현재 필터에 걸리는 행 ── */
+function activeRange() {
+  if (state.mode === 'month' && state.month) {
+    const [y, m] = state.month.split('-').map(Number);
+    const first = new Date(Date.UTC(y, m - 1, 1)), last = new Date(Date.UTC(y, m, 0));
+    return [Math.round((first - DATA.baseMs) / 86400000), Math.round((last - DATA.baseMs) / 86400000)];
+  }
+  return [-Infinity, Infinity];
+}
+
+function filtered() {
+  const [lo, hi] = activeRange();
+  const r = state.region === 'ALL' ? -1 : DATA.regions.indexOf(state.region);
+  const g = state.game === 'ALL' ? -1 : DATA.games.indexOf(state.game);
+  return DATA.rows.filter(row =>
+    row[0] >= lo && row[0] <= hi &&
+    (r < 0 || row[1] === r) &&
+    (g < 0 || row[2] === g));
+}
+
+/* ── 그리기 도우미 ── */
+function barList(entries, opts = {}) {
+  if (!entries.length) return '<div class="empty">해당 조건의 대회가 없습니다</div>';
+  const max = Math.max(...entries.map(e => e[1])) || 1;
+  const total = entries.reduce((s, e) => s + e[1], 0) || 1;
+  return '<div class="bars">' + entries.map(([name, v]) => `
+    <div class="bar-row">
+      <span class="nm" title="${name}">${name}</span>
+      <span class="bar-track"><span class="bar-fill" style="width:${(v / max * 100).toFixed(1)}%"></span></span>
+      <span class="vv"><b>${fmt(v)}</b>${opts.pct === false ? '' : ` <span style="color:#9aa5b1">${(v / total * 100).toFixed(0)}%</span>`}</span>
+    </div>`).join('') + '</div>';
+}
+
+function vbarList(entries, opts = {}) {
+  if (!entries.length) return '<div class="empty">데이터 없음</div>';
+  const max = Math.max(...entries.map(e => e[1])) || 1;
+  const total = entries.reduce((s, e) => s + e[1], 0) || 1;
+  const H = opts.height || 150;           // 막대 영역 높이(px) — 높이로 크기를 비교한다
+  return '<div class="vbars">' + entries.map(([label, v, dim]) => `
+    <div class="vbar${dim ? ' dim' : ''}" title="${label}: ${fmt(v)}건 (${(v / total * 100).toFixed(1)}%)">
+      <span class="val">${v ? fmt(v) : ''}</span>
+      <span class="col" style="height:${Math.round(v / max * H)}px"></span>
+      <span class="lb${opts.flat ? ' flat' : ''}">${label}</span>
+    </div>`).join('') + '</div>';
+}
+
+function countBy(rows, keyFn) {
+  const m = new Map();
+  rows.forEach(r => { const k = keyFn(r); m.set(k, (m.get(k) || 0) + 1); });
+  return m;
+}
+
+/* ── 렌더 ── */
+function render() {
+  const rows = filtered();
+  const gameName = g => DATA.game_labels[g] || g;
+
+  /* KPI */
+  const stores = new Set(rows.map(r => r[3]));
+  const games = new Set(rows.map(r => r[2]));
+  const days = new Set(rows.map(r => r[0]));
+  $('kpis').innerHTML = [
+    ['대회 수', fmt(rows.length)],
+    ['매장 수', fmt(stores.size)],
+    ['게임 수', fmt(games.size)],
+    ['대회가 열린 날', fmt(days.size)],
+  ].map(([l, v]) => `<div class="kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`).join('');
+
+  const cards = [];
+
+  /* 1. 지역별 대회 수 */
+  const byRegion = countBy(rows, r => r[1]);
+  const regionEntries = DATA.regions
+    .map((name, i) => [name, byRegion.get(i) || 0])
+    .filter(e => e[1] > 0).sort((a, b) => b[1] - a[1]);
+  cards.push(`<div class="card"><h3>지역별 대회 수</h3>
+    <p class="desc">${state.game === 'ALL' ? '전체 게임' : gameName(state.game)} 기준</p>
+    ${barList(regionEntries)}</div>`);
+
+  /* 2. 게임별 대회 수 */
+  const byGame = countBy(rows, r => r[2]);
+  const gameEntries = DATA.games
+    .map((g, i) => [gameName(g), byGame.get(i) || 0])
+    .filter(e => e[1] > 0).sort((a, b) => b[1] - a[1]);
+  cards.push(`<div class="card"><h3>게임별 대회 수</h3>
+    <p class="desc">${state.region === 'ALL' ? '전국' : state.region} 기준</p>
+    ${barList(gameEntries)}</div>`);
+
+  /* 3. 지역별 매장 수 / 매장당 평균 (A) */
+  const regStores = new Map(), regCount = new Map();
+  rows.forEach(r => {
+    if (!regStores.has(r[1])) regStores.set(r[1], new Set());
+    regStores.get(r[1]).add(r[3]);
+    regCount.set(r[1], (regCount.get(r[1]) || 0) + 1);
+  });
+  const regRows = DATA.regions.map((name, i) => ({
+    name, stores: (regStores.get(i) || new Set()).size, cnt: regCount.get(i) || 0,
+  })).filter(x => x.cnt > 0).sort((a, b) => (b.cnt / b.stores) - (a.cnt / a.stores));
+  cards.push(`<div class="card"><h3>지역별 매장 수 · 매장당 대회 수</h3>
+    <p class="desc">대회가 적은 게 매장이 적어서인지 구분하려면 같이 봐야 합니다</p>
+    <table><thead><tr><th>지역</th><th>매장</th><th>대회</th><th>매장당</th></tr></thead><tbody>
+    ${regRows.map(x => `<tr><td>${x.name}</td><td>${fmt(x.stores)}</td><td>${fmt(x.cnt)}</td>
+      <td><b>${(x.cnt / x.stores).toFixed(1)}</b></td></tr>`).join('')}
+    </tbody></table></div>`);
+
+  /* 4. 게임별 취급 매장 수 (A) */
+  const gameStores = new Map();
+  rows.forEach(r => {
+    if (!gameStores.has(r[2])) gameStores.set(r[2], new Set());
+    gameStores.get(r[2]).add(r[3]);
+  });
+  const gRows = DATA.games.map((g, i) => ({
+    name: gameName(g), stores: (gameStores.get(i) || new Set()).size, cnt: byGame.get(i) || 0,
+  })).filter(x => x.cnt > 0).sort((a, b) => b.stores - a.stores);
+  cards.push(`<div class="card"><h3>게임별 취급 매장 수</h3>
+    <p class="desc">대회 수가 많아도 매장이 적으면 특정 매장이 몰아서 여는 것입니다</p>
+    <table><thead><tr><th>게임</th><th>매장</th><th>대회</th><th>매장당</th></tr></thead><tbody>
+    ${gRows.map(x => `<tr><td>${x.name}</td><td><b>${fmt(x.stores)}</b></td><td>${fmt(x.cnt)}</td>
+      <td>${(x.cnt / x.stores).toFixed(1)}</td></tr>`).join('')}
+    </tbody></table></div>`);
+
+  /* 5. 요일 분포 (B) */
+  const byDow = countBy(rows, r => dayToDate(r[0]).getUTCDay());
+  cards.push(`<div class="card"><h3>요일 분포</h3>
+    <p class="desc">주말·평일 저녁 편중을 봅니다</p>
+    ${vbarList(WEEKDAYS.map((w, i) => [w, byDow.get(i) || 0]), { flat: true })}</div>`);
+
+  /* 6. 요일별 시작시간 분포 (B) */
+  const timed = rows.filter(r => r[4] >= 0);
+  const grid = new Map();                       // '요일-시' → 건수
+  timed.forEach(r => {
+    const k = dayToDate(r[0]).getUTCDay() + '-' + r[4];
+    grid.set(k, (grid.get(k) || 0) + 1);
+  });
+  const hours = [...new Set(timed.map(r => r[4]))].sort((a, b) => a - b);
+  const hMin = hours.length ? hours[0] : 9, hMax = hours.length ? hours[hours.length - 1] : 23;
+  const hourCols = [];
+  for (let h = hMin; h <= hMax; h++) hourCols.push(h);
+  const gMax = Math.max(...grid.values(), 1);
+  const dowTotal = WEEKDAYS.map((_, d) => timed.filter(r => dayToDate(r[0]).getUTCDay() === d).length);
+
+  const heat = !timed.length ? '<div class="empty">시간 정보가 있는 대회가 없습니다</div>' : `
+    <div class="heat"><table>
+      <thead><tr><th class="d"></th>${hourCols.map(h => `<th class="h">${h}</th>`).join('')}<th class="h sum">합계</th></tr></thead>
+      <tbody>${WEEKDAYS.map((w, d) => `<tr><th class="d">${w}</th>${hourCols.map(h => {
+        const v = grid.get(d + '-' + h) || 0;
+        const a = v / gMax;
+        const bg = v ? `background:rgba(240,140,0,${(0.12 + a * 0.88).toFixed(2)})` : '';
+        return `<td class="c${a > 0.55 ? ' hot' : ''}" style="${bg}" title="${w}요일 ${h}시 · ${fmt(v)}건">${v || ''}</td>`;
+      }).join('')}<th class="h sum">${fmt(dowTotal[d])}</th></tr>`).join('')}</tbody>
+    </table></div>
+    <div class="heat-legend">적음 <i style="background:rgba(240,140,0,0.12)"></i>
+      <i style="background:rgba(240,140,0,0.4)"></i><i style="background:rgba(240,140,0,0.7)"></i>
+      <i style="background:rgba(240,140,0,1)"></i> 많음 · 가장 많은 칸 ${fmt(gMax)}건</div>`;
+
+  const noTime = rows.length - timed.length;
+  cards.push(`<div class="card wide"><h3>요일별 시작시간 분포</h3>
+    <p class="desc">가로는 시작 시각, 세로는 요일${noTime ? ` · 시간 정보가 없는 ${fmt(noTime)}건 제외` : ''}</p>
+    ${heat}</div>`);
+
+  $('cards').innerHTML = cards.join('');
+}
+
+/* ── 필터 UI ── */
+function buildChips() {
+  const mk = (el, items, key) => {
+    el.innerHTML = ['ALL', ...items].map(v => {
+      const label = v === 'ALL' ? '전체' : (key === 'game' ? (DATA.game_labels[v] || v) : v);
+      return `<button class="chk${state[key] === v ? ' on' : ''}" data-v="${v}">${label}</button>`;
+    }).join('');
+    el.onclick = ev => {
+      const b = ev.target.closest('.chk'); if (!b) return;
+      trackFilter(key, b.dataset.v, true);
+      state[key] = b.dataset.v;
+      el.querySelectorAll('.chk').forEach(x => x.classList.toggle('on', x === b));
+      render();
+    };
+  };
+  mk($('regionChips'), DATA.regions, 'region');
+  mk($('gameChips'), DATA.games, 'game');
+}
+
+function setupPeriod() {
+  const months = [...new Set(DATA.rows.map(r => monthOf(r[0])))].sort();
+  const firstDay = isoOf(DATA.rows[0][0]);
+  const lastDay = isoOf(DATA.rows[DATA.rows.length - 1][0]);
+  const cur = new Date().toISOString().slice(0, 7);
+
+  $('monthPick').min = months[0]; $('monthPick').max = months[months.length - 1];
+  $('monthPick').value = months.includes(cur) ? cur : months[months.length - 1];
+  state.month = $('monthPick').value;
+
+  const hint = () => {
+    const [lo, hi] = activeRange();
+    $('rangeHint').textContent = state.mode === 'all'
+      ? `${firstDay} ~ ${lastDay} (전체)`
+      : `${isoOf(Math.max(lo, DATA.rows[0][0]))} ~ ${isoOf(Math.min(hi, DATA.rows[DATA.rows.length - 1][0]))}`;
+  };
+
+  document.querySelectorAll('[data-mode]').forEach(btn => {
+    btn.onclick = () => {
+      trackFilter('period', btn.dataset.mode, true);
+      state.mode = btn.dataset.mode;
+      document.querySelectorAll('[data-mode]').forEach(b => b.classList.toggle('on', b === btn));
+      $('monthPick').hidden = state.mode !== 'month';
+      hint(); render();
+    };
+  });
+  $('monthPick').onchange = () => { state.month = $('monthPick').value; hint(); render(); };
+  hint();
+}
+
+/* ── 시작 ── */
+(async function () {
+  try {
+    const res = await fetch('data/stats.json?v=' + Date.now());
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    DATA = await res.json();
+    DATA.baseMs = Date.parse(DATA.base_date + 'T00:00:00Z');
+    $('genLabel').textContent = `${DATA.generated_at} 기준 · 대회 ${fmt(DATA.rows.length)}건`;
+    buildChips();
+    setupPeriod();
+    render();
+  } catch (e) {
+    $('cards').innerHTML = `<div class="card wide empty">통계 데이터를 불러오지 못했습니다.<br>
+      <small>generate_stats.py 를 실행해 data/stats.json 을 만들어 주세요. (${e.message})</small></div>`;
+  }
+})();
+</script>
+</body>
+</html>
