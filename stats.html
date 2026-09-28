@@ -204,7 +204,7 @@
 
 <script>
 let DATA = null;
-let state = { mode: 'all', month: null, region: 'ALL', game: 'ALL' };
+let state = { mode: 'all', month: null, region: [], game: [] };  // region/game 빈 배열 = 전체
 
 const $ = id => document.getElementById(id);
 const fmt = n => n.toLocaleString('ko-KR');
@@ -230,12 +230,21 @@ function activeRange() {
 
 function filtered() {
   const [lo, hi] = activeRange();
-  const r = state.region === 'ALL' ? -1 : DATA.regions.indexOf(state.region);
-  const g = state.game === 'ALL' ? -1 : DATA.games.indexOf(state.game);
+  // 선택 안 하면(빈 배열) 전체. 여러 개 고르면 그중 하나라도 맞으면 포함(OR).
+  const rIdx = new Set(state.region.map(v => DATA.regions.indexOf(v)));
+  const gIdx = new Set(state.game.map(v => DATA.games.indexOf(v)));
   return DATA.rows.filter(row =>
     row[0] >= lo && row[0] <= hi &&
-    (r < 0 || row[1] === r) &&
-    (g < 0 || row[2] === g));
+    (rIdx.size === 0 || rIdx.has(row[1])) &&
+    (gIdx.size === 0 || gIdx.has(row[2])));
+}
+
+// 선택된 항목을 사람이 읽는 문구로 (기본값은 all 문구)
+function pickedLabel(key, allText) {
+  const arr = state[key];
+  if (!arr.length) return allText;
+  const names = key === 'game' ? arr.map(v => DATA.game_labels[v] || v) : arr;
+  return names.join(', ');
 }
 
 /* ── 그리기 도우미 ── */
@@ -294,7 +303,7 @@ function render() {
     .map((name, i) => [name, byRegion.get(i) || 0])
     .filter(e => e[1] > 0).sort((a, b) => b[1] - a[1]);
   cards.push(`<div class="card"><h3>지역별 대회 수</h3>
-    <p class="desc">${state.game === 'ALL' ? '전체 게임' : gameName(state.game)} 기준</p>
+    <p class="desc">${pickedLabel('game', '전체 게임')} 기준</p>
     ${barList(regionEntries)}</div>`);
 
   /* 2. 게임별 대회 수 */
@@ -303,7 +312,7 @@ function render() {
     .map((g, i) => [gameName(g), byGame.get(i) || 0])
     .filter(e => e[1] > 0).sort((a, b) => b[1] - a[1]);
   cards.push(`<div class="card"><h3>게임별 대회 수</h3>
-    <p class="desc">${state.region === 'ALL' ? '전국' : state.region} 기준</p>
+    <p class="desc">${pickedLabel('region', '전국')} 기준</p>
     ${barList(gameEntries)}</div>`);
 
   /* 3. 지역별 매장 수 / 매장당 평균 (A) */
@@ -383,16 +392,30 @@ function render() {
 
 /* ── 필터 UI ── */
 function buildChips() {
+  const paint = (el, key) => {
+    el.querySelectorAll('.chk').forEach(x => {
+      const v = x.dataset.v;
+      // '전체'는 아무것도 안 골랐을 때만 켜짐, 개별 칩은 선택 목록에 있으면 켜짐
+      x.classList.toggle('on', v === 'ALL' ? state[key].length === 0 : state[key].includes(v));
+    });
+  };
   const mk = (el, items, key) => {
     el.innerHTML = ['ALL', ...items].map(v => {
       const label = v === 'ALL' ? '전체' : (key === 'game' ? (DATA.game_labels[v] || v) : v);
-      return `<button class="chk${state[key] === v ? ' on' : ''}" data-v="${v}">${label}</button>`;
+      return `<button class="chk" data-v="${v}">${label}</button>`;
     }).join('');
+    paint(el, key);
     el.onclick = ev => {
       const b = ev.target.closest('.chk'); if (!b) return;
-      trackFilter(key, b.dataset.v, true);
-      state[key] = b.dataset.v;
-      el.querySelectorAll('.chk').forEach(x => x.classList.toggle('on', x === b));
+      const v = b.dataset.v;
+      if (v === 'ALL') {
+        state[key] = [];                       // 전체 = 선택 해제
+      } else {
+        const i = state[key].indexOf(v);
+        if (i >= 0) state[key].splice(i, 1);    // 다시 누르면 해제
+        else { state[key].push(v); trackFilter(key, v, true); }
+      }
+      paint(el, key);
       render();
     };
   };
