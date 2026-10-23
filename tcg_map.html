@@ -491,7 +491,7 @@ window.markerClick = function(i) {
 
 window.copyStore = function(idx, btn) {
   const s = allMarkers[idx].store;
-  const text = `${s.name}\n${s.addr}`;
+  const text = s.addr;
   const done = () => {
     const old = btn.textContent;
     btn.textContent = '✓ 복사됨'; btn.classList.add('done');
