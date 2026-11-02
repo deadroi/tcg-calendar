@@ -28,7 +28,7 @@
   input,textarea,button,select{font:inherit}
   input[type=text],input[type=date],input[type=number],select{box-sizing:border-box;width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:8px}
   input[type=file]{width:100%;font-size:12px}
-  button{border:0;border-radius:8px;background:#3b6bbb;color:#fff;padding:10px 14px;cursor:pointer}
+  .wrap button{border:0;border-radius:8px;background:#3b6bbb;color:#fff;padding:10px 14px;cursor:pointer}
   button.secondary{background:#e9eef8;color:#254376}
   button.danger{background:#fce7e7;color:#b42318;padding:5px 9px}
   .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
@@ -122,7 +122,7 @@
       <input id="threshold" type="number" min="0" value="1">
       <div class="row" style="gap:16px;flex-wrap:wrap">
         <label class="row" style="margin:0"><input id="merge" type="checkbox" checked>기타 덱 자동 묶기</label>
-        <label class="row" style="margin:0"><input id="showOther" type="checkbox" checked>기타 덱 상세 표기</label>
+        <label class="row" style="margin:0"><input id="showOther" type="checkbox">기타 덱 상세 표기</label>
       </div>
 
       <label class="row" style="justify-content:space-between">덱 목록
@@ -425,7 +425,7 @@ document.getElementById('loadFile').onchange=async e=>{
     renderRankInputs();
     for(const k of ['title','date','subtitle','threshold']) document.getElementById(k).value=data[k]??'';
     document.getElementById('merge').checked=!!data.merge;
-    document.getElementById('showOther').checked=data.showOther!==false;
+    document.getElementById('showOther').checked=data.showOther===true;
     if(data.bgColor) document.getElementById('bgColor').value=data.bgColor;
     if(data.textColor) document.getElementById('textColor').value=data.textColor;
     if(data.chartType) setType(data.chartType);
