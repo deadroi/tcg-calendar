@@ -120,7 +120,33 @@ wcs_do();
   #modalList li .result-title { font-size: 13px; color: #222; margin-top: 4px; }
   #modalList li a { color: inherit; text-decoration: none; display: block; }
   #modalList li a:hover .result-title { text-decoration: underline; color: var(--accent); }
-  #modalList li .result-link { font-size: 11px; color: var(--accent); margin-top: 4px; display: block; }
+  #modalList li .result-winner { font-size: 12px; font-weight:700; color:#c2410c; margin-top:4px; }
+  .result-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+  .result-actions .btn-x, .result-actions .btn-deck {
+    font-size:12px; font-weight:600; padding:5px 11px; border-radius:7px; cursor:pointer;
+    border:1px solid var(--accent-line); text-decoration:none; line-height:1.3;
+  }
+  .result-actions .btn-x { background:#fff; color:#254376; border-color:#cbd5e1; }
+  .result-actions .btn-x:hover { background:#f1f5f9; }
+  .result-actions .btn-deck { background:var(--accent-soft); color:var(--accent); }
+  .result-actions .btn-deck:hover { background:#fff0d8; }
+  .deck-panel { margin-top:8px; }
+  .tweet-embed { margin: 8px 0; min-height: 0; }
+  .tweet-embed .twitter-tweet { margin: 8px auto !important; }
+  .tweet-fail { font-size:12px; color:#999; padding:6px 0; }
+  .deck-loading { font-size:12px; color:#888; padding:6px 0; }
+  .deck-wrap { margin: 8px 0 2px; padding: 8px 10px; background:#fff; border:1px solid var(--accent-line); border-radius:8px; }
+  .deck-head { font-size:12px; font-weight:700; color:var(--accent); margin-bottom:4px; }
+  .deck-sub { font-size:11px; font-weight:700; color:#555; margin:6px 0 2px; }
+  ul.decklist { list-style:none; margin:0; padding:0; }
+  ul.decklist li { margin:1px 0; padding:0; background:none; border:none; display:flex; gap:6px; align-items:center; font-size:12px; }
+  .deck-cnt { font-weight:700; min-width:22px; color:#222; }
+  .deck-attr { font-size:10px; padding:1px 5px; border-radius:6px; color:#fff; min-width:26px; text-align:center; background:#888; }
+  .attr-화염{background:#e03131;} .attr-파도{background:#1971c2;} .attr-대지{background:#2f9e44;}
+  .attr-번개{background:#9c36b5;} .attr-폭풍{background:#15aabf;}
+  .deck-no { font-size:11px; color:#888; min-width:62px; }
+  .deck-rar { font-size:10px; font-weight:700; color:#5b4a1a; background:#fdf1cf; border:1px solid #f0d98a; border-radius:5px; padding:0 4px; min-width:30px; text-align:center; }
+  .deck-name { color:#222; }
   .modal-subhint { color:#888; font-size:12px; margin-top:10px; }
   .site-nav { background: #0d0d1a; position: relative; z-index: 500; }
   .site-nav-inner { max-width: 1600px; margin: 0 auto; padding: 0 8px; display: flex; align-items: center; justify-content: space-between; }
@@ -210,6 +236,7 @@ wcs_do();
 </style>
 <link rel="stylesheet" href="asset/data-pages-theme.css">
 <script src="asset/site-nav.js" defer></script>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 </head>
 <body>
 
@@ -326,6 +353,7 @@ let REGION_COLORS = {};
 let calendar;
 let currentVisibleEvents = [];
 let enrichedMaster = [];
+let decklistCache = {};  // results2.id → { decks:[...] } (클릭 시 그 id 파일만 fetch 해 캐시)
 let allMonths = [];
 let selectedMonthKey = null;
 const jsonCache = {};
@@ -364,6 +392,8 @@ function enrich(events, regionList) {
           ...(e.extendedProps||{}),
           regionKey: p.regionKey, storeKey: p.storeKey, gameKey: p.gameKey,
           xUrl: e.xUrl || "", resultTitle: e.resultTitle || "",
+          rid: (e.id != null ? String(e.id) : ""), winnerDeck: e.winnerDeck || "",
+          hasDeck: !!e.hasDeck,
         }
       };
     });
@@ -500,6 +530,50 @@ function buildByDate(eventsArr) {
   }
   return map;
 }
+function statusIdFromUrl(url) {
+  const m = String(url||"").match(/status\/(\d+)/);
+  return m ? m[1] : "";
+}
+function renderEmbeds(sids, tries) {
+  if (window.twttr && twttr.widgets) {
+    sids.forEach(sid => {
+      const el = document.getElementById('tw-' + sid);
+      if (el && !el.dataset.loaded) {
+        el.dataset.loaded = "1";
+        twttr.widgets.createTweet(sid, el, {theme:'light', conversation:'none', align:'center'})
+          .then(node => { if (!node) el.innerHTML = '<div class="tweet-fail">트윗을 불러올 수 없습니다 (삭제/비공개)</div>'; });
+      }
+    });
+  } else if (tries < 40) {           // widgets.js 로딩 대기(최대 ~12초)
+    setTimeout(() => renderEmbeds(sids, tries + 1), 300);
+  }
+}
+function escapeHtml(s){return String(s==null?"":s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+async function loadDeck(rid) {
+  if (rid in decklistCache) return decklistCache[rid];
+  try {
+    const r = await fetch(DATA_BASE + 'decklists/' + rid + '.json?v=' + (window._cacheVer || Date.now()));
+    decklistCache[rid] = r.ok ? await r.json() : null;
+  } catch (_) { decklistCache[rid] = null; }
+  return decklistCache[rid];
+}
+function deckListHtml(entry) {
+  if (!entry || !entry.decks || !entry.decks.length) return "";
+  let html = "";
+  const decks = entry.decks.filter(d => d.cards.some(c => c.확정));  // 확정 카드 있는 덱만
+  for (const deck of decks) {
+    const title = decks.length > 1 ? `<div class="deck-sub">덱 ${deck.deck_no}</div>` : "";
+    const rows = deck.cards.filter(c => c.확정).map(c =>    // 불확실 카드는 표시 안 함
+      `<li><span class="deck-cnt">${c.장수}x</span>`
+      + `<span class="deck-attr attr-${escapeHtml(c.속성)}">${escapeHtml(c.속성||"")}</span>`
+      + `<span class="deck-no">${escapeHtml(c.번호)}</span>`
+      + (c.레어도 ? `<span class="deck-rar">${escapeHtml(c.레어도)}</span>` : "")
+      + `<span class="deck-name">${escapeHtml(c.이름||"")}</span></li>`).join("");
+    html += `${title}<ul class="decklist">${rows}</ul>`;
+  }
+  if (!html) return "";
+  return `<div class="deck-wrap"><div class="deck-head">🃏 덱리스트</div>${html}</div>`;
+}
 function openModal(dateStr) {
   const list = buildByDate(currentVisibleEvents).get(dateStr) || [];
   if (list.length === 0) return;
@@ -510,17 +584,45 @@ function openModal(dateStr) {
     const r = e.extendedProps?.regionKey||"", store = e.extendedProps?.storeKey||"";
     const g = e.extendedProps?.gameKey||"", xUrl = e.extendedProps?.xUrl||"";
     const resultTitle = e.extendedProps?.resultTitle||"";
+    const rid = e.extendedProps?.rid||"", winner = e.extendedProps?.winnerDeck||"";
+    const hasDeck = !!e.extendedProps?.hasDeck && !!rid;
+    const sid = statusIdFromUrl(xUrl);
     const rColor = REGION_COLORS[r]||"#111", gColor = GAME_COLORS[g]||"#666";
-    const inner = `
+    li.innerHTML = `
       <div class="result-store"><span style="color:${rColor}">[${r}]</span> ${store}</div>
       <div class="result-game" style="color:${gColor}">● ${GAME_LABEL[g]||g}</div>
       ${resultTitle ? `<div class="result-title">${resultTitle}</div>` : ""}
+      ${winner ? `<div class="result-winner">🏆 ${escapeHtml(winner)}</div>` : ""}
+      <div class="result-actions"></div>
+      <div class="deck-panel" hidden></div>
     `;
+    if (xUrl) li.classList.add('has-link');
+    const actions = li.querySelector('.result-actions');
+    const panel = li.querySelector('.deck-panel');
     if (xUrl) {
-      li.classList.add('has-link');
-      li.innerHTML = `<a href="${xUrl}" target="_blank">${inner}<span class="result-link">🔗 원문 보기</span></a>`;
-    } else {
-      li.innerHTML = inner;
+      const a = document.createElement('a');
+      a.href = xUrl; a.target = "_blank"; a.rel = "noopener";
+      a.className = "btn-x"; a.textContent = "🔗 원문 보기";
+      actions.appendChild(a);
+    }
+    if (hasDeck) {
+      const btn = document.createElement('button');
+      btn.type = "button"; btn.className = "btn-deck"; btn.textContent = "🃏 덱리스트 보기";
+      btn.addEventListener('click', async () => {
+        const opening = panel.hidden;
+        panel.hidden = !opening;
+        btn.textContent = opening ? "🃏 덱리스트 닫기" : "🃏 덱리스트 보기";
+        if (opening && !panel.dataset.built) {   // 처음 열 때만 그 id 의 json 을 fetch
+          panel.dataset.built = "1";
+          panel.innerHTML = '<div class="deck-loading">불러오는 중…</div>';
+          const entry = await loadDeck(rid);
+          const html = deckListHtml(entry);
+          panel.innerHTML = (sid ? `<div class="tweet-embed" id="tw-${sid}"></div>` : "")
+            + (html || '<div class="tweet-fail">덱리스트를 불러오지 못했습니다.</div>');
+          if (sid) renderEmbeds([sid], 0);
+        }
+      });
+      actions.appendChild(btn);
     }
     modalList.appendChild(li);
   }
