@@ -100,6 +100,17 @@
       <label>부제 / 매장 정보</label>
       <input id="subtitle" type="text" placeholder="예: 평택 리미티드 레귤레이션" value="">
 
+      <label for="rankCount">입상 정보 표시</label>
+      <select id="rankCount">
+        <option value="0">표시 안 함</option>
+        <option value="1">1위까지</option>
+        <option value="2">2위까지</option>
+        <option value="3">3위까지</option>
+        <option value="4">4위까지</option>
+      </select>
+      <div id="rankInputs"></div>
+      <p class="note">선택한 순위까지 참가자 이름과 사용 덱을 이미지 하단에 표시합니다.</p>
+
       <label>색상</label>
       <div class="row" style="gap:16px">
         <span class="row" style="gap:6px">배경 <input id="bgColor" type="color" value="#ffffff"></span>
@@ -140,6 +151,38 @@ const canvas = document.getElementById('chart');
 const ctx = canvas.getContext('2d');
 let decks = [];
 let chartType = 'pie';
+let rankings = Array.from({length:4},()=>({name:'',deck:''}));
+function rankCount(){return Math.max(0,Math.min(4,parseInt(document.getElementById('rankCount').value,10)||0));}
+function renderRankInputs(){
+  const host=document.getElementById('rankInputs'); host.replaceChildren();
+  rankings.forEach((rank,i)=>{
+    if(i>=rankCount()) return;
+    const box=document.createElement('div'); box.className='deck';
+    const title=document.createElement('strong'); title.textContent=(i+1)+'위'; box.append(title);
+    [['name','참가자 이름 / 닉네임'],['deck','사용 덱']].forEach(([key,label])=>{
+      const id='rank-'+i+'-'+key;
+      const caption=document.createElement('label'); caption.htmlFor=id; caption.textContent=label;
+      const input=document.createElement('input'); input.id=id; input.type='text'; input.value=rank[key];
+      input.placeholder=label; input.maxLength=100;
+      input.oninput=()=>{rank[key]=input.value; draw();}; box.append(caption,input);
+    });
+    host.append(box);
+  });
+}
+function drawRankings(y){
+  if(!rankCount()) return;
+  ctx.save(); ctx.textAlign='left'; ctx.fillStyle=textColor();
+  ctx.globalAlpha=.25; ctx.fillRect(40,y,1120,1); ctx.globalAlpha=1;
+  ctx.font='bold 24px sans-serif'; ctx.fillText('대회 입상 정보',40,y+38);
+  rankings.slice(0,rankCount()).forEach((rank,i)=>{
+    const line=y+80+i*40;
+    ctx.font='bold 21px sans-serif'; ctx.fillText((i+1)+'위',40,line);
+    ctx.font='20px sans-serif';
+    ctx.fillText(rank.name.trim()||'—',115,line,330);
+    ctx.fillText(rank.deck.trim()||'—',470,line,680);
+  });
+  ctx.restore();
+}
 
 const colors = ['#658fdb','#f7a56d','#9c79d4','#6eb9ab','#e080a4','#d4b56b','#7194a0','#dc7d67','#a3b86a','#7583ba'];
 const bgColor = () => document.getElementById('bgColor').value;
@@ -272,10 +315,14 @@ function legendOther(other, y0){
 
 /* ── 메인 draw: 타입 분기 ── */
 function draw(){
-  const W=1200, H=850;
-  ctx.clearRect(0,0,W,H); ctx.fillStyle=bgColor(); ctx.fillRect(0,0,W,H);
   const {total, items, other}=prepare();
+  const showOther=document.getElementById('showOther').checked;
+  const footerY=Math.max(850,showOther && other.length ? 750+Math.ceil(other.length/3)*25 : 850);
+  const W=1200, H=rankCount()?footerY+100+rankCount()*40:footerY;
+  if(canvas.height!==H) canvas.height=H;
+  ctx.clearRect(0,0,W,H); ctx.fillStyle=bgColor(); ctx.fillRect(0,0,W,H);
   header(total);
+  drawRankings(footerY);
   if(!total){ ctx.fillStyle=textColor(); ctx.font='26px sans-serif'; ctx.textAlign='center';
     ctx.fillText('덱과 인원수를 입력해 주세요.', W/2, 440); ctx.textAlign='left'; return; }
   if(chartType==='treemap') drawTreemap(items, total);
@@ -366,12 +413,16 @@ document.getElementById('export').onclick=()=>{ draw(); canvas.toBlob(blob=>{
 document.getElementById('save').onclick=()=>download('tcg_distribution.json', JSON.stringify({
   title:document.getElementById('title').value, date:document.getElementById('date').value,
   subtitle:document.getElementById('subtitle').value, threshold:document.getElementById('threshold').value,
-  merge:document.getElementById('merge').checked, showOther:document.getElementById('showOther').checked, bgColor:bgColor(), textColor:textColor(), chartType, decks
+  merge:document.getElementById('merge').checked, showOther:document.getElementById('showOther').checked, bgColor:bgColor(), textColor:textColor(), chartType, decks,
+  rankCount:rankCount(), rankings
 },null,2), 'application/json');
 document.getElementById('loadBtn').onclick=()=>document.getElementById('loadFile').click();
 document.getElementById('loadFile').onchange=async e=>{
   try{
     const data=JSON.parse(await e.target.files[0].text());
+    document.getElementById('rankCount').value=String(Math.max(0,Math.min(4,parseInt(data.rankCount,10)||0)));
+    rankings=Array.from({length:4},(_,i)=>({name:String(data.rankings?.[i]?.name??'').slice(0,100),deck:String(data.rankings?.[i]?.deck??'').slice(0,100)}));
+    renderRankInputs();
     for(const k of ['title','date','subtitle','threshold']) document.getElementById(k).value=data[k]??'';
     document.getElementById('merge').checked=!!data.merge;
     document.getElementById('showOther').checked=data.showOther!==false;
@@ -394,6 +445,7 @@ function setType(t){
   draw();
 }
 document.getElementById('chartTypes').onclick=e=>{ const b=e.target.closest('button'); if(b) setType(b.dataset.type); };
+document.getElementById('rankCount').onchange=()=>{renderRankInputs(); draw();};
 document.getElementById('resetColor').onclick=()=>{ document.getElementById('bgColor').value='#ffffff'; document.getElementById('textColor').value='#1f2b46'; draw(); };
 
 /* ── 날짜 기본값: 오늘 (로컬 기준) ── */
