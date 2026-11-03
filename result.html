@@ -130,11 +130,9 @@ wcs_do();
   .result-actions .btn-x:hover { background:#f1f5f9; }
   .result-actions .btn-deck { background:var(--accent-soft); color:var(--accent); }
   .result-actions .btn-deck:hover { background:#fff0d8; }
-  .deck-panel { margin-top:8px; }
   .tweet-embed { margin: 8px 0; min-height: 0; }
   .tweet-embed .twitter-tweet { margin: 8px auto !important; }
   .tweet-fail { font-size:12px; color:#999; padding:6px 0; }
-  .deck-loading { font-size:12px; color:#888; padding:6px 0; }
   .deck-wrap { margin: 8px 0 2px; padding: 8px 10px; background:#fff; border:1px solid var(--accent-line); border-radius:8px; }
   .deck-head { font-size:12px; font-weight:700; color:var(--accent); margin-bottom:4px; }
   .deck-sub { font-size:11px; font-weight:700; color:#555; margin:6px 0 2px; }
@@ -534,20 +532,6 @@ function statusIdFromUrl(url) {
   const m = String(url||"").match(/status\/(\d+)/);
   return m ? m[1] : "";
 }
-function renderEmbeds(sids, tries) {
-  if (window.twttr && twttr.widgets) {
-    sids.forEach(sid => {
-      const el = document.getElementById('tw-' + sid);
-      if (el && !el.dataset.loaded) {
-        el.dataset.loaded = "1";
-        twttr.widgets.createTweet(sid, el, {theme:'light', conversation:'none', align:'center'})
-          .then(node => { if (!node) el.innerHTML = '<div class="tweet-fail">트윗을 불러올 수 없습니다 (삭제/비공개)</div>'; });
-      }
-    });
-  } else if (tries < 40) {           // widgets.js 로딩 대기(최대 ~12초)
-    setTimeout(() => renderEmbeds(sids, tries + 1), 300);
-  }
-}
 function escapeHtml(s){return String(s==null?"":s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 async function loadDeck(rid) {
   if (rid in decklistCache) return decklistCache[rid];
@@ -574,6 +558,60 @@ function deckListHtml(entry) {
   if (!html) return "";
   return `<div class="deck-wrap"><div class="deck-head">🃏 덱리스트</div>${html}</div>`;
 }
+function openDeckWindow(rid, sid, header, subtitle, xUrl) {
+  // 팝업은 클릭 즉시(동기) 열어야 차단되지 않음 → 먼저 열고 나서 데이터 주입
+  // 현재 창이 있는 모니터 기준 화면 중앙에 위치
+  const W = 620, H = 880;
+  const dualLeft = window.screenLeft != null ? window.screenLeft : window.screenX;
+  const dualTop = window.screenTop != null ? window.screenTop : window.screenY;
+  const vw = window.outerWidth || document.documentElement.clientWidth || screen.width;
+  const vh = window.outerHeight || document.documentElement.clientHeight || screen.height;
+  const left = Math.max(0, Math.round(dualLeft + (vw - W) / 2));
+  const top = Math.max(0, Math.round(dualTop + (vh - H) / 2));
+  const feat = `width=${W},height=${H},left=${left},top=${top},scrollbars=yes,resizable=yes`;
+  const w = window.open("", "deck_" + rid, feat);
+  if (!w) { alert("팝업이 차단되었습니다. 이 사이트의 팝업을 허용한 뒤 다시 눌러주세요."); return; }
+  w.document.write('<!doctype html><meta charset="utf-8"><title>덱리스트</title>'
+    + '<body style="font:14px system-ui,sans-serif;padding:16px;color:#182335">불러오는 중…</body>');
+  w.document.close();
+  loadDeck(rid).then(entry => {
+    const deckHtml = deckListHtml(entry) || '<p style="color:#999">확정된 덱리스트가 없습니다.</p>';
+    const css = `
+      body{font:14px system-ui,'Malgun Gothic',sans-serif;margin:0;padding:16px;color:#182335;background:#f8f9fa}
+      .pop-head{font-weight:800;font-size:15px;margin:0 0 2px}
+      .pop-sub{font-size:12px;color:#666;margin:0 0 12px}
+      .tweet-embed{margin:0 0 12px}
+      .link{font-size:12px;color:#c2410c;text-decoration:none}
+      .deck-wrap{margin:8px 0;padding:10px 12px;background:#fff;border:1px solid #f6c477;border-radius:8px}
+      .deck-head{font-size:12px;font-weight:700;color:#e8590c;margin-bottom:6px}
+      .deck-sub{font-size:11px;font-weight:700;color:#555;margin:6px 0 2px}
+      ul.decklist{list-style:none;margin:0;padding:0}
+      ul.decklist li{margin:2px 0;display:flex;gap:6px;align-items:center;font-size:13px}
+      .deck-cnt{font-weight:700;min-width:24px}
+      .deck-attr{font-size:10px;padding:1px 5px;border-radius:6px;color:#fff;min-width:28px;text-align:center;background:#888}
+      .attr-화염{background:#e03131}.attr-파도{background:#1971c2}.attr-대지{background:#2f9e44}
+      .attr-번개{background:#9c36b5}.attr-폭풍{background:#15aabf}
+      .deck-no{font-size:11px;color:#888;min-width:64px}
+      .deck-rar{font-size:10px;font-weight:700;color:#5b4a1a;background:#fdf1cf;border:1px solid #f0d98a;border-radius:5px;padding:0 4px;min-width:30px;text-align:center}
+      .deck-name{color:#222}`;
+    const embedBlock = sid ? '<div class="tweet-embed" id="tw"></div>' : "";
+    const embedScript = sid
+      ? '<script async src="https://platform.twitter.com/widgets.js" charset="utf-8" '
+        + 'onload="twttr.ready(function(){twttr.widgets.createTweet(\'' + sid
+        + '\',document.getElementById(\'tw\'),{theme:\'light\',conversation:\'none\',align:\'center\'});});"><\/script>'
+      : "";
+    const linkBlock = xUrl ? `<a class="link" href="${xUrl}" target="_blank" rel="noopener">🔗 X 원문 보기</a>` : "";
+    const doc = `<!doctype html><html lang="ko"><head><meta charset="utf-8">`
+      + `<meta name="viewport" content="width=device-width,initial-scale=1">`
+      + `<title>${escapeHtml(header)}</title><style>${css}</style></head><body>`
+      + `<p class="pop-head">${escapeHtml(header)}</p>`
+      + (subtitle ? `<p class="pop-sub">${escapeHtml(subtitle)}</p>` : "")
+      + embedBlock + deckHtml + `<p style="margin-top:12px">${linkBlock}</p>`
+      + embedScript + `</body></html>`;
+    try { w.document.open(); w.document.write(doc); w.document.close(); }
+    catch (_) { /* 사용자가 창을 닫은 경우 무시 */ }
+  });
+}
 function openModal(dateStr) {
   const list = buildByDate(currentVisibleEvents).get(dateStr) || [];
   if (list.length === 0) return;
@@ -594,11 +632,9 @@ function openModal(dateStr) {
       ${resultTitle ? `<div class="result-title">${resultTitle}</div>` : ""}
       ${winner ? `<div class="result-winner">🏆 ${escapeHtml(winner)}</div>` : ""}
       <div class="result-actions"></div>
-      <div class="deck-panel" hidden></div>
     `;
     if (xUrl) li.classList.add('has-link');
     const actions = li.querySelector('.result-actions');
-    const panel = li.querySelector('.deck-panel');
     if (xUrl) {
       const a = document.createElement('a');
       a.href = xUrl; a.target = "_blank"; a.rel = "noopener";
@@ -608,20 +644,8 @@ function openModal(dateStr) {
     if (hasDeck) {
       const btn = document.createElement('button');
       btn.type = "button"; btn.className = "btn-deck"; btn.textContent = "🃏 덱리스트 보기";
-      btn.addEventListener('click', async () => {
-        const opening = panel.hidden;
-        panel.hidden = !opening;
-        btn.textContent = opening ? "🃏 덱리스트 닫기" : "🃏 덱리스트 보기";
-        if (opening && !panel.dataset.built) {   // 처음 열 때만 그 id 의 json 을 fetch
-          panel.dataset.built = "1";
-          panel.innerHTML = '<div class="deck-loading">불러오는 중…</div>';
-          const entry = await loadDeck(rid);
-          const html = deckListHtml(entry);
-          panel.innerHTML = (sid ? `<div class="tweet-embed" id="tw-${sid}"></div>` : "")
-            + (html || '<div class="tweet-fail">덱리스트를 불러오지 못했습니다.</div>');
-          if (sid) renderEmbeds([sid], 0);
-        }
-      });
+      const header = `[${r}] ${store} · ${GAME_LABEL[g]||g}${winner ? ' · 🏆 ' + winner : ''}`;
+      btn.addEventListener('click', () => openDeckWindow(rid, sid, header, resultTitle, xUrl));
       actions.appendChild(btn);
     }
     modalList.appendChild(li);
