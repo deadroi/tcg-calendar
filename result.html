@@ -548,11 +548,11 @@ function deckListHtml(entry) {
   for (const deck of decks) {
     const title = decks.length > 1 ? `<div class="deck-sub">덱 ${deck.deck_no}</div>` : "";
     const rows = deck.cards.filter(c => c.확정).map(c =>    // 불확실 카드는 표시 안 함
-      `<li><span class="deck-cnt">${c.장수}x</span>`
-      + `<span class="deck-attr attr-${escapeHtml(c.속성)}">${escapeHtml(c.속성||"")}</span>`
+      `<li><span class="deck-attr attr-${escapeHtml(c.속성)}">${escapeHtml(c.속성||"")}</span>`
       + `<span class="deck-no">${escapeHtml(c.번호)}</span>`
       + (c.레어도 ? `<span class="deck-rar">${escapeHtml(c.레어도)}</span>` : "")
-      + `<span class="deck-name">${escapeHtml(c.이름||"")}</span></li>`).join("");
+      + `<span class="deck-name">${escapeHtml(c.이름||"")}</span>`
+      + `<span class="deck-cnt">x${c.장수}</span></li>`).join("");
     html += `${title}<ul class="decklist">${rows}</ul>`;
   }
   if (!html) return "";
@@ -576,6 +576,14 @@ function openDeckWindow(rid, sid, header, subtitle, xUrl) {
   w.document.close();
   loadDeck(rid).then(entry => {
     const deckHtml = deckListHtml(entry) || '<p style="color:#999">확정된 덱리스트가 없습니다.</p>';
+    // 엑셀 추출용: 확정 카드만 담은 덱 데이터 + 파일명
+    const confirmedDecks = (entry && entry.decks ? entry.decks : [])
+      .map(d => ({ deck_no: d.deck_no, cards: d.cards.filter(c => c.확정) }))
+      .filter(d => d.cards.length);
+    const hasDeck = confirmedDecks.length > 0;
+    const fileBase = ((header || '덱리스트') + (subtitle ? '_' + subtitle : ''))
+      .replace(/[\\/:*?"<>|]/g, ' ').replace(/\s+/g, '_').slice(0, 80);
+    const dataJson = JSON.stringify({ file: fileBase, multi: confirmedDecks.length > 1, decks: confirmedDecks });
     const css = `
       body{font:14px system-ui,'Malgun Gothic',sans-serif;margin:0;padding:16px;color:#182335;background:#f8f9fa}
       .pop-head{font-weight:800;font-size:15px;margin:0 0 2px}
@@ -587,13 +595,15 @@ function openDeckWindow(rid, sid, header, subtitle, xUrl) {
       .deck-sub{font-size:11px;font-weight:700;color:#555;margin:6px 0 2px}
       ul.decklist{list-style:none;margin:0;padding:0}
       ul.decklist li{margin:2px 0;display:flex;gap:6px;align-items:center;font-size:13px}
-      .deck-cnt{font-weight:700;min-width:24px}
+      .deck-cnt{font-weight:700;min-width:24px;margin-left:auto;text-align:right}
       .deck-attr{font-size:10px;padding:1px 5px;border-radius:6px;color:#fff;min-width:28px;text-align:center;background:#888}
       .attr-화염{background:#e03131}.attr-파도{background:#1971c2}.attr-대지{background:#2f9e44}
       .attr-번개{background:#9c36b5}.attr-폭풍{background:#15aabf}
       .deck-no{font-size:11px;color:#888;min-width:64px}
       .deck-rar{font-size:10px;font-weight:700;color:#5b4a1a;background:#fdf1cf;border:1px solid #f0d98a;border-radius:5px;padding:0 4px;min-width:30px;text-align:center}
-      .deck-name{color:#222}`;
+      .deck-name{color:#222}
+      .xlsx-btn{margin:10px 0 0;padding:6px 12px;font-size:13px;font-weight:700;color:#fff;background:#1d6f42;border:0;border-radius:6px;cursor:pointer}
+      .xlsx-btn:hover{background:#155c36}`;
     const embedBlock = sid ? '<div class="tweet-embed" id="tw"></div>' : "";
     const embedScript = sid
       ? '<script async src="https://platform.twitter.com/widgets.js" charset="utf-8" '
@@ -601,13 +611,26 @@ function openDeckWindow(rid, sid, header, subtitle, xUrl) {
         + '\',document.getElementById(\'tw\'),{theme:\'light\',conversation:\'none\',align:\'center\'});});"><\/script>'
       : "";
     const linkBlock = xUrl ? `<a class="link" href="${xUrl}" target="_blank" rel="noopener">🔗 X 원문 보기</a>` : "";
+    // 엑셀(.xlsx) 추출: 확정 덱 데이터 주입 + SheetJS + 클릭 핸들러
+    const xlsxBtn = hasDeck ? '<div><button id="xlsxBtn" class="xlsx-btn">⬇ 엑셀 추출</button></div>' : "";
+    const xlsxScript = hasDeck
+      ? '<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"><\/script>'
+        + '<script>var DECK_DATA=' + dataJson + ';'
+        + "document.getElementById('xlsxBtn').addEventListener('click',function(){"
+        + "if(typeof XLSX==='undefined'){alert('엑셀 라이브러리를 불러오는 중입니다. 잠시 후 다시 눌러주세요.');return;}"
+        + "var m=DECK_DATA.multi,aoa=[(m?['덱']:[]).concat(['속성','번호','레어도','이름','장수'])];"
+        + "DECK_DATA.decks.forEach(function(d){d.cards.forEach(function(c){"
+        + "aoa.push((m?[d.deck_no]:[]).concat([c.속성||'',c.번호||'',c.레어도||'',c.이름||'',c.장수||'']));});});"
+        + "var ws=XLSX.utils.aoa_to_sheet(aoa),wb=XLSX.utils.book_new();"
+        + "XLSX.utils.book_append_sheet(wb,ws,'덱리스트');XLSX.writeFile(wb,DECK_DATA.file+'.xlsx');});<\/script>"
+      : "";
     const doc = `<!doctype html><html lang="ko"><head><meta charset="utf-8">`
       + `<meta name="viewport" content="width=device-width,initial-scale=1">`
       + `<title>${escapeHtml(header)}</title><style>${css}</style></head><body>`
       + `<p class="pop-head">${escapeHtml(header)}</p>`
       + (subtitle ? `<p class="pop-sub">${escapeHtml(subtitle)}</p>` : "")
-      + embedBlock + deckHtml + `<p style="margin-top:12px">${linkBlock}</p>`
-      + embedScript + `</body></html>`;
+      + embedBlock + deckHtml + xlsxBtn + `<p style="margin-top:12px">${linkBlock}</p>`
+      + embedScript + xlsxScript + `</body></html>`;
     try { w.document.open(); w.document.write(doc); w.document.close(); }
     catch (_) { /* 사용자가 창을 닫은 경우 무시 */ }
   });
