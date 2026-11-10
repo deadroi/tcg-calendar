@@ -182,9 +182,13 @@
   <div class="filter-bar">
     <div class="filter-row">
       <h2>기간</h2>
-      <button class="chk on" data-mode="all">전체</button>
+      <button class="chk" data-mode="all">전체</button>
       <button class="chk" data-mode="month">월간</button>
+      <button class="chk on" data-mode="range">기간 지정</button>
       <input type="month" id="monthPick" hidden>
+      <span id="rangeGroup" style="display:flex;align-items:center;gap:6px">
+        <input type="date" id="rangeStart"> ~ <input type="date" id="rangeEnd">
+      </span>
       <span class="range-hint" id="rangeHint"></span>
     </div>
     <div class="filter-row">
@@ -203,7 +207,7 @@
 
 <script>
 let DATA = null;
-let state = { mode: 'all', month: null, region: [], game: [] };  // region/game 빈 배열 = 전체
+let state = { mode: 'range', month: null, rangeStart: null, rangeEnd: null, region: [], game: [] };  // region/game 빈 배열 = 전체
 
 const $ = id => document.getElementById(id);
 const fmt = n => n.toLocaleString('ko-KR');
@@ -222,6 +226,10 @@ function activeRange() {
   if (state.mode === 'month' && state.month) {
     const [y, m] = state.month.split('-').map(Number);
     const first = new Date(Date.UTC(y, m - 1, 1)), last = new Date(Date.UTC(y, m, 0));
+    return [Math.round((first - DATA.baseMs) / 86400000), Math.round((last - DATA.baseMs) / 86400000)];
+  }
+  if (state.mode === 'range' && state.rangeStart && state.rangeEnd) {
+    const first = new Date(state.rangeStart + 'T00:00:00Z'), last = new Date(state.rangeEnd + 'T00:00:00Z');
     return [Math.round((first - DATA.baseMs) / 86400000), Math.round((last - DATA.baseMs) / 86400000)];
   }
   return [-Infinity, Infinity];
@@ -432,6 +440,17 @@ function setupPeriod() {
   $('monthPick').value = months.includes(cur) ? cur : months[months.length - 1];
   state.month = $('monthPick').value;
 
+  // 기간 지정 기본값: 올해 2월 1일 ~ 오늘(데이터 범위 밖이면 보유 범위로 보정)
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const febStr = `${new Date().getFullYear()}-02-01`;
+  let defStart = febStr < firstDay ? firstDay : febStr;
+  let defEnd = todayStr > lastDay ? lastDay : todayStr;
+  if (defStart > defEnd) defStart = defEnd;
+  $('rangeStart').min = firstDay; $('rangeStart').max = lastDay;
+  $('rangeEnd').min = firstDay; $('rangeEnd').max = lastDay;
+  $('rangeStart').value = state.rangeStart = defStart;
+  $('rangeEnd').value = state.rangeEnd = defEnd;
+
   const hint = () => {
     const [lo, hi] = activeRange();
     $('rangeHint').textContent = state.mode === 'all'
@@ -445,10 +464,13 @@ function setupPeriod() {
       state.mode = btn.dataset.mode;
       document.querySelectorAll('[data-mode]').forEach(b => b.classList.toggle('on', b === btn));
       $('monthPick').hidden = state.mode !== 'month';
+      $('rangeGroup').hidden = state.mode !== 'range';
       hint(); render();
     };
   });
   $('monthPick').onchange = () => { state.month = $('monthPick').value; hint(); render(); };
+  $('rangeStart').onchange = () => { state.rangeStart = $('rangeStart').value; hint(); render(); };
+  $('rangeEnd').onchange = () => { state.rangeEnd = $('rangeEnd').value; hint(); render(); };
   hint();
 }
 
