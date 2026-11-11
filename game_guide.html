@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="description" content="TCG 게임 소개와 공식 사이트·카드 검색·덱빌더·커뮤니티 모음"/>
+<title>TCG 소개</title>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-9N9WTDYW2G"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-9N9WTDYW2G');
+</script>
+<style>
+  :root {
+    --navy: #172334;
+    --accent: #f08c00;
+    --accent-soft: #fff8ed;
+    --accent-line: #f6c477;
+    --bg: #f5f6f8;
+    --card: #fff;
+    --line: #e3e6ea;
+    --text: #222;
+    --muted: #7a8794;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans KR', sans-serif; }
+
+  .wrap { max-width: 1220px; margin: 0 auto; padding: 16px 12px 48px; }
+  .page-header { text-align: center; padding: 32px 16px 28px;
+                 background: linear-gradient(135deg, var(--navy) 0%, #22344b 100%);
+                 border-bottom: 1px solid #2b3b50; }
+  .page-header h1 { font-size: 26px; font-weight: 900; margin: 0 0 6px; letter-spacing: -.5px; color: #fff; }
+  .page-header-sub { font-size: 14px; line-height: 1.7; margin: 0; color: #9baabd; }
+  @media (max-width: 600px) {
+    .page-header { padding: 26px 12px 23px; }
+    .page-header h1 { font-size: 23px; }
+  }
+
+  .games { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+  .game-card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
+  .game-head { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .game-logo { flex: 0 0 auto; height: 40px; width: 64px; object-fit: contain;
+               background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 4px; }
+  .game-card h2 { margin: 0; font-size: 16px; color: var(--navy); }
+  .game-card .intro { font-size: 12.5px; color: #444; line-height: 1.5; margin: 0 0 12px;
+                       padding-bottom: 10px; border-bottom: 1px dashed var(--line); }
+
+  .linklist { display: flex; flex-direction: column; gap: 7px; }
+  .linkrow { display: flex; gap: 8px; align-items: flex-start; font-size: 12.5px; }
+  .linkrow .tag { flex: 0 0 72px; margin-top: 1px; font-size: 10.5px; font-weight: 700; color: var(--accent);
+                  background: var(--accent-soft); border-radius: 999px; padding: 2px 8px; text-align: center; }
+  .linkrow .vals { display: flex; flex-direction: column; gap: 4px; }
+  .linkrow a { color: #1a5fa8; text-decoration: none; }
+  .linkrow a:hover { text-decoration: underline; }
+  .linkrow .note { color: var(--muted); }
+
+  .page-footnote { margin-top: 20px; font-size: 11.5px; color: var(--muted); line-height: 1.6; }
+</style>
+<link rel="stylesheet" href="asset/site-nav.css" data-common-site-nav>
+<script src="asset/site-nav.js" defer></script>
+</head>
+<body>
+
+<nav class="site-nav" aria-label="주요 메뉴">
+  <div class="site-nav-inner">
+    <a class="site-nav-brand" href="index.html" aria-label="TCG Calendar 홈"><span><b>TCG</b> CALENDAR</span></a>
+
+    <div class="site-nav-links">
+      <a href="index.html" class="site-nav-link" data-page="index.html">
+        <svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5M5.5 9v11h13V9M9 20v-6h6v6"/></svg><span>메인</span>
+      </a>
+
+      <div class="site-nav-group">
+        <button class="site-nav-link site-nav-group-button" type="button" aria-expanded="false">
+          <svg viewBox="0 0 24 24"><path d="M5 3v3m14-3v3M3.5 9h17M5 5h14a2 2 0 0 1 2 2v13H3V7a2 2 0 0 1 2-2Z"/><path d="M7 13h3m4 0h3m-10 4h3m4 0h3"/></svg><span>매장대회정보</span><svg class="site-nav-chevron" viewBox="0 0 24 24"><path d="m8 10 4 4 4-4"/></svg>
+        </button>
+        <div class="site-nav-submenu">
+          <a href="calendar_viewer.html" class="site-nav-submenu-link" data-page="calendar_viewer.html"><span><b>대회 일정</b><small>매장별 대회 확인</small></span></a>
+          <a href="result.html" class="site-nav-submenu-link" data-page="result.html"><span><b>대회 결과</b><small>매장별 대회 결과 확인</small></span></a>
+          <a href="deck_meta.html" class="site-nav-submenu-link" data-page="deck_meta.html"><span><b>입상덱 메타</b><small>주간·월간 입상덱 분석</small></span></a>
+          <a href="stats.html" class="site-nav-submenu-link" data-page="stats.html"><span><b>대회 통계</b><small>지역별·게임별 개최 현황</small></span></a>
+        </div>
+      </div>
+
+      <a href="game_guide.html" class="site-nav-link active" data-page="game_guide.html" aria-current="page">
+        <svg viewBox="0 0 24 24"><path d="M12 6c-2-1.3-4.6-2-7-2v14c2.4 0 5 .7 7 2 2-1.3 4.6-2 7-2V4c-2.4 0-5 .7-7 2Z"/><path d="M12 6v14"/></svg><span>TCG 소개</span>
+      </a>
+
+      <div class="site-nav-group">
+        <button class="site-nav-link site-nav-group-button" type="button" aria-expanded="false">
+          <svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5 5L4 17l3 3 5.7-5.7a4 4 0 0 0 5-5l-2.4 2.4-3-3 2.4-2.4Z"/></svg><span>도구</span><svg class="site-nav-chevron" viewBox="0 0 24 24"><path d="m8 10 4 4 4-4"/></svg>
+        </button>
+        <div class="site-nav-submenu">
+          <a href="tcg-swisssystem.html" class="site-nav-submenu-link" data-page="tcg-swisssystem.html"><span><b>스위스라운드 시스템</b><small>대진 및 순위 자동 계산</small></span></a>
+          <a href="tcgtimer.html" class="site-nav-submenu-link" data-page="tcgtimer.html"><span><b>TCG 타이머</b><small>대회용 라운드 타이머</small></span></a>
+        </div>
+      </div>
+
+      <a href="tcg_map.html" class="site-nav-link" data-page="tcg_map.html">
+        <svg viewBox="0 0 24 24"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg><span>매장 지도</span>
+      </a>
+    </div>
+
+    <button class="site-nav-hamburger" type="button" aria-label="메뉴 열기" aria-expanded="false"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<header class="page-header">
+  <h1>TCG 소개</h1>
+  <p class="page-header-sub">TCG 게임의 간단한 소개와 공식 사이트·룰/카드 검색·덱빌더·커뮤니티를 모았습니다.</p>
+</header>
+
+<div class="wrap">
+
+  <div class="games">
+
+    <div class="game-card">
+      <div class="game-head"><img class="game-logo" src="logo/YUGIHO.PNG" alt="유희왕 로고" loading="lazy"><h2>유희왕 (Yu-Gi-Oh! OCG)</h2></div>
+      <p class="intro">코나미가 만든 세계적인 TCG. 몬스터·마법·함정 카드로 대결하며, 국내에도 정식 발매됩니다.</p>
+      <div class="linklist">
+        <div class="linkrow"><span class="tag">공식</span><span class="vals">
+          <a href="https://www.db.yugioh-card.com/yugiohdb/?request_locale=ko" target="_blank" rel="noopener">Yu-Gi-Oh! Neuron (카드 DB)</a>
+          <a href="https://cardgame-network.konami.net/tournament_search" target="_blank" rel="noopener">대회 검색</a></span></div>
+        <div class="linkrow"><span class="tag">카드검색</span><span class="vals">
+          <a href="https://www.db.yugioh-card.com/yugiohdb/card_search.action?request_locale=ko" target="_blank" rel="noopener">공식 카드 검색(한국어)</a></span></div>
+        <div class="linkrow"><span class="tag">덱빌더</span><span class="vals">
+          <a href="https://ygoprodeck.com/" target="_blank" rel="noopener">YGOPRODeck</a>
+          <a href="https://www.duelingbook.com/" target="_blank" rel="noopener">Duelingbook(시뮬레이터)</a></span></div>
+        <div class="linkrow"><span class="tag">커뮤니티</span><span class="vals">
+          <a href="https://gall.dcinside.com/mgallery/board/lists/?id=ocg" target="_blank" rel="noopener">디시인사이드 유희왕 OCG 갤러리</a></span></div>
+      </div>
+    </div>
+
+    <div class="game-card">
+      <div class="game-head"><img class="game-logo" src="logo/POKEMON.PNG" alt="포켓몬 로고" loading="lazy"><h2>포켓몬 (Pokémon TCG)</h2></div>
+      <p class="intro">포켓몬 IP 기반 TCG. 국내는 포켓몬코리아가 정식 유통합니다.</p>
+      <div class="linklist">
+        <div class="linkrow"><span class="tag">공식</span><span class="vals">
+          <a href="https://pokemoncard.co.kr/" target="_blank" rel="noopener">포켓몬카드 공식(한국)</a></span></div>
+        <div class="linkrow"><span class="tag">카드검색</span><span class="vals">
+          <a href="https://pokemoncard.co.kr/" target="_blank" rel="noopener">공식 사이트 내 카드 검색</a></span></div>
+        <div class="linkrow"><span class="tag">덱빌더</span><span class="vals">
+          <a href="https://pokemoncard.co.kr/recipe" target="_blank" rel="noopener">공식 덱 레시피</a></span></div>
+        <div class="linkrow"><span class="tag">커뮤니티</span><span class="vals">
+          <a href="https://cafe.naver.com/pokemontcg" target="_blank" rel="noopener">네이버 포켓몬TCG커뮤니티 카페</a>
+          <a href="https://gall.dcinside.com/mgallery/board/lists/?id=pokemoncardgame" target="_blank" rel="noopener">디시인사이드 갤러리</a></span></div>
+      </div>
+    </div>
+
+    <div class="game-card">
+      <div class="game-head"><img class="game-logo" src="logo/HOLOLIVE.png" alt="홀로라이브 로고" loading="lazy"><h2>홀로라이브 (hololive OCG)</h2></div>
+      <p class="intro">커버(주) 기획, 부시로드 판매의 버추얼 유튜버 IP 기반 TCG. 2024년 출시된 비교적 신생 게임입니다.</p>
+      <div class="linklist">
+        <div class="linkrow"><span class="tag">공식</span><span class="vals">
+          <a href="https://hololive-official-cardgame.com/" target="_blank" rel="noopener">hololive OCG 공식</a>
+          <a href="https://www.en.bushi-navi.com" target="_blank" rel="noopener">부시나비</a>
+          <a href="https://decklog.bushiroad.com" target="_blank" rel="noopener">덱로그</a></span></div>
+        <div class="linkrow"><span class="tag">카드검색</span><span class="vals">
+          <a href="https://hololive-official-cardgame.com/" target="_blank" rel="noopener">공식 사이트 내 카드 리스트</a></span></div>
+        <div class="linkrow"><span class="tag">덱빌더</span><span class="vals">
+          <a href="https://holoburi.com/" target="_blank" rel="noopener">hOCG 시뮬레이터(비공식 팬메이드)</a></span></div>
+        <div class="linkrow"><span class="tag">커뮤니티</span><span class="vals">
+          <a href="https://gall.dcinside.com/mgallery/board/lists/?id=hololiveocg" target="_blank" rel="noopener">디시인사이드 홀로라이브 OCG 갤러리</a></span></div>
+      </div>
+    </div>
+
+    <div class="game-card">
+      <div class="game-head"><img class="game-logo" src="logo/DIGIMON.png" alt="디지몬 로고" loading="lazy"><h2>디지몬 (Digimon Card Game)</h2></div>
+      <p class="intro">반다이가 발매하는 디지몬 IP 기반 TCG. 국내에도 정식 발매됩니다.</p>
+      <div class="linklist">
+        <div class="linkrow"><span class="tag">공식</span><span class="vals">
+          <a href="https://digimoncard.co.kr/" target="_blank" rel="noopener">디지몬카드게임 공식(한국)</a></span></div>
+        <div class="linkrow"><span class="tag">카드검색</span><span class="vals">
+          <a href="https://digimoncard.co.kr/index.php?mid=cardlist&category=52730" target="_blank" rel="noopener">공식 카드 검색(한국)</a></span></div>
+        <div class="linkrow"><span class="tag">덱빌더</span><span class="vals">
+          <a href="https://dgchub.com/" target="_blank" rel="noopener">DGC Hub</a>
+          <a href="http://www.digicamaild.o-r.kr/" target="_blank" rel="noopener">디지카마일드</a>
+          <a href="https://gall.dcinside.com/mgallery/board/view/?id=digimontcg&no=214792" target="_blank" rel="noopener">DCGO(시뮬레이터)</a></span></div>
+        <div class="linkrow"><span class="tag">커뮤니티</span><span class="vals">
+          <a href="https://gall.dcinside.com/mgallery/board/lists/?id=digimontcg" target="_blank" rel="noopener">디시인사이드 디지몬 TCG 갤러리</a></span></div>
+      </div>
+    </div>
+
+    <div class="game-card">
+      <div class="game-head"><img class="game-logo" src="logo/ONE%20PIECE.png" alt="원피스 로고" loading="lazy"><h2>원피스 (One Piece Card Game)</h2></div>
+      <p class="intro">반다이가 발매하는 원피스 IP 기반 TCG. 국내에도 정식 발매됩니다.</p>
+      <div class="linklist">
+        <div class="linkrow"><span class="tag">공식</span><span class="vals">
+          <a href="https://onepiece-cardgame.kr/" target="_blank" rel="noopener">원피스카드게임 공식(한국)</a></span></div>
+        <div class="linkrow"><span class="tag">카드검색</span><span class="vals">
+          <a href="https://onepiece-cardgame.kr/" target="_blank" rel="noopener">공식 사이트 내 카드 검색</a></span></div>
+        <div class="linkrow"><span class="tag">덱빌더</span><span class="vals">
+          <a href="https://kardrate.com/decks" target="_blank" rel="noopener">Kard Rate</a>
+          <a href="https://kimchioptcgdeck.onrender.com/" target="_blank" rel="noopener">Kimchi OPTCG(한글판 비공식)</a></span></div>
+        <div class="linkrow"><span class="tag">커뮤니티</span><span class="vals">
+          <a href="https://gall.dcinside.com/mgallery/board/lists/?id=onepiececardgame" target="_blank" rel="noopener">디시인사이드 원피스 카드 게임 갤러리</a></span></div>
+      </div>
+    </div>
+
+    <div class="game-card">
+      <div class="game-head"><img class="game-logo" src="logo/WEIS%20SCHWARZ.png" alt="바이스 슈발츠 로고" loading="lazy"><h2>바이스 슈발츠 (Weiß Schwarz)</h2></div>
+      <p class="intro">부시로드의 애니메이션·게임 IP 크로스오버 TCG. 일본 중심으로 운영되며 국내에도 정식 유통됩니다.</p>
+      <div class="linklist">
+        <div class="linkrow"><span class="tag">공식</span><span class="vals">
+          <a href="https://ws-tcg.com/" target="_blank" rel="noopener">Weiß Schwarz 공식(일본어)</a>
+          <a href="https://www.en.bushi-navi.com" target="_blank" rel="noopener">부시나비</a>
+          <a href="https://decklog.bushiroad.com" target="_blank" rel="noopener">덱로그</a></span></div>
+        <div class="linkrow"><span class="tag">카드검색</span><span class="vals">
+          <a href="https://ws-tcg.com/" target="_blank" rel="noopener">공식 사이트 내 카드 검색</a></span></div>
+        <div class="linkrow"><span class="tag">덱빌더</span><span class="vals">
+          <a href="https://wsdeckbuild.netlify.app/" target="_blank" rel="noopener">WS Deck Build</a>
+          <span class="note">· 공식 온라인 클라이언트 WSO는 2027년 출시 예정</span></span></div>
+        <div class="linkrow"><span class="tag">커뮤니티</span><span class="vals">
+          <a href="https://cafe.naver.com/wstcg" target="_blank" rel="noopener">네이버 바이스 슈발츠 카페</a>
+          <a href="https://gall.dcinside.com/mgallery/board/lists/?id=weissschwartz" target="_blank" rel="noopener">디시인사이드 갤러리</a></span></div>
+      </div>
+    </div>
+
+    <div class="game-card">
+      <div class="game-head"><img class="game-logo" src="logo/NIVELAREAN.png" alt="니벨아레나 로고" loading="lazy"><h2>니벨아레나 (Nivel Arena)</h2></div>
+      <p class="intro">2024년 발매된 국내 서브컬쳐 IP 기반 TCG로, 흔히 'K-바이스 슈발츠'로 불립니다. 승리의 여신: 니케·브라운더스트2·이터널 리턴·블루 아카이브 등의 IP를 다루며, 이 사이트가 가장 깊게(대회·결과·덱리스트) 다루는 게임이기도 합니다.</p>
+      <div class="linklist">
+        <div class="linkrow"><span class="tag">공식</span><span class="vals">
+          <a href="http://nivelarena.co.kr/" target="_blank" rel="noopener">니벨아레나 공식</a></span></div>
+        <div class="linkrow"><span class="tag">카드검색</span><span class="vals">
+          <a href="https://nivelscan.com/" target="_blank" rel="noopener">NivelScan(카드 목록·덱빌더)</a></span></div>
+        <div class="linkrow"><span class="tag">덱빌더</span><span class="vals">
+          <a href="https://nivelscan.com/" target="_blank" rel="noopener">NivelScan</a></span></div>
+        <div class="linkrow"><span class="tag">커뮤니티</span><span class="vals">
+          <a href="https://discord.com/invite/tDM8fwDYcX" target="_blank" rel="noopener">공식 디스코드(리모트 배틀)</a>
+          <a href="https://gall.dcinside.com/mgallery/board/lists/?id=nivelarena" target="_blank" rel="noopener">디시인사이드 갤러리</a>
+          <a href="https://arca.live/b/nivelarena" target="_blank" rel="noopener">아카라이브</a>
+          <a href="result.html" target="_blank" rel="noopener">이 사이트의 대회 결과·덱리스트</a></span></div>
+      </div>
+    </div>
+
+    <div class="game-card">
+      <div class="game-head"><img class="game-logo" src="logo/SHADOWVERSE%20EVOLVE.png" alt="섀도우버스 이볼브 로고" loading="lazy"><h2>섀도우버스 이볼브 (Shadowverse EVOLVE)</h2></div>
+      <p class="intro">온라인 TCG 섀도우버스를 실물 카드로 옮긴 TCG. 일본 중심으로 운영되고 국내 공식 지원은 제한적입니다.</p>
+      <div class="linklist">
+        <div class="linkrow"><span class="tag">공식</span><span class="vals">
+          <a href="https://shadowverse-evolve.com/" target="_blank" rel="noopener">Shadowverse EVOLVE 공식(일본어)</a>
+          <a href="https://www.en.bushi-navi.com" target="_blank" rel="noopener">부시나비</a>
+          <a href="https://decklog.bushiroad.com" target="_blank" rel="noopener">덱로그</a></span></div>
+        <div class="linkrow"><span class="tag">카드검색</span><span class="vals">
+          <a href="https://shadowverse-evolve.com/" target="_blank" rel="noopener">공식 사이트 내 카드 리스트</a>
+          <a href="https://openbinder.co.kr/shadowverseevolve/" target="_blank" rel="noopener">비공식 한국어 지원</a></span></div>
+        <div class="linkrow"><span class="tag">덱빌더</span><span class="vals">
+          <span class="note">검증된 안정적 공식/비공식 덱빌더를 아직 찾지 못했습니다</span></span></div>
+        <div class="linkrow"><span class="tag">커뮤니티</span><span class="vals">
+          <a href="https://gall.dcinside.com/mgallery/board/lists/?id=svevolve" target="_blank" rel="noopener">디시인사이드 섀도우버스 이볼브 갤러리</a></span></div>
+      </div>
+    </div>
+
+    <div class="game-card">
+      <div class="game-head"><img class="game-logo" src="logo/RIFTBOUND.png" alt="리프트바운드 로고" loading="lazy"><h2>리프트바운드 (Riftbound)</h2></div>
+      <p class="intro">Riot Games가 만든 리그 오브 레전드 IP 기반 TCG. 2025년 출시된 신생 게임으로, 국내에도 정식 출시되었습니다.</p>
+      <div class="linklist">
+        <div class="linkrow"><span class="tag">공식</span><span class="vals">
+          <a href="https://playriftbound.com/ko-KR/" target="_blank" rel="noopener">Riftbound 공식(한국어)</a></span></div>
+        <div class="linkrow"><span class="tag">카드검색</span><span class="vals">
+          <a href="https://piltoverarchive.com/" target="_blank" rel="noopener">Piltover Archive(비공식 팬메이드)</a>
+          <a href="https://www.riftnaru.com/cards" target="_blank" rel="noopener">리프트나루(한국어)</a></span></div>
+        <div class="linkrow"><span class="tag">덱빌더</span><span class="vals">
+          <a href="https://riftatlas.com/" target="_blank" rel="noopener">riftatlas(시뮬레이터)</a></span></div>
+        <div class="linkrow"><span class="tag">커뮤니티</span><span class="vals">
+          <a href="https://cafe.naver.com/riftboundtcg" target="_blank" rel="noopener">네이버 리프트바운드 카페</a>
+          <a href="https://gall.dcinside.com/mgallery/board/lists/?id=riftbound" target="_blank" rel="noopener">디시인사이드 갤러리</a></span></div>
+      </div>
+    </div>
+
+    <div class="game-card">
+      <div class="game-head"><img class="game-logo" src="logo/STACKER%20BATTLE.png" alt="스태커배틀 로고" loading="lazy"><h2>스태커배틀 (Stacker Battle)</h2></div>
+      <p class="intro">국내 게임 IP 플랫폼 Panas가 만든 챔피언 기반 TCG. 2026년 4월 정식 출시된 신생 게임으로, 상대 덱을 소진시키는 독특한 승리 조건이 특징입니다.</p>
+      <div class="linklist">
+        <div class="linkrow"><span class="tag">공식</span><span class="vals">
+          <a href="https://stackerbattle.com/" target="_blank" rel="noopener">스태커배틀 공식</a></span></div>
+        <div class="linkrow"><span class="tag">카드검색</span><span class="vals">
+          <a href="https://stackerbattle.com/card/" target="_blank" rel="noopener">공식 카드 검색</a></span></div>
+        <div class="linkrow"><span class="tag">덱빌더</span><span class="vals">
+          <a href="https://stacker.hinoto.kr/decks" target="_blank" rel="noopener">스태커 덱빌더</a></span></div>
+        <div class="linkrow"><span class="tag">커뮤니티</span><span class="vals">
+          <a href="https://discord.com/invite/5AUSUejVyX" target="_blank" rel="noopener">공식 디스코드</a>
+          <a href="https://gall.dcinside.com/mgallery/board/lists/?id=stackerbattle" target="_blank" rel="noopener">디시인사이드 갤러리</a></span></div>
+      </div>
+    </div>
+
+    <div class="game-card">
+      <div class="game-head"><img class="game-logo" src="logo/MB.PNG" alt="명조 배틀 로고" loading="lazy"><h2>명조TCG (명조: 배틀)</h2></div>
+      <p class="intro">UCP가 쿠로게임즈 공식 라이선스로 만든 명조(鳴潮) IP 기반 실물 카드게임. 2026년 9월 30일 한국 정식 출시된 신생 게임입니다.</p>
+      <div class="linklist">
+        <div class="linkrow"><span class="tag">공식</span><span class="vals">
+          <a href="https://wwcg.ucp-jp.com/kr/" target="_blank" rel="noopener">명조: 배틀 공식(한국)</a></span></div>
+        <div class="linkrow"><span class="tag">카드검색</span><span class="vals">
+          <a href="https://wwcg.ucp-jp.com/kr/card" target="_blank" rel="noopener">공식 카드 검색</a></span></div>
+        <div class="linkrow"><span class="tag">덱빌더</span><span class="vals">
+          <a href="https://wutheringbuilds.xyz/" target="_blank" rel="noopener">Wuthering Builds</a></span></div>
+        <div class="linkrow"><span class="tag">커뮤니티</span><span class="vals">
+          <a href="https://gall.dcinside.com/mgallery/board/lists/?id=wutheringtcg" target="_blank" rel="noopener">디시인사이드 명조 TCG 갤러리</a>
+          <a href="https://arca.live/b/wutheringwaves" target="_blank" rel="noopener">아카라이브 명조 채널</a></span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <p class="page-footnote">
+    디시인사이드 등 커뮤니티 링크는 외부 게시판으로, 사이트 운영자와 무관합니다.<br>
+    사이트·주소는 운영 상황에 따라 바뀔 수 있어, 접속이 안 되면 검색으로 최신 주소를 확인해 주세요.
+  </p>
+</div>
+
+</body>
+</html>
