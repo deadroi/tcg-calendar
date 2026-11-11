@@ -23,6 +23,9 @@
               <a href="stats.html" class="site-nav-submenu-link" data-page="stats.html"><span><b>대회 통계</b><small>지역별·게임별 개최 현황</small></span></a>
             </div>
           </div>
+          <a href="game_guide.html" class="site-nav-link" data-page="game_guide.html">
+            <svg viewBox="0 0 24 24"><path d="M12 6c-2-1.3-4.6-2-7-2v14c2.4 0 5 .7 7 2 2-1.3 4.6-2 7-2V4c-2.4 0-5 .7-7 2Z"/><path d="M12 6v14"/></svg><span>TCG 소개</span>
+          </a>
           <div class="site-nav-group">
             <button class="site-nav-link site-nav-group-button" type="button" aria-expanded="false">
               <svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5 5L4 17l3 3 5.7-5.7a4 4 0 0 0 5-5l-2.4 2.4-3-3 2.4-2.4Z"/></svg><span>도구</span><svg class="site-nav-chevron" viewBox="0 0 24 24"><path d="m8 10 4 4 4-4"/></svg>
