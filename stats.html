@@ -61,6 +61,7 @@
     border: 1px solid var(--line); border-radius: 8px; padding: 5px 8px; font-size: 12px;
     font-family: inherit; color: #333; }
   .range-hint { font-size: 12px; color: var(--muted); }
+  #rangeGroup[hidden] { display: none !important; }
 
   /* ── 카드 ── */
   .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
@@ -212,6 +213,7 @@ let state = { mode: 'range', month: null, rangeStart: null, rangeEnd: null, regi
 const $ = id => document.getElementById(id);
 const fmt = n => n.toLocaleString('ko-KR');
 const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
+const ALL_START_DATE = '2026-02-02';
 
 /* ── 날짜 유틸: rows의 offset ↔ 실제 날짜 ── */
 function dayToDate(off) {
@@ -223,6 +225,9 @@ function monthOf(off) { return isoOf(off).slice(0, 7); }
 
 /* ── 현재 필터에 걸리는 행 ── */
 function activeRange() {
+  if (state.mode === 'all') {
+    return [Math.round((Date.parse(ALL_START_DATE + 'T00:00:00Z') - DATA.baseMs) / 86400000), Infinity];
+  }
   if (state.mode === 'month' && state.month) {
     const [y, m] = state.month.split('-').map(Number);
     const first = new Date(Date.UTC(y, m - 1, 1)), last = new Date(Date.UTC(y, m, 0));
@@ -454,7 +459,7 @@ function setupPeriod() {
   const hint = () => {
     const [lo, hi] = activeRange();
     $('rangeHint').textContent = state.mode === 'all'
-      ? `${firstDay} ~ ${lastDay} (전체)`
+      ? `${ALL_START_DATE} ~ ${lastDay} (전체)`
       : `${isoOf(Math.max(lo, DATA.rows[0][0]))} ~ ${isoOf(Math.min(hi, DATA.rows[DATA.rows.length - 1][0]))}`;
   };
 
@@ -471,6 +476,8 @@ function setupPeriod() {
   $('monthPick').onchange = () => { state.month = $('monthPick').value; hint(); render(); };
   $('rangeStart').onchange = () => { state.rangeStart = $('rangeStart').value; hint(); render(); };
   $('rangeEnd').onchange = () => { state.rangeEnd = $('rangeEnd').value; hint(); render(); };
+  $('monthPick').hidden = state.mode !== 'month';
+  $('rangeGroup').hidden = state.mode !== 'range';
   hint();
 }
 
