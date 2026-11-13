@@ -151,6 +151,7 @@ wcs_do();
   .deck-color-청색 { background:#dbeafe; color:#1d4ed8; }
   .deck-color-녹색 { background:#dcfce7; color:#15803d; }
   .deck-divider { border:0; border-top:1px dashed #aeb8c5; margin:12px 0; }
+  ul.deck-characters { display:flex; flex-wrap:nowrap; gap:8px; align-items:center; }
   ul.decklist li { flex-wrap:wrap; }
   .modal-subhint { color:#888; font-size:12px; margin-top:10px; }
   .site-nav { background: #0d0d1a; position: relative; z-index: 500; }
@@ -551,15 +552,18 @@ async function loadDeck(rid) {
 function visibleDeckCards(cards) {
   const confirmed = cards.filter(c => c.확정);
   if (!confirmed.some(c => c.카드종류 === '캐릭터' || c.카드종류 === '액션')) return confirmed;
-  const level = c => c.LV == null ? -1 : Number(c.LV);
   const compareText = (a,b) => String(a||'').localeCompare(String(b||''),'ko',{numeric:true});
-  const highest = new Map();
-  for (const c of confirmed.filter(c => c.카드종류 === '캐릭터')) {
-    const key = c.캐릭터 || c.이름 || c.번호;
-    const old = highest.get(key);
-    if (!old || level(c) > level(old) || (level(c) === level(old) && compareText(c.번호,old.번호)<0)) highest.set(key,c);
+  const characterCounts = new Map();
+  for (const c of confirmed.filter(c => c.카드종류 === '액션')) {
+    const name = String(c.캐릭터 || '').trim();
+    if (!name || name === '일반' || name === '-') continue;
+    if (!characterCounts.has(name)) characterCounts.set(name, new Set());
+    characterCounts.get(name).add(c.번호 || c.이름);
   }
-  const characters = [...highest.values()].sort((a,b)=>compareText(a.캐릭터||a.이름,b.캐릭터||b.이름));
+  // 표시용 요약: 실제 검출된 캐릭터 카드나 장수를 의미하지 않는다.
+  const characters = [...characterCounts.entries()]
+    .sort((a,b)=>b[1].size-a[1].size || compareText(a[0],b[0])).slice(0,3)
+    .map(([name,numbers])=>({카드종류:'캐릭터',캐릭터:name,이름:name,action_type_count:numbers.size}));
   const colors = {'적색':0,'청색':1,'녹색':2};
   const actions = confirmed.filter(c=>c.카드종류 !== '캐릭터').sort((a,b)=>
     compareText(a.캐릭터,b.캐릭터)
@@ -590,7 +594,8 @@ function deckListHtml(entry) {
       const characters = confirmed.filter(c => c.카드종류 === '캐릭터');
       const actions = confirmed.filter(c => c.카드종류 !== '캐릭터');
       html += title
-        + (characters.length ? `<ul class="decklist deck-characters">${characters.map(cardRow).join('')}</ul>` : '')
+        + (characters.length ? `<ul class="decklist deck-characters">${characters.map(c=>
+            `<li><span class="deck-character" title="확정 액션 카드 ${c.action_type_count}종 기준">${escapeHtml(c.캐릭터)}</span></li>`).join('')}</ul>` : '')
         + (characters.length && actions.length ? '<hr class="deck-divider">' : '')
         + (actions.length ? `<ul class="decklist deck-actions">${actions.map(cardRow).join('')}</ul>` : '');
       continue;
@@ -658,6 +663,7 @@ function openDeckWindow(rid, sid, header, subtitle, xUrl) {
       .deck-color-청색{background:#dbeafe;color:#1d4ed8}
       .deck-color-녹색{background:#dcfce7;color:#15803d}
       .deck-divider{border:0;border-top:1px dashed #aeb8c5;margin:12px 0}
+      ul.deck-characters{display:flex;flex-wrap:nowrap;gap:8px;align-items:center}
       ul.decklist li{flex-wrap:wrap}
       .xlsx-btn{margin:10px 0 0;padding:6px 12px;font-size:13px;font-weight:700;color:#fff;background:#1d6f42;border:0;border-radius:6px;cursor:pointer}
       .xlsx-btn:hover{background:#155c36}`;
