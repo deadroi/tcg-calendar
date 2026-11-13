@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="ko">
 <head>
+<script src="asset/decklist-viewer.js"></script>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <meta name="description" content="TCG 입상덱 메타"/>
@@ -269,6 +270,7 @@ if(window.wcs) {
     padding: 1px 7px; border-radius: 5px; border: 1px solid #ddd;
     transition: background .12s, color .12s;
   }
+  .detail-xlink { cursor: pointer; }
   .detail-xlink:hover { background: #111; color: #fff; border-color: #111; }
   .detail-deck-group { margin-bottom: 14px; }
   .detail-deck-header {
@@ -661,6 +663,17 @@ function showDetail(gameLabel, periodLabel, details, decks) {
           <span class="detail-store" title="${escHtml(r.store)}">${escHtml(r.store)}</span>
           ${xHtml}
         `;
+        if (r.has_decklist && Number.isInteger(r.result_id) && r.result_id > 0) {
+          const button = document.createElement('button');
+          button.className = 'detail-xlink';
+          button.type = 'button';
+          button.textContent = '덱리스트';
+          button.addEventListener('click', () => {
+            const sid = String(r.x || '').match(/status\/(\d+)/)?.[1] || '';
+            openDeckWindow(r.result_id, sid, `${r.date} ${r.store}`, r.decks, r.x || '');
+          });
+          row.appendChild(button);
+        }
         group.appendChild(row);
       });
 
