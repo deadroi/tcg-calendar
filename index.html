@@ -683,9 +683,10 @@ loadSchedule();
   // 오늘 이후 발매만 날짜별로 묶어 그린다.
   function renderReleases(items) {
     const today = new Date(); today.setHours(0, 0, 0, 0);
+    const limit = new Date(today); limit.setMonth(limit.getMonth() + 2);   // 2달 뒤까지만 표시
     const groups = new Map();
     items.map(i => { const [y, m, d] = i.date.split('-').map(Number); return { ...i, _d: new Date(y, m - 1, d) }; })
-         .filter(i => i._d >= today)
+         .filter(i => i._d >= today && i._d <= limit)
          .sort((a, b) => a._d - b._d)
          .forEach(i => { if (!groups.has(i.date)) groups.set(i.date, []); groups.get(i.date).push(i); });
 
