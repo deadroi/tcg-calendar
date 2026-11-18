@@ -224,7 +224,7 @@ wcs_do();
   .rel-txt { min-width: 0; }
   .rel-name { font-size: 12px; font-weight: 600; line-height: 1.3; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; word-break: keep-all; }
   .rel-meta { font-size: 10.5px; font-weight: 700; color: var(--tc); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .rel-booster { --tc: #f08c00; } .rel-deck { --tc: #1a73c8; } .rel-special { --tc: #8a4fd0; } .rel-supply { --tc: #6b7785; }
+  .rel-ed-kr { --tc: #e03131; } .rel-ed-jp { --tc: #1a73c8; } .rel-ed-en { --tc: #2f9e44; } .rel-ed-x { --tc: #6b7785; }
   .rel-empty { color: #aaa; font-size: 14px; text-align: center; padding: 18px 0; }
   @media (max-width: 600px) { .rel-legend { display: none; } .rel-day { flex-basis: 178px; } }
 </style>
@@ -656,7 +656,7 @@ loadSchedule();
 </script>
 <script>
   // 데이터 한 건의 모양: { game, date:'YYYY-MM-DD', name, type, url(선택) }
-  const REL_TYPES = { booster: '부스터', deck: '덱' };
+  const REL_ED = { '한글판': { s: '한', c: 'kr' }, '일본판': { s: '일', c: 'jp' }, '영문판': { s: '영', c: 'en' } };
   const REL_GAMES = {
     'YUGIOH':             { name: '유희왕',         logo: 'logo/YUGIHO.PNG' },
     'YUGIOH RUSH DUEL':   { name: '유희왕 러쉬듀얼', logo: 'logo/YUGIHO%20RUSH%20DUEL.PNG' },
@@ -697,17 +697,18 @@ loadSchedule();
       const head = `<div class="rel-day-head"><span class="dt">${d.getMonth() + 1}/${d.getDate()}</span><span class="wd">${REL_WD[d.getDay()]}요일</span><span class="dd">${dd === 0 ? '오늘' : 'D-' + dd}</span></div>`;
       const rows = list.map(i => {
         const g = REL_GAMES[i.game] || { name: i.game, logo: '' };
+        const ed = REL_ED[i.edition] || { s: i.edition || '', c: 'x' };
         const inner = (g.logo ? `<img class="rel-logo" src="${g.logo}" alt="">` : '') +
-          `<div class="rel-txt"><div class="rel-name" title="${relEsc(i.name)}">${relEsc(i.name)}</div><div class="rel-meta">${relEsc(g.name)} · ${relEsc(i.edition || '')}</div></div>`;
-        return i.url ? `<a class="rel-item rel-${i.type}" href="${relEsc(i.url)}" target="_blank" rel="noopener">${inner}</a>`
-                     : `<div class="rel-item rel-${i.type}">${inner}</div>`;
+          `<div class="rel-txt"><div class="rel-name" title="${relEsc(i.name)}">${relEsc(i.name)}</div><div class="rel-meta">${relEsc(g.name)} · ${relEsc(ed.s)}</div></div>`;
+        return i.url ? `<a class="rel-item rel-ed-${ed.c}" href="${relEsc(i.url)}" target="_blank" rel="noopener">${inner}</a>`
+                     : `<div class="rel-item rel-ed-${ed.c}">${inner}</div>`;
       }).join('');
       return `<div class="rel-day${dd <= 7 ? ' soon' : ''}">${head}${rows}</div>`;
     }).join('');
   }
 
-  document.getElementById('relLegend').innerHTML = Object.entries(REL_TYPES)
-    .map(([k, v]) => `<span class="rel-${k}"><i style="background:var(--tc)"></i>${v}</span>`).join('');
+  document.getElementById('relLegend').innerHTML = Object.values(REL_ED)
+    .map(v => `<span class="rel-ed-${v.c}"><i style="background:var(--tc)"></i>${v.s}</span>`).join('');
   document.querySelectorAll('.rel-nav button').forEach(b => b.addEventListener('click', () => {
     const sc = document.getElementById('relScroller');
     sc.scrollBy({ left: Number(b.dataset.dir) * sc.clientWidth * 0.7, behavior: 'smooth' });
