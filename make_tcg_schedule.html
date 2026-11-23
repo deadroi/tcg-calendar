@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TCG 대회 일정 생성기 | TCG Calendar</title>
+<meta name="description" content="TCG 대회 일정 목록을 만들고 고해상도 PNG 이미지로 저장하세요.">
+<link rel="stylesheet" href="asset/data-pages-theme.css"><link rel="stylesheet" href="asset/site-nav.css" data-common-site-nav>
+<link rel="stylesheet" href="asset/schedule-maker.css">
+<script src="asset/site-nav.js" defer></script><script src="asset/schedule-maker.js" defer></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-9N9WTDYW2G"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-9N9WTDYW2G');</script>
+<script src="https://wcs.pstatic.net/wcslog.js"></script><script>window.wcs_add=window.wcs_add||{};window.wcs_add.wa='1adf585ec5e6af0';if(window.wcs)wcs_do();</script>
+</head>
+<body>
+<nav class="site-nav" aria-label="주요 메뉴"></nav>
+<header class="page-header"><h1>TCG 대회 일정 생성기</h1><p>대회 일정을 날짜별 목록으로 정리하고 이미지로 저장하세요.</p></header>
+<main class="maker">
+<aside class="mobile-notice">세밀한 편집은 PC를 권장합니다. 저장 이미지는 화면 크기와 관계없이 선택한 픽셀 규격으로 만들어집니다.</aside>
+<div class="workspace">
+<section class="editor panel" aria-label="일정 편집">
+<h2>출력 설정</h2>
+<label for="layout">목록 배치</label><select id="layout"><option value="list">기간 목록</option><option value="week-horizontal">주간 가로형 · 7일을 옆으로</option><option value="week-vertical">주간 세로형 · 7일을 아래로</option></select>
+<p class="hint" id="weekHint" hidden>시작일부터 7일간 표시합니다. 일정이 없는 날짜도 표시됩니다.</p>
+<label for="title">제목</label><input id="title" maxlength="100" value="TCG 대회 일정">
+<div id="rangeGroup" class="two"><div><label for="from">시작일</label><input id="from" type="date"></div><div><label for="to">종료일</label><input id="to" type="date"></div></div>
+<label for="preset">출력 규격 · 가로 × 세로</label><select id="preset"></select>
+<div class="two"><div><label for="width">가로 px</label><input id="width" type="number" min="800" max="4096" step="1"></div><div><label for="height">세로 px</label><input id="height" type="number" min="800" max="4096" step="1"></div></div>
+<p class="hint" id="sizeHint"></p>
+<label class="check"><input id="autoHeight" type="checkbox" checked> 일정이 많으면 세로 길이 자동 확장</label>
+<div class="two"><div><label for="scale">글자 크기 (%)</label><input id="scale" type="number" min="50" max="200" step="5" value="100"></div></div>
+<div class="two"><div><label for="titleScale">제목 글자 크기 (%)</label><input id="titleScale" type="number" min="50" max="200" step="5" value="100"></div><div><label for="periodScale">날짜 기간 글자 크기 (%)</label><input id="periodScale" type="number" min="50" max="200" step="5" value="100"></div></div>
+<div class="two"><div><label for="textColor">제목·안내 글자 색상</label><input id="textColor" type="color" value="#ffffff"></div><div><label for="fontWeight">제목·안내 글자 굵기</label><select id="fontWeight"><option value="normal">보통</option><option value="bold">굵게</option></select></div></div>
+<h3 class="sub-heading">일정 칸 안의 글씨</h3>
+<div class="two"><div><label for="cardColor">글자 색상</label><input id="cardColor" type="color" value="#ffffff"></div><div><label for="cardWeight">글자 굵기</label><select id="cardWeight"><option value="normal">보통</option><option value="bold">굵게</option></select></div></div>
+<label for="cardScale">글자 크기 (%) · 위 글자 크기에 곱해집니다</label><input id="cardScale" type="number" min="50" max="200" step="5" value="100">
+<label for="imgScale">일정 이미지 크기 (%) · 100% = 기본, 값을 키우면 이미지 공간이 커집니다</label><input id="imgScale" type="number" min="50" max="200" step="5" value="100">
+<div class="two"><div><label for="bgColor">배경 색상</label><input id="bgColor" type="color" value="#172334"></div><div><label for="cardBg">일정 칸 색상</label><input id="cardBg" type="color" value="#22344b"></div></div>
+<div class="two"><div><label for="bandBg">주간 요일 띠 색상</label><input id="bandBg" type="color" value="#f08c00"></div><div><label for="bandColor">요일 띠 글자 색상</label><input id="bandColor" type="color" value="#ffffff"></div></div>
+<p class="hint">요일 띠는 주간 가로형에서만 보입니다.</p>
+<label for="bgFile">배경 이미지</label><input id="bgFile" type="file" accept="image/*"><p class="hint" id="bgState"></p><div class="actions"><button id="bgClear" class="secondary" type="button">배경 제거</button></div>
+<label for="bgScale">배경 이미지 크기 (100% = 화면에 꽉 채움)</label><input id="bgScale" type="range" min="50" max="300" step="5" value="100">
+<label for="bgX">배경 이미지 좌우 이동 (50 = 가운데)</label><input id="bgX" type="range" min="0" max="100" step="1" value="50">
+<label for="bgY">배경 이미지 상하 이동 (50 = 가운데)</label><input id="bgY" type="range" min="0" max="100" step="1" value="50">
+<label for="bgOverlay">배경 이미지 위에 배경 색상 덮기 (글씨가 안 보이면 올려 주세요)</label><input id="bgOverlay" type="range" min="0" max="0.95" step="0.05" value="0.7">
+<label for="footer">하단 안내</label><textarea id="footer" rows="2" maxlength="300"></textarea>
+<div class="section-heading"><h2>대회 일정</h2><span id="eventCount"></span></div>
+<p class="hint">날짜와 시간순으로 자동 정렬됩니다. 게임명을 바꾸면 기본 색상도 바뀌며, 직접 지정할 수 있습니다.</p>
+<div class="actions"><button id="add" type="button">일정 추가</button><button id="sample" class="secondary" type="button">예시 불러오기</button></div>
+<div id="undoBar" class="undo" hidden>일정을 삭제했습니다. <button id="undo" class="secondary" type="button">되돌리기</button></div>
+<div id="events"></div>
+<div class="actions"><button id="saveProject" class="secondary" type="button">편집 파일 저장</button><button id="loadProject" class="secondary" type="button">편집 파일 열기</button><input id="projectFile" type="file" accept=".json,application/json" hidden></div>
+<p class="hint" id="saveState">입력 내용은 이 브라우저에 자동 저장됩니다.</p>
+<details class="size-guide"><summary>어떤 규격이 좋을까요?</summary><p>일정 목록은 1600×2400px가 기본입니다. 가로 공지 1920×1080, 세로 공지 1080×1350, 긴 세로형 1080×1920, 정사각형 2160×2160도 선택할 수 있습니다.</p><p>자동 확장 시 일정 수에 따라 세로 길이가 늘어납니다. 각 변은 최대 4096px입니다. 내용이 넘치면 기간을 나누거나 글자 크기를 줄여 주세요.</p></details>
+</section>
+<section class="preview-panel panel" aria-label="이미지 미리보기">
+<div class="preview-heading"><div><span class="eyebrow">LIVE PREVIEW</span><h2 id="previewTitle">일정 목록</h2></div><div class="actions" style="margin:0"><button id="copy" class="secondary" type="button">이미지 복사</button><button id="download" type="button">PNG 이미지 저장</button></div></div>
+<div class="preview-meta"><span id="dimensions"></span><button id="actualSize" class="secondary" type="button">실제 픽셀 크기로 보기 (새 창)</button></div>
+<p id="status" role="status" aria-live="polite"></p>
+<div class="canvas-stage" id="stage"><canvas id="canvas" aria-label="대회 일정 이미지 미리보기">Canvas를 지원하는 브라우저에서 이용해 주세요.</canvas></div>
+<p class="hint">작게 보이는 미리보기와 저장 해상도는 다릅니다. 저장 전 실제 크기로 글씨를 확인하세요.</p>
+</section>
+</div></main>
+<datalist id="games"><option value="니벨아레나"><option value="명조"><option value="포켓몬"><option value="원피스"><option value="유희왕"><option value="디지몬"><option value="리프트바운드"><option value="매직 더 개더링"></datalist>
+</body></html>
